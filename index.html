@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JAMID App • Panel Admin Web Masjid Ar-Ridho</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <!-- Firebase App & Firestore Compat SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            brand: {
+              50: '#ecfdf5',
+              100: '#d1fae5',
+              500: '#10b981',
+              600: '#059669',
+              700: '#047857',
+              800: '#065f46',
+              900: '#064e3b',
+              950: '#022c22'
+            },
+            gold: {
+              400: '#fbbf24',
+              500: '#f59e0b',
+              600: '#d97706',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      background-color: #0b1315;
+      color: #f1f5f9;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #1e293b;
+      border-radius: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: transparent;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col font-sans antialiased custom-scrollbar">
+
+  <!-- Top Sticky Header -->
+  <header class="sticky top-0 z-40 bg-brand-950/90 backdrop-blur-md border-b border-brand-800/40 px-4 py-3 sm:px-6">
+    <div class="max-w-6xl mx-auto flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-brand-500 flex items-center justify-center shadow-lg shadow-brand-900/40 text-white font-bold text-lg">
+          <i class="fa-solid fa-mosque"></i>
+        </div>
+        <div>
+          <div class="flex items-center space-x-2">
+            <h1 class="text-lg sm:text-xl font-bold tracking-tight text-white">JAMID <span class="text-gold-400 font-extrabold">ADMIN</span></h1>
+            <span class="px-2 py-0.5 text-[10px] font-bold tracking-wider uppercase bg-brand-800/80 text-brand-200 border border-brand-600/50 rounded-full">Cloud TV Sync</span>
+          </div>
+          <p class="text-xs text-brand-300/80 truncate max-w-[220px] sm:max-w-md">Masjid Ar-Ridho Kejati Lampung</p>
+        </div>
+      </div>
+
+      <!-- Cloud Status & Action -->
+      <div class="flex items-center space-x-2 sm:space-x-3">
+        <div id="cloudStatusBadge" class="hidden sm:flex items-center space-x-2 px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-900 border border-slate-700/60 text-slate-300">
+          <span class="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse" id="cloudStatusDot"></span>
+          <span id="cloudStatusText">Menghubungkan...</span>
+        </div>
+
+        <button onclick="saveAllToCloud()" id="btnSaveAll" class="flex items-center space-x-2 bg-gradient-to-r from-brand-600 to-brand-500 hover:from-brand-500 hover:to-brand-400 text-white font-bold text-xs sm:text-sm px-4 py-2 rounded-xl shadow-lg shadow-brand-600/30 active:scale-95 transition-all">
+          <i class="fa-solid fa-cloud-arrow-up"></i>
+          <span>Simpan ke TV</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile Cloud Status Indicator -->
+  <div class="sm:hidden px-4 py-1.5 bg-slate-900 border-b border-slate-800 flex items-center justify-between text-xs">
+    <div class="flex items-center space-x-2 text-slate-300">
+      <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse" id="cloudStatusDotMobile"></span>
+      <span id="cloudStatusTextMobile">Menghubungkan ke Firebase...</span>
+    </div>
+    <span class="text-[11px] text-slate-400" id="lastUpdatedMobile">-</span>
+  </div>
+
+  <!-- Main Content Container -->
+  <main class="flex-1 max-w-6xl w-full mx-auto px-4 py-6 sm:px-6">
+
+    <!-- Notification Toast Bar -->
+    <div id="toastNotification" class="hidden mb-6 p-4 rounded-xl border flex items-center justify-between transition-all duration-300">
+      <div class="flex items-center space-x-3">
+        <i id="toastIcon" class="fa-solid fa-circle-check text-lg"></i>
+        <span id="toastMessage" class="text-sm font-semibold"></span>
+      </div>
+      <button onclick="hideToast()" class="text-slate-400 hover:text-white text-sm"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="flex space-x-2 overflow-x-auto pb-2 mb-6 border-b border-slate-800 custom-scrollbar text-sm font-semibold">
+      <button onclick="switchTab('profile')" id="tab-btn-profile" class="tab-btn flex items-center space-x-2 px-4 py-2.5 rounded-lg bg-brand-800 text-white border border-brand-600">
+        <i class="fa-solid fa-building-columns"></i>
+        <span>Profil Masjid</span>
+      </button>
+      <button onclick="switchTab('runningText')" id="tab-btn-runningText" class="tab-btn flex items-center space-x-2 px-4 py-2.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent">
+        <i class="fa-solid fa-scroll"></i>
+        <span>Teks Berjalan</span>
+      </button>
+      <button onclick="switchTab('iqamah')" id="tab-btn-iqamah" class="tab-btn flex items-center space-x-2 px-4 py-2.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent">
+        <i class="fa-solid fa-stopwatch"></i>
+        <span>Jeda Adzan & Iqamah</span>
+      </button>
+      <button onclick="switchTab('kajian')" id="tab-btn-kajian" class="tab-btn flex items-center space-x-2 px-4 py-2.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent">
+        <i class="fa-solid fa-book-quran"></i>
+        <span>Kajian & Info</span>
+      </button>
+      <button onclick="switchTab('financial')" id="tab-btn-financial" class="tab-btn flex items-center space-x-2 px-4 py-2.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent">
+        <i class="fa-solid fa-wallet"></i>
+        <span>Laporan Kas</span>
+      </button>
+      <button onclick="switchTab('qris')" id="tab-btn-qris" class="tab-btn flex items-center space-x-2 px-4 py-2.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent">
+        <i class="fa-solid fa-qrcode"></i>
+        <span>QRIS & Rekening</span>
+      </button>
+      <button onclick="switchTab('media')" id="tab-btn-media" class="tab-btn flex items-center space-x-2 px-4 py-2.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent">
+        <i class="fa-solid fa-video"></i>
+        <span>YouTube Live</span>
+      </button>
+    </div>
+
+    <!-- TAB 1: PROFIL MASJID -->
+    <div id="tab-profile" class="tab-content block space-y-6">
+      <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 sm:p-6">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-4 mb-5">
+          <div>
+            <h2 class="text-base sm:text-lg font-bold text-white flex items-center space-x-2">
+              <i class="fa-solid fa-mosque text-brand-400"></i>
+              <span>Identitas & Lokasi Masjid</span>
+            </h2>
+            <p class="text-xs text-slate-400 mt-1">Nama dan alamat ini akan tampil di bagian atas dan header layar TV.</p>
+          </div>
+          <span class="px-2.5 py-1 bg-brand-900/60 text-brand-300 border border-brand-700/40 rounded-lg text-xs font-mono">ID: masjid_001</span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-2">Nama Masjid</label>
+            <input type="text" id="mosqueName" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-500" placeholder="Masjid Ar-Ridho">
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-2">Kota / Wilayah</label>
+            <input type="text" id="mosqueCity" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-500" placeholder="Bandar Lampung">
+          </div>
+
+          <div class="md:col-span-2">
+            <label class="block text-xs font-semibold text-slate-300 mb-2">Alamat Lengkap</label>
+            <textarea id="mosqueAddress" rows="2" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-500" placeholder="Jl. Jaksa Agung R. Soeprapto No. 226 Teluk Betung Selatan"></textarea>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-2">Pimpinan DKM / Takmir</label>
+            <input type="text" id="mosqueLeader" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-500" placeholder="DKM Masjid Ar-Ridho Kejati Lampung">
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-2">Kontak / Telepon Pengurus</label>
+            <input type="text" id="mosquePhone" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-500" placeholder="08xxxxxxxxxx">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: TEKS BERJALAN (RUNNING TEXT) -->
+    <div id="tab-runningText" class="tab-content hidden space-y-6">
+      <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 sm:p-6">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-4 mb-5">
+          <div>
+            <h2 class="text-base sm:text-lg font-bold text-white flex items-center space-x-2">
+              <i class="fa-solid fa-scroll text-brand-400"></i>
+              <span>Running Text (Teks Berjalan di Bawah TV)</span>
+            </h2>
+            <p class="text-xs text-slate-400 mt-1">Teks ini bergerak terus-menerus di bagian bawah layar Android TV.</p>
+          </div>
+          <button onclick="resetRunningTextDefault()" class="text-xs text-gold-400 hover:text-gold-300 underline font-medium">
+            Reset Default Ar-Ridho
+          </button>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-2">Isi Pesan Running Text</label>
+          <textarea id="runningTextInput" rows="5" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-4 text-sm text-white focus:outline-none focus:border-brand-500 font-sans leading-relaxed" placeholder="Tuliskan pesan teks berjalan..."></textarea>
+          <p class="text-xs text-slate-400 mt-2">
+            💡 Tips: Gunakan tanda pemisah titik bulat <span class="text-brand-400 font-bold">•</span> di antara kalimat agar mudah dibaca oleh jamaah di masjid.
+          </p>
+        </div>
+
+        <div class="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-slate-800/80">
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-2">Kecepatan Bergerak</label>
+            <select id="runningTextSpeed" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-500">
+              <option value="45">Normal (Rekomendasi - 45 dp/s)</option>
+              <option value="35">Pelan (35 dp/s)</option>
+              <option value="60">Cepat (60 dp/s)</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-2">Status Tampilan</label>
+            <select id="runningTextActive" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-500">
+              <option value="true">Aktif (Tampil di Layar TV)</option>
+              <option value="false">Nonaktifkan</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: JEDA ADZAN & IQAMAH -->
+    <div id="tab-iqamah" class="tab-content hidden space-y-6">
+      <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 sm:p-6">
+        <div class="border-b border-slate-800 pb-4 mb-5">
+          <h2 class="text-base sm:text-lg font-bold text-white flex items-center space-x-2">
+            <i class="fa-solid fa-stopwatch text-brand-400"></i>
+            <span>Pengaturan Transisi Shalat, Jeda Adzan & Iqamah</span>
+          </h2>
+          <p class="text-xs text-slate-400 mt-1">Mengontrol transisi otomatis: Countdown 1 menit sebelum waktu shalat $\rightarrow$ Kumandang Adzan $\rightarrow$ Countdown Iqamah $\rightarrow$ Layar Hitam Sedang Shalat.</p>
+        </div>
+
+        <!-- Master Durations -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-6">
+          <div class="bg-slate-950/80 border border-slate-800 p-4 rounded-xl">
+            <div class="flex items-center justify-between mb-2">
+              <label class="text-xs font-bold text-white uppercase tracking-wider">Jeda Kumandang Adzan</label>
+              <span class="text-xs text-brand-400 font-bold" id="adzanDurationLabel">120 Detik (2 Menit)</span>
+            </div>
+            <input type="number" id="adzanDurationInput" min="30" max="600" value="120" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-brand-500">
+            <p class="text-[11px] text-slate-400 mt-1.5">Layar menampilkan kumandang adzan selama 2 menit (120 detik) sebelum hitung mundur iqamah dimulai.</p>
+          </div>
+
+          <div class="bg-slate-950/80 border border-slate-800 p-4 rounded-xl">
+            <div class="flex items-center justify-between mb-2">
+              <label class="text-xs font-bold text-white uppercase tracking-wider">Layar Hitam Saat Shalat</label>
+              <span class="text-xs text-brand-400 font-bold" id="shalatDurationLabel">10 Menit</span>
+            </div>
+            <input type="number" id="shalatDurationInput" min="2" max="60" value="10" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-brand-500">
+            <p class="text-[11px] text-slate-400 mt-1.5">Durasi layar hitam murni dengan jam besar dan tulisan "SEDANG SHALAT ...".</p>
+          </div>
+        </div>
+
+        <h3 class="text-sm font-bold text-white mb-3 flex items-center space-x-2">
+          <i class="fa-solid fa-clock-rotate-left text-gold-400"></i>
+          <span>Durasi Countdown Iqamah Per Waktu Shalat (Menit)</span>
+        </h3>
+
+        <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
+          <div class="bg-slate-950 border border-slate-800 p-3 rounded-xl text-center">
+            <span class="block text-xs font-bold text-slate-300 uppercase mb-1">Subuh</span>
+            <input type="number" id="iqSubuh" min="1" max="45" value="12" class="w-full bg-slate-900 border border-slate-700 rounded-lg py-1.5 text-center text-base font-bold text-white focus:outline-none focus:border-brand-500">
+            <span class="text-[10px] text-slate-500 mt-1 block">Menit</span>
+          </div>
+
+          <div class="bg-slate-950 border border-slate-800 p-3 rounded-xl text-center">
+            <span class="block text-xs font-bold text-slate-300 uppercase mb-1">Dzuhur</span>
+            <input type="number" id="iqDzuhur" min="1" max="45" value="10" class="w-full bg-slate-900 border border-slate-700 rounded-lg py-1.5 text-center text-base font-bold text-white focus:outline-none focus:border-brand-500">
+            <span class="text-[10px] text-slate-500 mt-1 block">Menit</span>
+          </div>
+
+          <div class="bg-slate-950 border border-slate-800 p-3 rounded-xl text-center">
+            <span class="block text-xs font-bold text-slate-300 uppercase mb-1">Ashar</span>
+            <input type="number" id="iqAshar" min="1" max="45" value="10" class="w-full bg-slate-900 border border-slate-700 rounded-lg py-1.5 text-center text-base font-bold text-white focus:outline-none focus:border-brand-500">
+            <span class="text-[10px] text-slate-500 mt-1 block">Menit</span>
+          </div>
+
+          <div class="bg-slate-950 border border-slate-800 p-3 rounded-xl text-center">
+            <span class="block text-xs font-bold text-slate-300 uppercase mb-1">Maghrib</span>
+            <input type="number" id="iqMaghrib" min="1" max="45" value="8" class="w-full bg-slate-900 border border-slate-700 rounded-lg py-1.5 text-center text-base font-bold text-white focus:outline-none focus:border-brand-500">
+            <span class="text-[10px] text-slate-500 mt-1 block">Menit</span>
+          </div>
+
+          <div class="col-span-2 sm:col-span-1 bg-slate-950 border border-slate-800 p-3 rounded-xl text-center">
+            <span class="block text-xs font-bold text-slate-300 uppercase mb-1">Isya</span>
+            <input type="number" id="iqIsya" min="1" max="45" value="10" class="w-full bg-slate-900 border border-slate-700 rounded-lg py-1.5 text-center text-base font-bold text-white focus:outline-none focus:border-brand-500">
+            <span class="text-[10px] text-slate-500 mt-1 block">Menit</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 4: KAJIAN & INFO -->
+    <div id="tab-kajian" class="tab-content hidden space-y-6">
+      <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 sm:p-6">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-4 mb-5">
+          <div>
+            <h2 class="text-base sm:text-lg font-bold text-white flex items-center space-x-2">
+              <i class="fa-solid fa-book-quran text-brand-400"></i>
+              <span>Jadwal Kajian & Kegiatan Masjid</span>
+            </h2>
+            <p class="text-xs text-slate-400 mt-1">Tampil bergantian pada slide layar informasi Android TV.</p>
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <div class="bg-slate-950 border border-slate-800 p-4 rounded-xl">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div class="sm:col-span-2">
+                <label class="block text-xs font-semibold text-slate-300 mb-1">Judul / Tema Kajian</label>
+                <input type="text" id="kajianTitle" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-brand-500" value="Kajian Islam Rutin">
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-slate-300 mb-1">Pemateri / Ustadz</label>
+                <input type="text" id="kajianSpeaker" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-brand-500" value="Asatidz DKM Ar-Ridho">
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-slate-300 mb-1">Hari & Waktu</label>
+                <input type="text" id="kajianSchedule" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-brand-500" value="Setiap Hari Rabu ba'da Shalat Dzuhur">
+              </div>
+
+              <div class="sm:col-span-2">
+                <label class="block text-xs font-semibold text-slate-300 mb-1">Deskripsi Tambahan</label>
+                <input type="text" id="kajianDescription" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-brand-500" value="Terbuka untuk umum, pegawai Kejati Lampung, dan jamaah sekitar.">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 5: LAPORAN KAS -->
+    <div id="tab-financial" class="tab-content hidden space-y-6">
+      <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 sm:p-6">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-4 mb-5">
+          <div>
+            <h2 class="text-base sm:text-lg font-bold text-white flex items-center space-x-2">
+              <i class="fa-solid fa-wallet text-brand-400"></i>
+              <span>Laporan Keuangan & Kas Masjid</span>
+            </h2>
+            <p class="text-xs text-slate-400 mt-1">Status saat ini dikosongkan/diatur sesuai kebutuhan pengurus.</p>
+          </div>
+          <div class="flex items-center space-x-2">
+            <span class="text-xs text-slate-400">Tampilkan di TV:</span>
+            <input type="checkbox" id="financialShowOnTv" class="w-4 h-4 rounded text-brand-600 bg-slate-900 border-slate-700 focus:ring-brand-500">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div class="bg-slate-950 border border-slate-800 p-4 rounded-xl">
+            <label class="block text-xs font-semibold text-emerald-400 mb-1">Total Pemasukan / Infaq (Rp)</label>
+            <input type="number" id="finIncome" value="0" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-base font-mono font-bold text-white focus:outline-none focus:border-brand-500">
+          </div>
+
+          <div class="bg-slate-950 border border-slate-800 p-4 rounded-xl">
+            <label class="block text-xs font-semibold text-rose-400 mb-1">Total Pengeluaran (Rp)</label>
+            <input type="number" id="finExpense" value="0" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-base font-mono font-bold text-white focus:outline-none focus:border-brand-500">
+          </div>
+
+          <div class="bg-slate-950 border border-slate-800 p-4 rounded-xl">
+            <label class="block text-xs font-semibold text-gold-400 mb-1">Saldo Akhir Kas (Rp)</label>
+            <input type="number" id="finBalance" value="0" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-base font-mono font-bold text-white focus:outline-none focus:border-brand-500">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 6: QRIS & REKENING -->
+    <div id="tab-qris" class="tab-content hidden space-y-6">
+      <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 sm:p-6">
+        <div class="border-b border-slate-800 pb-4 mb-5">
+          <h2 class="text-base sm:text-lg font-bold text-white flex items-center space-x-2">
+            <i class="fa-solid fa-qrcode text-brand-400"></i>
+            <span>Rekening & Donasi QRIS Masjid</span>
+          </h2>
+          <p class="text-xs text-slate-400 mt-1">Data rekening dan donasi yang ditampilkan pada slide donasi TV.</p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Nama Bank</label>
+            <input type="text" id="qrisBank" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-500" value="Bank Syariah Indonesia (BSI)">
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Nomor Rekening</label>
+            <input type="text" id="qrisAccountNumber" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm font-mono text-white focus:outline-none focus:border-brand-500" value="7221172102">
+          </div>
+
+          <div class="sm:col-span-2">
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Atas Nama Rekening</label>
+            <input type="text" id="qrisAccountName" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-500" value="Masjid Ar Ridho Kejati Lampung">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 7: YOUTUBE LIVE -->
+    <div id="tab-media" class="tab-content hidden space-y-6">
+      <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 sm:p-6">
+        <div class="border-b border-slate-800 pb-4 mb-5">
+          <h2 class="text-base sm:text-lg font-bold text-white flex items-center space-x-2">
+            <i class="fa-solid fa-video text-brand-400"></i>
+            <span>YouTube Live Streaming di Layar TV</span>
+          </h2>
+          <p class="text-xs text-slate-400 mt-1">Dapat digunakan saat khutbah Jum'at atau kajian akbar berlangsung.</p>
+        </div>
+
+        <div class="space-y-4">
+          <div class="flex items-center space-x-3">
+            <input type="checkbox" id="ytActive" class="w-4 h-4 rounded text-brand-600 bg-slate-900 border-slate-700 focus:ring-brand-500">
+            <label for="ytActive" class="text-sm font-semibold text-white">Aktifkan Tampilan YouTube Live di TV</label>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">ID Video atau Link YouTube</label>
+            <input type="text" id="ytVideoId" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-500" placeholder="contoh: jfKfPfyJRdk atau link lengkap">
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-slate-800/80 py-4 px-4 sm:px-6 text-center text-xs text-slate-500">
+    <p>JAMID App • Digital Signage Masjid Ar-Ridho Kejati Lampung &copy; 2026. Powered by Firebase Firestore.</p>
+  </footer>
+
+  <!-- Firebase Integration & Controller Logic -->
+  <script>
+    // 1. Inisialisasi Firebase menggunakan config yang diberikan
+    const firebaseConfig = {
+      apiKey: "AIzaSyAWEEJahfkQ4l9-we-r5PAvyHKFyQcGkjM",
+      authDomain: "jamid-app.firebaseapp.com",
+      projectId: "jamid-app",
+      storageBucket: "jamid-app.firebasestorage.app",
+      messagingSenderId: "399461750278",
+      appId: "1:399461750278:web:23ece2017d4f7a8e1b1587",
+      measurementId: "G-B24TP93FJM"
+    };
+
+    let db = null;
+    const MASJID_ID = "masjid_001";
+    let activeData = null;
+
+    try {
+      if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+      }
+      db = firebase.firestore();
+      console.log("Firebase initialized successfully for project:", firebaseConfig.projectId);
+      setupRealtimeListener();
+    } catch (err) {
+      console.error("Firebase init failed:", err);
+      updateStatusBadge(false, "Gagal koneksi: " + err.message);
+    }
+
+    // Default Running Text
+    const DEFAULT_RUNNING_TEXT = "SELAMAT DATANG DI MASJID AR-RIDHO KEJATI LAMPUNG • WAKTU SHALAT MENGIKUTI JADWAL YANG TAMPIL DI LAYAR • MARI SHALAT BERJAMAAH • LURUSKAN DAN RAPATKAN SHAF • MOHON SENYAPKAN TELEPON SAAT MEMASUKI MASJID • JAGA KEBERSIHAN MASJID • DILARANG BERJUAL BELI DI DALAM MASJID • HARAP MENJAGA KETENANGAN • MARI PERBANYAK DZIKIR DAN MEMBACA AL-QUR'AN • INFO KAJIAN DAN KEGIATAN MASJID DAPAT DILIHAT PADA LAYAR • DONASI PEMBANGUNAN DAN OPERASIONAL MASJID DAPAT DISALURKAN MELALUI QRIS • JAZAKUMULLAHU KHAIRAN •";
+
+    function resetRunningTextDefault() {
+      document.getElementById('runningTextInput').value = DEFAULT_RUNNING_TEXT;
+      showToast("Teks berjalan direset ke default Masjid Ar-Ridho", "info");
+    }
+
+    function switchTab(tabKey) {
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('bg-brand-800', 'text-white', 'border-brand-600');
+        btn.classList.add('text-slate-400', 'border-transparent');
+      });
+      document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.add('hidden');
+        content.classList.remove('block');
+      });
+
+      const activeBtn = document.getElementById('tab-btn-' + tabKey);
+      if (activeBtn) {
+        activeBtn.classList.add('bg-brand-800', 'text-white', 'border-brand-600');
+        activeBtn.classList.remove('text-slate-400', 'border-transparent');
+      }
+      const targetContent = document.getElementById('tab-' + tabKey);
+      if (targetContent) {
+        targetContent.classList.remove('hidden');
+        targetContent.classList.add('block');
+      }
+    }
+
+    function updateStatusBadge(isOnline, message) {
+      const dot = document.getElementById('cloudStatusDot');
+      const text = document.getElementById('cloudStatusText');
+      const dotMob = document.getElementById('cloudStatusDotMobile');
+      const textMob = document.getElementById('cloudStatusTextMobile');
+
+      if (isOnline) {
+        dot.className = "w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-sm shadow-emerald-400";
+        dotMob.className = "w-2 h-2 rounded-full bg-emerald-400";
+        text.innerText = message || "Tersambung ke Cloud";
+        textMob.innerText = message || "Tersambung ke Cloud";
+      } else {
+        dot.className = "w-2.5 h-2.5 rounded-full bg-rose-500 animate-pulse";
+        dotMob.className = "w-2 h-2 rounded-full bg-rose-500";
+        text.innerText = message || "Offline / Gangguan";
+        textMob.innerText = message || "Offline / Gangguan";
+      }
+    }
+
+    function setupRealtimeListener() {
+      if (!db) return;
+      updateStatusBadge(true, "Menghubungkan ke Firestore...");
+
+      db.collection("masjids").document(MASJID_ID)
+        .onSnapshot((doc) => {
+          if (doc.exists) {
+            activeData = doc.data();
+            populateForm(activeData);
+            updateStatusBadge(true, "Tersambung Realtime");
+            const dateStr = activeData.lastUpdatedString || new Date().toLocaleTimeString('id-ID');
+            document.getElementById('lastUpdatedMobile').innerText = "Diperbarui: " + dateStr;
+          } else {
+            console.log("Dokumen belum ada di Firestore, menggunakan template bawaan Ar-Ridho.");
+            populateDefaultArRidho();
+            updateStatusBadge(true, "Siap Simpan (Data Baru)");
+          }
+        }, (error) => {
+          console.error("Firestore listen error:", error);
+          updateStatusBadge(false, "Koneksi Error");
+        });
+    }
+
+    function populateDefaultArRidho() {
+      document.getElementById('mosqueName').value = "Masjid Ar-Ridho";
+      document.getElementById('mosqueAddress').value = "Jl. Jaksa Agung R. Soeprapto No. 226 Teluk Betung Selatan";
+      document.getElementById('mosqueCity').value = "Bandar Lampung";
+      document.getElementById('mosqueLeader').value = "DKM Masjid Ar-Ridho Kejati Lampung";
+      document.getElementById('mosquePhone').value = "-";
+
+      document.getElementById('runningTextInput').value = DEFAULT_RUNNING_TEXT;
+      document.getElementById('runningTextSpeed').value = "45";
+      document.getElementById('runningTextActive').value = "true";
+
+      document.getElementById('adzanDurationInput').value = 120;
+      document.getElementById('shalatDurationInput').value = 10;
+      document.getElementById('iqSubuh').value = 12;
+      document.getElementById('iqDzuhur').value = 10;
+      document.getElementById('iqAshar').value = 10;
+      document.getElementById('iqMaghrib').value = 8;
+      document.getElementById('iqIsya').value = 10;
+
+      document.getElementById('kajianTitle').value = "Kajian Islam Rutin";
+      document.getElementById('kajianSpeaker').value = "Asatidz DKM Ar-Ridho";
+      document.getElementById('kajianSchedule').value = "Setiap Hari Rabu ba'da Shalat Dzuhur";
+      document.getElementById('kajianDescription').value = "Terbuka untuk umum, pegawai Kejati Lampung, dan jamaah sekitar.";
+
+      document.getElementById('finIncome').value = 0;
+      document.getElementById('finExpense').value = 0;
+      document.getElementById('finBalance').value = 0;
+      document.getElementById('financialShowOnTv').checked = false;
+
+      document.getElementById('qrisBank').value = "Bank Syariah Indonesia (BSI)";
+      document.getElementById('qrisAccountNumber').value = "7221172102";
+      document.getElementById('qrisAccountName').value = "Masjid Ar Ridho Kejati Lampung";
+
+      document.getElementById('ytActive').checked = false;
+      document.getElementById('ytVideoId').value = "";
+    }
+
+    function populateForm(data) {
+      if (!data) return;
+
+      if (data.profile) {
+        document.getElementById('mosqueName').value = data.profile.name || "Masjid Ar-Ridho";
+        document.getElementById('mosqueAddress').value = data.profile.address || "";
+        document.getElementById('mosqueCity').value = data.profile.city || "Bandar Lampung";
+        document.getElementById('mosqueLeader').value = data.profile.leaderName || "";
+        document.getElementById('mosquePhone').value = data.profile.phoneNumber || "";
+      }
+
+      if (data.runningTexts && data.runningTexts.length > 0) {
+        document.getElementById('runningTextInput').value = data.runningTexts[0].text || DEFAULT_RUNNING_TEXT;
+        document.getElementById('runningTextSpeed').value = data.runningTexts[0].speed || 45;
+        document.getElementById('runningTextActive').value = data.runningTexts[0].isActive ? "true" : "false";
+      }
+
+      if (data.appConfig && data.appConfig.iqamahConfig) {
+        const iq = data.appConfig.iqamahConfig;
+        document.getElementById('adzanDurationInput').value = iq.adzanDurationSeconds || 120;
+        document.getElementById('shalatDurationInput').value = iq.shalatDurationMinutes || 10;
+        document.getElementById('iqSubuh').value = iq.subuhMinutes || 12;
+        document.getElementById('iqDzuhur').value = iq.dzuhurMinutes || 10;
+        document.getElementById('iqAshar').value = iq.asharMinutes || 10;
+        document.getElementById('iqMaghrib').value = iq.maghribMinutes || 8;
+        document.getElementById('iqIsya').value = iq.isyaMinutes || 10;
+      }
+
+      if (data.kajianList && data.kajianList.length > 0) {
+        const k = data.kajianList[0];
+        document.getElementById('kajianTitle').value = k.title || "Kajian Islam Rutin";
+        document.getElementById('kajianSpeaker').value = k.speaker || "Asatidz DKM Ar-Ridho";
+        document.getElementById('kajianSchedule').value = k.dayOrDate || "Setiap Hari Rabu ba'da Shalat Dzuhur";
+        document.getElementById('kajianDescription').value = k.description || "";
+      }
+
+      if (data.financialReport) {
+        document.getElementById('finIncome').value = data.financialReport.totalIncome || 0;
+        document.getElementById('finExpense').value = data.financialReport.totalExpense || 0;
+        document.getElementById('finBalance').value = data.financialReport.currentBalance || 0;
+        document.getElementById('financialShowOnTv').checked = data.financialReport.displayOnTv || false;
+      }
+
+      if (data.qrisData) {
+        document.getElementById('qrisBank').value = data.qrisData.bankName || "Bank Syariah Indonesia (BSI)";
+        document.getElementById('qrisAccountNumber').value = data.qrisData.accountNumber || "7221172102";
+        document.getElementById('qrisAccountName').value = data.qrisData.accountHolder || "Masjid Ar Ridho Kejati Lampung";
+      }
+
+      if (data.appConfig && data.appConfig.youtubeLiveConfig) {
+        document.getElementById('ytActive').checked = data.appConfig.youtubeLiveConfig.isActive || false;
+        document.getElementById('ytVideoId').value = data.appConfig.youtubeLiveConfig.videoIdOrUrl || "";
+      }
+    }
+
+    async function saveAllToCloud() {
+      if (!db) {
+        alert("Firebase belum terhubung. Periksa koneksi internet Anda.");
+        return;
+      }
+
+      const btn = document.getElementById('btnSaveAll');
+      const originalText = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...';
+
+      try {
+        const now = Date.now();
+        const timeStr = new Date(now).toLocaleString('id-ID', {
+          day: '2-digit', month: 'short', year: 'numeric',
+          hour: '2-digit', minute: '2-digit', second: '2-digit'
+        });
+
+        // 1. Profile
+        const profile = {
+          id: 1,
+          name: document.getElementById('mosqueName').value.trim() || "Masjid Ar-Ridho",
+          address: document.getElementById('mosqueAddress').value.trim(),
+          city: document.getElementById('mosqueCity').value.trim() || "Bandar Lampung",
+          leaderName: document.getElementById('mosqueLeader').value.trim(),
+          phoneNumber: document.getElementById('mosquePhone').value.trim(),
+          logoUri: ""
+        };
+
+        // 2. Running Text
+        const runningTextString = document.getElementById('runningTextInput').value.trim() || DEFAULT_RUNNING_TEXT;
+        const speed = parseInt(document.getElementById('runningTextSpeed').value) || 45;
+        const isActiveText = document.getElementById('runningTextActive').value === "true";
+        const runningTexts = [{
+          id: 1,
+          text: runningTextString,
+          speed: speed,
+          isActive: isActiveText
+        }];
+
+        // 3. Iqamah Config & App Config
+        const adzanDuration = parseInt(document.getElementById('adzanDurationInput').value) || 120;
+        const shalatDuration = parseInt(document.getElementById('shalatDurationInput').value) || 10;
+        const iqamahConfig = {
+          subuhMinutes: parseInt(document.getElementById('iqSubuh').value) || 12,
+          dzuhurMinutes: parseInt(document.getElementById('iqDzuhur').value) || 10,
+          asharMinutes: parseInt(document.getElementById('iqAshar').value) || 10,
+          maghribMinutes: parseInt(document.getElementById('iqMaghrib').value) || 8,
+          isyaMinutes: parseInt(document.getElementById('iqIsya').value) || 10,
+          adzanDurationSeconds: adzanDuration,
+          shalatDurationMinutes: shalatDuration,
+          beepEnabled: true,
+          beepVolume: 0.8
+        };
+
+        const ytActive = document.getElementById('ytActive').checked;
+        const ytUrl = document.getElementById('ytVideoId').value.trim();
+
+        const appConfig = {
+          id: 1,
+          slideIntervalSeconds: 15,
+          darkTheme: true,
+          themeMode: "AUTO_GPS",
+          iqamahConfig: iqamahConfig,
+          youtubeLiveConfig: {
+            videoIdOrUrl: ytUrl,
+            title: "Live Streaming Masjid Ar-Ridho",
+            isActive: ytActive,
+            autoReturnToSignage: true,
+            displayDurationMinutes: 60
+          }
+        };
+
+        // 4. Kajian
+        const kajianList = [{
+          id: 1,
+          title: document.getElementById('kajianTitle').value.trim() || "Kajian Islam Rutin",
+          speaker: document.getElementById('kajianSpeaker').value.trim(),
+          dayOrDate: document.getElementById('kajianSchedule').value.trim(),
+          time: "Ba'da Shalat Dzuhur",
+          description: document.getElementById('kajianDescription').value.trim(),
+          sortOrder: 1
+        }];
+
+        // 5. Financial
+        const finIncome = parseFloat(document.getElementById('finIncome').value) || 0;
+        const finExpense = parseFloat(document.getElementById('finExpense').value) || 0;
+        const finBalance = parseFloat(document.getElementById('finBalance').value) || 0;
+        const finShow = document.getElementById('financialShowOnTv').checked;
+
+        const financialReport = {
+          id: 1,
+          periodTitle: "Laporan Kas Masjid Ar-Ridho",
+          totalIncome: finIncome,
+          totalExpense: finExpense,
+          currentBalance: finBalance,
+          bankName: document.getElementById('qrisBank').value.trim(),
+          accountNumber: document.getElementById('qrisAccountNumber').value.trim(),
+          displayOnTv: finShow
+        };
+
+        // 6. QRIS
+        const qrisData = {
+          id: 1,
+          qrisImageUrl: "",
+          bankName: document.getElementById('qrisBank').value.trim(),
+          accountNumber: document.getElementById('qrisAccountNumber').value.trim(),
+          accountHolder: document.getElementById('qrisAccountName').value.trim(),
+          infaqDescription: "Donasi pembangunan & operasional Masjid Ar-Ridho dapat disalurkan via QRIS / transfer BSI"
+        };
+
+        const payload = {
+          profile: profile,
+          runningTexts: runningTexts,
+          appConfig: appConfig,
+          kajianList: kajianList,
+          financialReport: financialReport,
+          qrisData: qrisData,
+          lastUpdated: now,
+          lastUpdatedString: timeStr,
+          updatedByDevice: "Web Admin (HP/PC)"
+        };
+
+        await db.collection("masjids").document(MASJID_ID).set(payload, { merge: true });
+        showToast("Berhasil disimpan! Layar Android TV di masjid akan otomatis terupdate saat ini juga.", "success");
+      } catch (err) {
+        console.error("Save error:", err);
+        showToast("Gagal menyimpan ke cloud: " + err.message, "error");
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+      }
+    }
+
+    function showToast(message, type = "success") {
+      const toast = document.getElementById('toastNotification');
+      const toastMsg = document.getElementById('toastMessage');
+      const toastIcon = document.getElementById('toastIcon');
+
+      toast.classList.remove('hidden', 'bg-emerald-950/90', 'border-emerald-700', 'text-emerald-200', 'bg-rose-950/90', 'border-rose-700', 'text-rose-200', 'bg-amber-950/90', 'border-amber-700', 'text-amber-200');
+
+      if (type === "success") {
+        toast.classList.add('bg-emerald-950/90', 'border-emerald-700', 'text-emerald-200');
+        toastIcon.className = "fa-solid fa-circle-check text-emerald-400 text-lg";
+      } else if (type === "error") {
+        toast.classList.add('bg-rose-950/90', 'border-rose-700', 'text-rose-200');
+        toastIcon.className = "fa-solid fa-triangle-exclamation text-rose-400 text-lg";
+      } else {
+        toast.classList.add('bg-amber-950/90', 'border-amber-700', 'text-amber-200');
+        toastIcon.className = "fa-solid fa-circle-info text-amber-400 text-lg";
+      }
+
+      toastMsg.innerText = message;
+      toast.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    function hideToast() {
+      document.getElementById('toastNotification').classList.add('hidden');
+    }
+
+    // Auto-init defaults
+    populateDefaultArRidho();
+  </script>
+</body>
+</html>
