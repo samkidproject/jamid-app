@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>JAMID App • Panel Admin Web Masjid Ar-Ridho</title>
+  <title>JAMID App • Panel Admin Web Digital Signage Masjid</title>
+  
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -13,9 +14,10 @@
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 
-  <!-- Firebase App & Firestore Compat SDK -->
-  <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
+  <!-- Firebase App, Auth & Firestore SDK (Compat v9) -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
   <script>
     tailwind.config = {
@@ -35,6 +37,11 @@
               800: '#065f46',
               900: '#064e3b',
               950: '#022c22'
+            },
+            cyanTheme: {
+              500: '#0891b2',
+              600: '#0e7490',
+              700: '#155e75'
             },
             gold: {
               400: '#fbbf24',
@@ -62,37 +69,125 @@
     .custom-scrollbar::-webkit-scrollbar-track {
       background: transparent;
     }
+    .theme-card-selected {
+      border-color: #10b981 !important;
+      background: rgba(6, 95, 70, 0.25) !important;
+      box-shadow: 0 0 15px rgba(16, 185, 129, 0.25);
+    }
+    .layout-card-selected {
+      border-color: #0891b2 !important;
+      background: rgba(14, 116, 144, 0.25) !important;
+      box-shadow: 0 0 15px rgba(8, 145, 178, 0.25);
+    }
   </style>
 </head>
 <body class="min-h-screen flex flex-col font-sans antialiased custom-scrollbar">
 
-  <!-- Top Sticky Header -->
-  <header class="sticky top-0 z-40 bg-brand-950/90 backdrop-blur-md border-b border-brand-800/40 px-4 py-3 sm:px-6">
+  <!-- ========================================== -->
+  <!-- 0. MODAL / VIEW: LOGIN & AUTHENTICATION   -->
+  <!-- ========================================== -->
+  <div id="authScreen" class="hidden fixed inset-0 z-50 bg-[#080d0f]/95 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="max-w-md w-full bg-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl shadow-black relative">
+      <div class="text-center mb-6">
+        <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-brand-600 to-cyanTheme-500 mx-auto flex items-center justify-center shadow-lg shadow-brand-900/50 text-white font-bold text-2xl mb-3">
+          <i class="fa-solid fa-mosque"></i>
+        </div>
+        <h2 class="text-xl sm:text-2xl font-black text-white tracking-tight">JAMID <span class="text-gold-400">ADMIN</span></h2>
+        <p class="text-xs text-slate-400 mt-1">Autentikasi Pengelola & Lisensi Masjid Digital</p>
+      </div>
+
+      <!-- Auth Alert Banner -->
+      <div id="authAlert" class="hidden mb-4 p-3 rounded-xl border text-xs font-semibold flex items-center space-x-2">
+        <i id="authAlertIcon" class="fa-solid fa-triangle-exclamation"></i>
+        <span id="authAlertText"></span>
+      </div>
+
+      <form id="authForm" onsubmit="handleAuthSubmit(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1.5">Email Pengurus / DKM</label>
+          <div class="relative">
+            <i class="fa-solid fa-envelope absolute left-3.5 top-3 text-slate-500 text-sm"></i>
+            <input type="email" id="authEmail" required class="w-full bg-slate-950 border border-slate-700 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-500" placeholder="admin@masjid.com">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1.5">Kata Sandi (Password)</label>
+          <div class="relative">
+            <i class="fa-solid fa-lock absolute left-3.5 top-3 text-slate-500 text-sm"></i>
+            <input type="password" id="authPassword" required class="w-full bg-slate-950 border border-slate-700 rounded-xl pl-10 pr-10 py-2.5 text-sm text-white focus:outline-none focus:border-brand-500" placeholder="••••••••">
+            <button type="button" onclick="toggleAuthPasswordVisibility()" class="absolute right-3.5 top-3 text-slate-500 hover:text-white text-xs">
+              <i id="authEyeIcon" class="fa-solid fa-eye"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="pt-2">
+          <button type="submit" id="btnAuthSubmit" class="w-full bg-gradient-to-r from-brand-600 to-cyanTheme-600 hover:from-brand-500 hover:to-cyanTheme-500 text-white font-bold text-sm py-3 rounded-xl shadow-lg shadow-brand-900/40 active:scale-95 transition-all flex items-center justify-center space-x-2">
+            <i class="fa-solid fa-right-to-bracket"></i>
+            <span id="authSubmitText">Masuk ke Panel Admin</span>
+          </button>
+        </div>
+
+        <div class="text-center pt-2">
+          <button type="button" onclick="toggleAuthMode()" id="authSwitchModeBtn" class="text-xs text-gold-400 hover:text-gold-300 font-medium transition-colors">
+            Belum punya akun admin? Buat Akun Baru / Daftar Lisensi
+          </button>
+        </div>
+      </form>
+
+      <!-- Monetization / Security Notice -->
+      <div class="mt-6 pt-4 border-t border-slate-800 text-center">
+        <p class="text-[11px] text-slate-500 flex items-center justify-center space-x-1.5">
+          <i class="fa-solid fa-shield-halved text-brand-400"></i>
+          <span>Dilindungi Firebase Auth & Sistem Validasi Lisensi JamMasjid 2026.</span>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- 1. TOP STICKY HEADER                      -->
+  <!-- ========================================== -->
+  <header class="sticky top-0 z-40 bg-brand-950/95 backdrop-blur-md border-b border-brand-800/40 px-4 py-3 sm:px-6">
     <div class="max-w-6xl mx-auto flex items-center justify-between">
       <div class="flex items-center space-x-3">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-brand-500 flex items-center justify-center shadow-lg shadow-brand-900/40 text-white font-bold text-lg">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-cyanTheme-500 flex items-center justify-center shadow-lg shadow-brand-900/40 text-white font-bold text-lg">
           <i class="fa-solid fa-mosque"></i>
         </div>
         <div>
           <div class="flex items-center space-x-2">
             <h1 class="text-lg sm:text-xl font-bold tracking-tight text-white">JAMID <span class="text-gold-400 font-extrabold">ADMIN</span></h1>
-            <span class="px-2 py-0.5 text-[10px] font-bold tracking-wider uppercase bg-brand-800/80 text-brand-200 border border-brand-600/50 rounded-full">Cloud TV Sync</span>
+            <span id="licenseBadgeHeader" class="px-2 py-0.5 text-[10px] font-bold tracking-wider uppercase bg-brand-800/80 text-brand-200 border border-brand-600/50 rounded-full">PRO ACTIVE</span>
           </div>
-          <p class="text-xs text-brand-300/80 truncate max-w-[220px] sm:max-w-md">Masjid Ar-Ridho Kejati Lampung</p>
+          <p id="headerMosqueName" class="text-xs text-brand-300/80 truncate max-w-[200px] sm:max-w-md">Masjid Ar-Ridho Kejati Lampung</p>
         </div>
       </div>
 
-      <!-- Cloud Status & Action -->
+      <!-- Cloud Status, Save Action & User Auth Profile -->
       <div class="flex items-center space-x-2 sm:space-x-3">
+        <!-- Target Mosque ID Selector Badge -->
+        <div class="hidden md:flex items-center space-x-1.5 px-2.5 py-1.5 bg-slate-900/90 border border-slate-800 rounded-lg text-xs font-mono text-slate-400">
+          <i class="fa-solid fa-database text-brand-400 text-[10px]"></i>
+          <span id="targetMasjidIdLabel">ID: masjid_001</span>
+        </div>
+
         <div id="cloudStatusBadge" class="hidden sm:flex items-center space-x-2 px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-900 border border-slate-700/60 text-slate-300">
           <span class="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse" id="cloudStatusDot"></span>
           <span id="cloudStatusText">Menghubungkan...</span>
         </div>
 
-        <button onclick="saveAllToCloud()" id="btnSaveAll" class="flex items-center space-x-2 bg-gradient-to-r from-brand-600 to-brand-500 hover:from-brand-500 hover:to-brand-400 text-white font-bold text-xs sm:text-sm px-4 py-2 rounded-xl shadow-lg shadow-brand-600/30 active:scale-95 transition-all">
+        <button onclick="saveAllToCloud()" id="btnSaveAll" class="flex items-center space-x-2 bg-gradient-to-r from-brand-600 to-cyanTheme-600 hover:from-brand-500 hover:to-cyanTheme-500 text-white font-bold text-xs sm:text-sm px-4 py-2 rounded-xl shadow-lg shadow-brand-600/30 active:scale-95 transition-all">
           <i class="fa-solid fa-cloud-arrow-up"></i>
           <span>Simpan ke TV</span>
         </button>
+
+        <!-- User Logout Menu / Trigger -->
+        <div id="authUserSection" class="flex items-center pl-1 sm:pl-2">
+          <button onclick="handleLogout()" title="Keluar Akun Admin" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-rose-950 hover:text-rose-400 text-slate-400 border border-slate-700 flex items-center justify-center text-xs transition-colors">
+            <i class="fa-solid fa-right-from-bracket"></i>
+          </button>
+        </div>
       </div>
     </div>
   </header>
@@ -106,7 +201,9 @@
     <span class="text-[11px] text-slate-400" id="lastUpdatedMobile">-</span>
   </div>
 
-  <!-- Main Content Container -->
+  <!-- ========================================== -->
+  <!-- 2. MAIN CONTENT CONTAINER                 -->
+  <!-- ========================================== -->
   <main class="flex-1 max-w-6xl w-full mx-auto px-4 py-6 sm:px-6">
 
     <!-- Notification Toast Bar -->
@@ -118,39 +215,74 @@
       <button onclick="hideToast()" class="text-slate-400 hover:text-white text-sm"><i class="fa-solid fa-xmark"></i></button>
     </div>
 
-    <!-- Navigation Tabs -->
-    <div class="flex space-x-2 overflow-x-auto pb-2 mb-6 border-b border-slate-800 custom-scrollbar text-sm font-semibold">
-      <button onclick="switchTab('profile')" id="tab-btn-profile" class="tab-btn flex items-center space-x-2 px-4 py-2.5 rounded-lg bg-brand-800 text-white border border-brand-600">
-        <i class="fa-solid fa-building-columns"></i>
-        <span>Profil Masjid</span>
-      </button>
-      <button onclick="switchTab('runningText')" id="tab-btn-runningText" class="tab-btn flex items-center space-x-2 px-4 py-2.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent">
-        <i class="fa-solid fa-scroll"></i>
-        <span>Teks Berjalan</span>
-      </button>
-      <button onclick="switchTab('iqamah')" id="tab-btn-iqamah" class="tab-btn flex items-center space-x-2 px-4 py-2.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent">
-        <i class="fa-solid fa-stopwatch"></i>
-        <span>Jeda Adzan & Iqamah</span>
-      </button>
-      <button onclick="switchTab('kajian')" id="tab-btn-kajian" class="tab-btn flex items-center space-x-2 px-4 py-2.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent">
-        <i class="fa-solid fa-book-quran"></i>
-        <span>Kajian & Info</span>
-      </button>
-      <button onclick="switchTab('financial')" id="tab-btn-financial" class="tab-btn flex items-center space-x-2 px-4 py-2.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent">
-        <i class="fa-solid fa-wallet"></i>
-        <span>Laporan Kas</span>
-      </button>
-      <button onclick="switchTab('qris')" id="tab-btn-qris" class="tab-btn flex items-center space-x-2 px-4 py-2.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent">
-        <i class="fa-solid fa-qrcode"></i>
-        <span>QRIS & Rekening</span>
-      </button>
-      <button onclick="switchTab('media')" id="tab-btn-media" class="tab-btn flex items-center space-x-2 px-4 py-2.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent">
-        <i class="fa-solid fa-video"></i>
-        <span>YouTube Live</span>
+    <!-- Live Preview Banner for TV Theme & Layout -->
+    <div id="themePreviewBanner" class="mb-6 p-4 rounded-2xl bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border border-slate-700/70 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div class="flex items-center space-x-3.5">
+        <div id="previewColorCircle" class="w-10 h-10 rounded-xl bg-cyan-600 border-2 border-white shadow-md flex items-center justify-center text-white">
+          <i class="fa-solid fa-tv text-sm"></i>
+        </div>
+        <div>
+          <div class="flex items-center space-x-2">
+            <span class="text-xs text-slate-400">Konfigurasi Tampilan Aktif:</span>
+            <span id="previewThemeTitle" class="text-xs font-bold px-2 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-700/50">JAMID App Toska Cyan</span>
+            <span id="previewLayoutTitle" class="text-xs font-bold px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">Layout JAMID App</span>
+          </div>
+          <p class="text-xs text-slate-300 mt-1">Perubahan tema warna, latar belakang, dan susunan layout di bawah akan langsung diterapkan di layar TV saat Anda menekan tombol <b>Simpan ke TV</b>.</p>
+        </div>
+      </div>
+      <button onclick="switchTab('theme')" class="text-xs font-bold text-gold-400 hover:text-gold-300 bg-slate-950/80 hover:bg-slate-950 border border-gold-500/30 px-3 py-1.5 rounded-lg flex items-center space-x-1.5 transition-all">
+        <i class="fa-solid fa-palette"></i>
+        <span>Ganti Tema Sekarang</span>
       </button>
     </div>
 
-    <!-- TAB 1: PROFIL MASJID -->
+    <!-- Navigation Tabs (Semua Menu Admin Tersedia Lengkap) -->
+    <div class="flex space-x-2 overflow-x-auto pb-2 mb-6 border-b border-slate-800 custom-scrollbar text-sm font-semibold">
+      <button onclick="switchTab('profile')" id="tab-btn-profile" class="tab-btn flex items-center space-x-2 px-4 py-2.5 rounded-lg bg-brand-800 text-white border border-brand-600 whitespace-nowrap">
+        <i class="fa-solid fa-building-columns"></i>
+        <span>1. Profil Masjid</span>
+      </button>
+      <button onclick="switchTab('theme')" id="tab-btn-theme" class="tab-btn flex items-center space-x-2 px-4 py-2.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent whitespace-nowrap">
+        <i class="fa-solid fa-palette text-cyan-400"></i>
+        <span>2. Tema & Tampilan TV</span>
+      </button>
+      <button onclick="switchTab('runningText')" id="tab-btn-runningText" class="tab-btn flex items-center space-x-2 px-4 py-2.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent whitespace-nowrap">
+        <i class="fa-solid fa-scroll"></i>
+        <span>3. Teks Berjalan</span>
+      </button>
+      <button onclick="switchTab('iqamah')" id="tab-btn-iqamah" class="tab-btn flex items-center space-x-2 px-4 py-2.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent whitespace-nowrap">
+        <i class="fa-solid fa-stopwatch"></i>
+        <span>4. Jeda Adzan & Iqamah</span>
+      </button>
+      <button onclick="switchTab('kajian')" id="tab-btn-kajian" class="tab-btn flex items-center space-x-2 px-4 py-2.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent whitespace-nowrap">
+        <i class="fa-solid fa-book-quran"></i>
+        <span>5. Kajian & Info</span>
+      </button>
+      <button onclick="switchTab('financial')" id="tab-btn-financial" class="tab-btn flex items-center space-x-2 px-4 py-2.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent whitespace-nowrap">
+        <i class="fa-solid fa-wallet"></i>
+        <span>6. Laporan Kas</span>
+      </button>
+      <button onclick="switchTab('qris')" id="tab-btn-qris" class="tab-btn flex items-center space-x-2 px-4 py-2.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent whitespace-nowrap">
+        <i class="fa-solid fa-qrcode"></i>
+        <span>7. QRIS & Rekening</span>
+      </button>
+      <button onclick="switchTab('media')" id="tab-btn-media" class="tab-btn flex items-center space-x-2 px-4 py-2.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent whitespace-nowrap">
+        <i class="fa-solid fa-video"></i>
+        <span>8. YouTube Live</span>
+      </button>
+      <button onclick="switchTab('system')" id="tab-btn-system" class="tab-btn flex items-center space-x-2 px-4 py-2.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent whitespace-nowrap">
+        <i class="fa-solid fa-gear"></i>
+        <span>9. Sistem & PIN</span>
+      </button>
+      <button onclick="switchTab('license')" id="tab-btn-license" class="tab-btn flex items-center space-x-2 px-4 py-2.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent whitespace-nowrap">
+        <i class="fa-solid fa-key text-gold-400"></i>
+        <span>10. Lisensi & Penjualan</span>
+      </button>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- TAB 1: PROFIL MASJID                      -->
+    <!-- ========================================== -->
     <div id="tab-profile" class="tab-content block space-y-6">
       <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 sm:p-6">
         <div class="flex items-center justify-between border-b border-slate-800 pb-4 mb-5">
@@ -171,12 +303,12 @@
           </div>
 
           <div>
-            <label class="block text-xs font-semibold text-slate-300 mb-2">Kota / Wilayah</label>
+            <label class="block text-xs font-semibold text-slate-300 mb-2">Kota / Wilayah Preset</label>
             <input type="text" id="mosqueCity" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-500" placeholder="Bandar Lampung">
           </div>
 
           <div class="md:col-span-2">
-            <label class="block text-xs font-semibold text-slate-300 mb-2">Alamat Lengkap</label>
+            <label class="block text-xs font-semibold text-slate-300 mb-2">Alamat Lengkap Masjid</label>
             <textarea id="mosqueAddress" rows="2" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-500" placeholder="Jl. Jaksa Agung R. Soeprapto No. 226 Teluk Betung Selatan"></textarea>
           </div>
 
@@ -189,11 +321,294 @@
             <label class="block text-xs font-semibold text-slate-300 mb-2">Kontak / Telepon Pengurus</label>
             <input type="text" id="mosquePhone" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-500" placeholder="08xxxxxxxxxx">
           </div>
+
+          <div class="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 mb-1">Garis Lintang (Latitude)</label>
+              <input type="number" step="0.0001" id="mosqueLatitude" value="-5.4414" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2 text-sm font-mono text-white focus:outline-none focus:border-brand-500">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 mb-1">Garis Bujur (Longitude)</label>
+              <input type="number" step="0.0001" id="mosqueLongitude" value="105.2580" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2 text-sm font-mono text-white focus:outline-none focus:border-brand-500">
+            </div>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- TAB 2: TEKS BERJALAN (RUNNING TEXT) -->
+    <!-- ========================================== -->
+    <!-- TAB 2: TEMA & TAMPILAN TV (NEW!)          -->
+    <!-- ========================================== -->
+    <div id="tab-theme" class="tab-content hidden space-y-6">
+      
+      <!-- A. Tema Warna Pilihan -->
+      <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 sm:p-6">
+        <div class="border-b border-slate-800 pb-4 mb-5">
+          <h2 class="text-base sm:text-lg font-bold text-white flex items-center space-x-2">
+            <i class="fa-solid fa-palette text-brand-400"></i>
+            <span>Pilihan Tema Warna TV Digital</span>
+          </h2>
+          <p class="text-xs text-slate-400 mt-1">Pilih nuansa warna kartu, header, dan aksen jadwal shalat yang ditampilkan pada layar TV.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="themeGridContainer">
+          <!-- 1. JAMID Toska Cyan -->
+          <div onclick="selectThemeOption('JAMID_CYAN')" id="theme-card-JAMID_CYAN" class="theme-card cursor-pointer border border-slate-700 bg-slate-950/80 rounded-2xl p-4 transition-all hover:border-cyan-500">
+            <div class="flex items-center space-x-3 mb-2">
+              <span class="w-8 h-8 rounded-xl bg-[#0891b2] border border-white flex items-center justify-center text-white text-xs font-bold">
+                <i class="fa-solid fa-check theme-check hidden"></i>
+              </span>
+              <div>
+                <h4 class="text-sm font-bold text-white">JAMID Toska Cyan</h4>
+                <span class="text-[10px] text-cyan-400 font-semibold">Sesuai Foto / Bawaan</span>
+              </div>
+            </div>
+            <p class="text-xs text-slate-400">Toska kubah masjid, langit cerah & kartu kaca transparan modern.</p>
+          </div>
+
+          <!-- 2. Hijau Elegan -->
+          <div onclick="selectThemeOption('HIJAU_ELEGAN')" id="theme-card-HIJAU_ELEGAN" class="theme-card cursor-pointer border border-slate-700 bg-slate-950/80 rounded-2xl p-4 transition-all hover:border-emerald-500">
+            <div class="flex items-center space-x-3 mb-2">
+              <span class="w-8 h-8 rounded-xl bg-[#1B6B44] border border-white flex items-center justify-center text-white text-xs font-bold">
+                <i class="fa-solid fa-check theme-check hidden"></i>
+              </span>
+              <div>
+                <h4 class="text-sm font-bold text-white">Hijau Elegan</h4>
+                <span class="text-[10px] text-emerald-400 font-semibold">Islami Klasik</span>
+              </div>
+            </div>
+            <p class="text-xs text-slate-400">Nuansa hijau khas masjid, sejuk, tenang, dan bersahabat di mata.</p>
+          </div>
+
+          <!-- 3. Hijau Zamrud -->
+          <div onclick="selectThemeOption('HIJAU_ZAMRUD')" id="theme-card-HIJAU_ZAMRUD" class="theme-card cursor-pointer border border-slate-700 bg-slate-950/80 rounded-2xl p-4 transition-all hover:border-emerald-500">
+            <div class="flex items-center space-x-3 mb-2">
+              <span class="w-8 h-8 rounded-xl bg-[#047857] border border-white flex items-center justify-center text-white text-xs font-bold">
+                <i class="fa-solid fa-check theme-check hidden"></i>
+              </span>
+              <div>
+                <h4 class="text-sm font-bold text-white">Hijau Zamrud</h4>
+                <span class="text-[10px] text-emerald-400 font-semibold">Emerald Bersih</span>
+              </div>
+            </div>
+            <p class="text-xs text-slate-400">Emerald segar, kontras tinggi, sangat jelas terbaca dari kejauhan.</p>
+          </div>
+
+          <!-- 4. Biru Navy -->
+          <div onclick="selectThemeOption('BIRU_NAVY')" id="theme-card-BIRU_NAVY" class="theme-card cursor-pointer border border-slate-700 bg-slate-950/80 rounded-2xl p-4 transition-all hover:border-blue-500">
+            <div class="flex items-center space-x-3 mb-2">
+              <span class="w-8 h-8 rounded-xl bg-[#1D4ED8] border border-white flex items-center justify-center text-white text-xs font-bold">
+                <i class="fa-solid fa-check theme-check hidden"></i>
+              </span>
+              <div>
+                <h4 class="text-sm font-bold text-white">Biru Navy</h4>
+                <span class="text-[10px] text-blue-400 font-semibold">Formal & Modern</span>
+              </div>
+            </div>
+            <p class="text-xs text-slate-400">Aksen biru royal yang profesional, teduh, dan berwibawa.</p>
+          </div>
+
+          <!-- 5. Gold Luxury -->
+          <div onclick="selectThemeOption('GOLD_LUXURY')" id="theme-card-GOLD_LUXURY" class="theme-card cursor-pointer border border-slate-700 bg-slate-950/80 rounded-2xl p-4 transition-all hover:border-amber-500">
+            <div class="flex items-center space-x-3 mb-2">
+              <span class="w-8 h-8 rounded-xl bg-[#B45309] border border-white flex items-center justify-center text-white text-xs font-bold">
+                <i class="fa-solid fa-check theme-check hidden"></i>
+              </span>
+              <div>
+                <h4 class="text-sm font-bold text-white">Gold Luxury</h4>
+                <span class="text-[10px] text-amber-400 font-semibold">Mewah & Prestisius</span>
+              </div>
+            </div>
+            <p class="text-xs text-slate-400">Sentuhan keemasan hangat yang sangat anggun untuk masjid megah.</p>
+          </div>
+
+          <!-- 6. Merah Marun -->
+          <div onclick="selectThemeOption('MERAH_MARUN')" id="theme-card-MERAH_MARUN" class="theme-card cursor-pointer border border-slate-700 bg-slate-950/80 rounded-2xl p-4 transition-all hover:border-rose-500">
+            <div class="flex items-center space-x-3 mb-2">
+              <span class="w-8 h-8 rounded-xl bg-[#9F1239] border border-white flex items-center justify-center text-white text-xs font-bold">
+                <i class="fa-solid fa-check theme-check hidden"></i>
+              </span>
+              <div>
+                <h4 class="text-sm font-bold text-white">Merah Marun</h4>
+                <span class="text-[10px] text-rose-400 font-semibold">Hangat & Khidmat</span>
+              </div>
+            </div>
+            <p class="text-xs text-slate-400">Karakter marun mewah yang khusyuk dan tegas.</p>
+          </div>
+
+          <!-- 7. Sultan Zamrud Emas -->
+          <div onclick="selectThemeOption('SULTAN_EMERALD_GOLD')" id="theme-card-SULTAN_EMERALD_GOLD" class="theme-card cursor-pointer border border-slate-700 bg-slate-950/80 rounded-2xl p-4 transition-all hover:border-amber-400">
+            <div class="flex items-center space-x-3 mb-2">
+              <span class="w-8 h-8 rounded-xl bg-[#065F46] border-2 border-amber-400 flex items-center justify-center text-amber-300 text-xs font-bold">
+                <i class="fa-solid fa-check theme-check hidden"></i>
+              </span>
+              <div>
+                <h4 class="text-sm font-bold text-white">Sultan Zamrud Emas</h4>
+                <span class="text-[10px] text-amber-300 font-semibold">Mewah Ornamen Islami</span>
+              </div>
+            </div>
+            <p class="text-xs text-slate-400">Kemegahan zamrud raja dipadu aksen emas royal & frosted glass.</p>
+          </div>
+
+          <!-- 8. Safir Royal Navy -->
+          <div onclick="selectThemeOption('ROYAL_SAPPHIRE')" id="theme-card-ROYAL_SAPPHIRE" class="theme-card cursor-pointer border border-slate-700 bg-slate-950/80 rounded-2xl p-4 transition-all hover:border-blue-400">
+            <div class="flex items-center space-x-3 mb-2">
+              <span class="w-8 h-8 rounded-xl bg-[#1E40AF] border border-blue-300 flex items-center justify-center text-white text-xs font-bold">
+                <i class="fa-solid fa-check theme-check hidden"></i>
+              </span>
+              <div>
+                <h4 class="text-sm font-bold text-white">Safir Royal Navy</h4>
+                <span class="text-[10px] text-blue-300 font-semibold">Malam Khidmat</span>
+              </div>
+            </div>
+            <p class="text-xs text-slate-400">Biru safir dalam dengan aksen perak berkilau.</p>
+          </div>
+
+          <!-- 9. Madinah Sand & Bronze -->
+          <div onclick="selectThemeOption('MADINAH_BRONZE')" id="theme-card-MADINAH_BRONZE" class="theme-card cursor-pointer border border-slate-700 bg-slate-950/80 rounded-2xl p-4 transition-all hover:border-amber-600">
+            <div class="flex items-center space-x-3 mb-2">
+              <span class="w-8 h-8 rounded-xl bg-[#92400E] border border-amber-500 flex items-center justify-center text-white text-xs font-bold">
+                <i class="fa-solid fa-check theme-check hidden"></i>
+              </span>
+              <div>
+                <h4 class="text-sm font-bold text-white">Madinah Bronze</h4>
+                <span class="text-[10px] text-amber-500 font-semibold">Marmer Nabawi Hangat</span>
+              </div>
+            </div>
+            <p class="text-xs text-slate-400">Nuansa marmer Nabawi, pasir senja & perunggu hangat.</p>
+          </div>
+
+          <!-- 10. Monokrom Abu -->
+          <div onclick="selectThemeOption('MONOCHROME_SLATE')" id="theme-card-MONOCHROME_SLATE" class="theme-card cursor-pointer border border-slate-700 bg-slate-950/80 rounded-2xl p-4 transition-all hover:border-slate-400">
+            <div class="flex items-center space-x-3 mb-2">
+              <span class="w-8 h-8 rounded-xl bg-[#334155] border border-white flex items-center justify-center text-white text-xs font-bold">
+                <i class="fa-solid fa-check theme-check hidden"></i>
+              </span>
+              <div>
+                <h4 class="text-sm font-bold text-white">Monokrom Abu</h4>
+                <span class="text-[10px] text-slate-300 font-semibold">Minimalis Bersih</span>
+              </div>
+            </div>
+            <p class="text-xs text-slate-400">Gaya minimalis netral, kontras elegan tanpa warna mencolok.</p>
+          </div>
+        </div>
+        <input type="hidden" id="selectedThemeKey" value="JAMID_CYAN">
+      </div>
+
+      <!-- B. Tata Letak (TV Layout) -->
+      <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 sm:p-6">
+        <div class="border-b border-slate-800 pb-4 mb-5">
+          <h2 class="text-base sm:text-lg font-bold text-white flex items-center space-x-2">
+            <i class="fa-solid fa-table-columns text-brand-400"></i>
+            <span>Tata Letak Layar (TV Layout)</span>
+          </h2>
+          <p class="text-xs text-slate-400 mt-1">Sesuaikan orientasi tata letak berdasarkan dimensi dan rasio layar TV masjid.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="layoutGridContainer">
+          <!-- 1. JAMID App -->
+          <div onclick="selectLayoutOption('JAMID_APP')" id="layout-card-JAMID_APP" class="layout-card cursor-pointer border border-slate-700 bg-slate-950/80 rounded-2xl p-4 transition-all">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold text-white">Layout JAMID App</span>
+              <span class="text-[10px] px-2 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-800">Bawaan Foto</span>
+            </div>
+            <p class="text-xs text-slate-400">Header 3 kartu atas (Logo & Tanggal, Jam & Cuaca, Countdown), Agenda tengah, Jadwal glowing horizontal bawah.</p>
+          </div>
+
+          <!-- 2. Klasik -->
+          <div onclick="selectLayoutOption('KLASIK')" id="layout-card-KLASIK" class="layout-card cursor-pointer border border-slate-700 bg-slate-950/80 rounded-2xl p-4 transition-all">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold text-white">Layout Klasik</span>
+              <span class="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-300">Populer</span>
+            </div>
+            <p class="text-xs text-slate-400">Header atas memanjang, konten slideshow tengah, jadwal shalat horizontal simetris di bagian bawah.</p>
+          </div>
+
+          <!-- 3. Modern -->
+          <div onclick="selectLayoutOption('MODERN')" id="layout-card-MODERN" class="layout-card cursor-pointer border border-slate-700 bg-slate-950/80 rounded-2xl p-4 transition-all">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold text-white">Layout Modern</span>
+              <span class="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-300">Vertikal Grid</span>
+            </div>
+            <p class="text-xs text-slate-400">Jam & hitung mundur di sebelah kiri, konten dinamis di tengah, dan deretan jadwal shalat di sebelah kanan.</p>
+          </div>
+
+          <!-- 4. Elegan -->
+          <div onclick="selectLayoutOption('ELEGAN')" id="layout-card-ELEGAN" class="layout-card cursor-pointer border border-slate-700 bg-slate-950/80 rounded-2xl p-4 transition-all">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold text-white">Layout Elegan</span>
+              <span class="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-300">Premium</span>
+            </div>
+            <p class="text-xs text-slate-400">Header transparan elegan, slider berbayang halus, dan jadwal card modern dengan sudut membulat mewah.</p>
+          </div>
+
+          <!-- 5. Minimal -->
+          <div onclick="selectLayoutOption('MINIMAL')" id="layout-card-MINIMAL" class="layout-card cursor-pointer border border-slate-700 bg-slate-950/80 rounded-2xl p-4 transition-all">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold text-white">Layout Minimal</span>
+              <span class="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-300">Simpel</span>
+            </div>
+            <p class="text-xs text-slate-400">Fokus pada angka jam super besar, status countdown, dan ringkasan jadwal shalat yang bersih.</p>
+          </div>
+
+          <!-- 6. Pengumuman -->
+          <div onclick="selectLayoutOption('PENGUMUMAN')" id="layout-card-PENGUMUMAN" class="layout-card cursor-pointer border border-slate-700 bg-slate-950/80 rounded-2xl p-4 transition-all">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold text-white">Layout Pengumuman</span>
+              <span class="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-300">Info Fokus</span>
+            </div>
+            <p class="text-xs text-slate-400">Area poster dan info kajian mendominasi layar penuh, jadwal shalat tampil rapi di kolom samping.</p>
+          </div>
+        </div>
+        <input type="hidden" id="selectedLayoutKey" value="JAMID_APP">
+      </div>
+
+      <!-- C. Efek Visual & Mode Warna Shalat -->
+      <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 sm:p-6">
+        <h3 class="text-sm font-bold text-white mb-4">Pengaturan Efek Visual & Pergantian Layar</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-2">Variasi Warna Jadwal Shalat</label>
+            <select id="prayerColorModeSelect" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-500">
+              <option value="HARMONIOUS">Warna-warni Harmonis (Rekomendasi)</option>
+              <option value="UNIFORM">Seragam Mengikuti Tema Terpilih</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-2">Mode Pergantian Layar TV</label>
+            <select id="displayModeSelect" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-500">
+              <option value="OTOMATIS">Mode Otomatis (Jam + Slideshow)</option>
+              <option value="MANUAL">Mode Manual (Statis)</option>
+              <option value="FULL_PENGUMUMAN">Mode Full Pengumuman</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-2">Durasi Tayang Layar Utama Jam</label>
+            <div class="flex items-center space-x-2">
+              <input type="number" id="autoMainDurationInput" value="20" min="5" max="120" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-brand-500 font-mono">
+              <span class="text-xs text-slate-400">Detik</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-4 pt-4 border-t border-slate-800/80 flex items-center justify-between">
+          <div class="flex items-center space-x-3">
+            <input type="checkbox" id="effect3dEnabled" checked class="w-4 h-4 rounded text-brand-600 bg-slate-950 border-slate-700 focus:ring-brand-500">
+            <div>
+              <label for="effect3dEnabled" class="text-sm font-semibold text-white">Aktifkan Efek Kedalaman 3D & Bayangan Kartu</label>
+              <p class="text-xs text-slate-400">Memberikan efek visual melayang modern pada setiap kartu informasi di layar TV.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- TAB 3: TEKS BERJALAN (RUNNING TEXT)       -->
+    <!-- ========================================== -->
     <div id="tab-runningText" class="tab-content hidden space-y-6">
       <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 sm:p-6">
         <div class="flex items-center justify-between border-b border-slate-800 pb-4 mb-5">
@@ -238,7 +653,9 @@
       </div>
     </div>
 
-    <!-- TAB 3: JEDA ADZAN & IQAMAH -->
+    <!-- ========================================== -->
+    <!-- TAB 4: JEDA ADZAN & IQAMAH                -->
+    <!-- ========================================== -->
     <div id="tab-iqamah" class="tab-content hidden space-y-6">
       <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 sm:p-6">
         <div class="border-b border-slate-800 pb-4 mb-5">
@@ -246,7 +663,7 @@
             <i class="fa-solid fa-stopwatch text-brand-400"></i>
             <span>Pengaturan Transisi Shalat, Jeda Adzan & Iqamah</span>
           </h2>
-          <p class="text-xs text-slate-400 mt-1">Mengontrol transisi otomatis: Countdown 1 menit sebelum waktu shalat $\rightarrow$ Kumandang Adzan $\rightarrow$ Countdown Iqamah $\rightarrow$ Layar Hitam Sedang Shalat.</p>
+          <p class="text-xs text-slate-400 mt-1">Mengontrol transisi otomatis: Countdown 1 menit sebelum waktu shalat &rarr; Kumandang Adzan &rarr; Countdown Iqamah &rarr; Layar Hitam Sedang Shalat.</p>
         </div>
 
         <!-- Master Durations -->
@@ -262,19 +679,16 @@
 
           <div class="bg-slate-950/80 border border-slate-800 p-4 rounded-xl">
             <div class="flex items-center justify-between mb-2">
-              <label class="text-xs font-bold text-white uppercase tracking-wider">Layar Hitam Saat Shalat</label>
+              <label class="text-xs font-bold text-white uppercase tracking-wider">Durasi Mode Sedang Shalat</label>
               <span class="text-xs text-brand-400 font-bold" id="shalatDurationLabel">10 Menit</span>
             </div>
-            <input type="number" id="shalatDurationInput" min="2" max="60" value="10" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-brand-500">
-            <p class="text-[11px] text-slate-400 mt-1.5">Durasi layar hitam murni dengan jam besar dan tulisan "SEDANG SHALAT ...".</p>
+            <input type="number" id="shalatDurationInput" min="3" max="60" value="10" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-brand-500">
+            <p class="text-[11px] text-slate-400 mt-1.5">Layar otomatis redup/hitam menampilkan pesan khusyuk sedang shalat berjamaah.</p>
           </div>
         </div>
 
-        <h3 class="text-sm font-bold text-white mb-3 flex items-center space-x-2">
-          <i class="fa-solid fa-clock-rotate-left text-gold-400"></i>
-          <span>Durasi Countdown Iqamah Per Waktu Shalat (Menit)</span>
-        </h3>
-
+        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">Durasi Hitung Mundur Iqamah Per Waktu Shalat (Menit)</h3>
+        
         <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
           <div class="bg-slate-950 border border-slate-800 p-3 rounded-xl text-center">
             <span class="block text-xs font-bold text-slate-300 uppercase mb-1">Subuh</span>
@@ -309,7 +723,9 @@
       </div>
     </div>
 
-    <!-- TAB 4: KAJIAN & INFO -->
+    <!-- ========================================== -->
+    <!-- TAB 5: KAJIAN & INFO                      -->
+    <!-- ========================================== -->
     <div id="tab-kajian" class="tab-content hidden space-y-6">
       <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 sm:p-6">
         <div class="flex items-center justify-between border-b border-slate-800 pb-4 mb-5">
@@ -350,7 +766,9 @@
       </div>
     </div>
 
-    <!-- TAB 5: LAPORAN KAS -->
+    <!-- ========================================== -->
+    <!-- TAB 6: LAPORAN KAS                        -->
+    <!-- ========================================== -->
     <div id="tab-financial" class="tab-content hidden space-y-6">
       <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 sm:p-6">
         <div class="flex items-center justify-between border-b border-slate-800 pb-4 mb-5">
@@ -386,7 +804,9 @@
       </div>
     </div>
 
-    <!-- TAB 6: QRIS & REKENING -->
+    <!-- ========================================== -->
+    <!-- TAB 7: QRIS & REKENING                    -->
+    <!-- ========================================== -->
     <div id="tab-qris" class="tab-content hidden space-y-6">
       <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 sm:p-6">
         <div class="border-b border-slate-800 pb-4 mb-5">
@@ -416,7 +836,9 @@
       </div>
     </div>
 
-    <!-- TAB 7: YOUTUBE LIVE -->
+    <!-- ========================================== -->
+    <!-- TAB 8: YOUTUBE LIVE                       -->
+    <!-- ========================================== -->
     <div id="tab-media" class="tab-content hidden space-y-6">
       <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 sm:p-6">
         <div class="border-b border-slate-800 pb-4 mb-5">
@@ -441,16 +863,130 @@
       </div>
     </div>
 
+    <!-- ========================================== -->
+    <!-- TAB 9: PENGATURAN SISTEM & PIN            -->
+    <!-- ========================================== -->
+    <div id="tab-system" class="tab-content hidden space-y-6">
+      <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 sm:p-6">
+        <div class="border-b border-slate-800 pb-4 mb-5">
+          <h2 class="text-base sm:text-lg font-bold text-white flex items-center space-x-2">
+            <i class="fa-solid fa-gear text-brand-400"></i>
+            <span>Pengaturan Keamanan & Sistem</span>
+          </h2>
+          <p class="text-xs text-slate-400 mt-1">PIN admin untuk membuka konsol pengaturan langsung di layar Android TV.</p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">PIN Akses Admin di Android TV</label>
+            <input type="text" id="adminPinInput" maxlength="6" value="1234" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm font-mono text-white focus:outline-none focus:border-brand-500" placeholder="1234">
+            <p class="text-xs text-slate-500 mt-1">Default: 1234. Digunakan saat menekan tombol Pengaturan di layar TV.</p>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Koreksi Tanggal Hijriah (+/- Hari)</label>
+            <input type="number" id="hijriAdjustmentInput" min="-3" max="3" value="0" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm font-mono text-white focus:outline-none focus:border-brand-500">
+            <p class="text-xs text-slate-500 mt-1">Sesuaikan jika ada perbedaan 1 hari dengan hilal lokal.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- TAB 10: LISENSI & BISNIS PENJUALAN (NEW!)  -->
+    <!-- ========================================== -->
+    <div id="tab-license" class="tab-content hidden space-y-6">
+      <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 sm:p-6">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-4 mb-5">
+          <div>
+            <h2 class="text-base sm:text-lg font-bold text-white flex items-center space-x-2">
+              <i class="fa-solid fa-key text-gold-400"></i>
+              <span>Status Lisensi & Manajemen Penjualan TV Masjid</span>
+            </h2>
+            <p class="text-xs text-slate-400 mt-1">Atur lisensi aktivasi bagi pembeli aplikasi atau paket perangkat TV masjid Anda.</p>
+          </div>
+          <span id="licenseStatusBadge" class="px-3 py-1 bg-emerald-950 text-emerald-300 border border-emerald-700/60 rounded-xl text-xs font-black tracking-wider uppercase">ACTIVE</span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
+          <div class="bg-slate-950 border border-slate-800 p-4 rounded-xl space-y-3 text-xs">
+            <div class="flex justify-between items-center py-1 border-b border-slate-800/80">
+              <span class="text-slate-400">Kode Lisensi Terdaftar</span>
+              <span id="licenseCodeDisplay" class="font-mono font-bold text-gold-400 text-sm">JM-2026-DEV-PREMIUM</span>
+            </div>
+            <div class="flex justify-between items-center py-1 border-b border-slate-800/80">
+              <span class="text-slate-400">Target Masjid ID</span>
+              <span id="licenseMasjidIdDisplay" class="font-mono font-semibold text-white">masjid_001</span>
+            </div>
+            <div class="flex justify-between items-center py-1 border-b border-slate-800/80">
+              <span class="text-slate-400">Masa Berlaku Lisensi</span>
+              <span id="licenseExpiryDisplay" class="font-semibold text-white">2028-12-31</span>
+            </div>
+            <div class="flex justify-between items-center py-1">
+              <span class="text-slate-400">Device ID Terkoneksi</span>
+              <span id="licenseDeviceDisplay" class="font-mono text-slate-300 truncate max-w-[180px]">TV-ANDROID-DEFAULT</span>
+            </div>
+          </div>
+
+          <!-- Form Update / Aktivasi Lisensi Baru -->
+          <div class="bg-slate-950 border border-slate-800 p-4 rounded-xl space-y-3">
+            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-300">Aktivasi / Perpanjang Lisensi Klien</h4>
+            
+            <div>
+              <label class="block text-[11px] font-semibold text-slate-400 mb-1">Kode Lisensi Baru</label>
+              <input type="text" id="inputNewLicenseCode" placeholder="Contoh: JM-PRO-MASJID001" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-brand-500 uppercase">
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-[11px] font-semibold text-slate-400 mb-1">Status Lisensi</label>
+                <select id="selectLicenseStatus" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-500">
+                  <option value="ACTIVE">ACTIVE (Penuh)</option>
+                  <option value="TRIAL">TRIAL (Uji Coba)</option>
+                  <option value="INACTIVE">INACTIVE (Nonaktif)</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-[11px] font-semibold text-slate-400 mb-1">Masa Berlaku Sampai</label>
+                <input type="date" id="inputLicenseExpiry" value="2028-12-31" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-brand-500">
+              </div>
+            </div>
+
+            <button type="button" onclick="applyLicenseUpdate()" class="w-full bg-slate-800 hover:bg-slate-700 text-gold-400 font-bold text-xs py-2 rounded-lg border border-slate-700 flex items-center justify-center space-x-1.5 transition-all">
+              <i class="fa-solid fa-key"></i>
+              <span>Terapkan Lisensi ke Firestore</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Panduan Bisnis / Monetisasi -->
+        <div class="p-4 rounded-xl bg-gradient-to-r from-brand-950/80 to-slate-900 border border-brand-800/40 text-xs text-slate-300 leading-relaxed">
+          <h4 class="font-bold text-white flex items-center space-x-2 mb-1.5">
+            <i class="fa-solid fa-coins text-gold-400"></i>
+            <span>Peluang Bisnis Digital Signage Masjid (JAMID App):</span>
+          </h4>
+          <p>
+            Dengan panel admin web ini dan Firebase Auth, Anda dapat menjual produk sistem jam digital masjid ke banyak masjid berbeda. 
+            Cukup buat akun login pengurus untuk setiap masjid, atau setel ID masjid (misal: <code class="text-brand-300 font-mono">masjid_002</code>, <code class="text-brand-300 font-mono">masjid_003</code>) sehingga pengurus masjid hanya dapat merubah konten masjid mereka sendiri secara aman dari HP atau laptop.
+          </p>
+        </div>
+      </div>
+    </div>
+
   </main>
 
-  <!-- Footer -->
+  <!-- ========================================== -->
+  <!-- 3. FOOTER                                  -->
+  <!-- ========================================== -->
   <footer class="border-t border-slate-800/80 py-4 px-4 sm:px-6 text-center text-xs text-slate-500">
-    <p>JAMID App • Digital Signage Masjid Ar-Ridho Kejati Lampung &copy; 2026. Powered by Firebase Firestore.</p>
+    <p>JAMID App • Digital Signage Masjid Ar-Ridho Kejati Lampung &copy; 2026. Powered by Firebase Firestore & Auth.</p>
   </footer>
 
-  <!-- Firebase Integration & Controller Logic -->
+  <!-- ========================================== -->
+  <!-- 4. CONTROLLER & FIREBASE SCRIPT LOGIC      -->
+  <!-- ========================================== -->
   <script>
-    // 1. Inisialisasi Firebase menggunakan config yang diberikan
+    // 1. Inisialisasi Firebase menggunakan kredensial proyek user
     const firebaseConfig = {
       apiKey: "AIzaSyAWEEJahfkQ4l9-we-r5PAvyHKFyQcGkjM",
       authDomain: "jamid-app.firebaseapp.com",
@@ -462,29 +998,77 @@
     };
 
     let db = null;
+    let auth = null;
     const MASJID_ID = "masjid_001";
     let activeData = null;
+    let isRegisterMode = false;
+
+    // Helper untuk inisialisasi Firestore
+    function getDb() {
+      if (db) return db;
+      if (typeof firebase !== "undefined" && firebase.firestore) {
+        if (!firebase.apps || !firebase.apps.length) {
+          firebase.initializeApp(firebaseConfig);
+        }
+        db = firebase.firestore();
+        return db;
+      }
+      return null;
+    }
+
+    // Helper untuk Firebase Auth
+    function getAuth() {
+      if (auth) return auth;
+      if (typeof firebase !== "undefined" && firebase.auth) {
+        if (!firebase.apps || !firebase.apps.length) {
+          firebase.initializeApp(firebaseConfig);
+        }
+        auth = firebase.auth();
+        return auth;
+      }
+      return null;
+    }
 
     try {
-      if (!firebase.apps.length) {
+      if (typeof firebase !== "undefined" && !firebase.apps.length) {
         firebase.initializeApp(firebaseConfig);
       }
-      db = firebase.firestore();
-      console.log("Firebase initialized successfully for project:", firebaseConfig.projectId);
-      setupRealtimeListener();
+      if (typeof firebase !== "undefined") {
+        if (firebase.firestore) db = firebase.firestore();
+        if (firebase.auth) auth = firebase.auth();
+        console.log("Firebase initialized successfully for project:", firebaseConfig.projectId);
+      }
     } catch (err) {
       console.error("Firebase init failed:", err);
-      updateStatusBadge(false, "Gagal koneksi: " + err.message);
     }
 
     // Default Running Text
     const DEFAULT_RUNNING_TEXT = "SELAMAT DATANG DI MASJID AR-RIDHO KEJATI LAMPUNG • WAKTU SHALAT MENGIKUTI JADWAL YANG TAMPIL DI LAYAR • MARI SHALAT BERJAMAAH • LURUSKAN DAN RAPATKAN SHAF • MOHON SENYAPKAN TELEPON SAAT MEMASUKI MASJID • JAGA KEBERSIHAN MASJID • DILARANG BERJUAL BELI DI DALAM MASJID • HARAP MENJAGA KETENANGAN • MARI PERBANYAK DZIKIR DAN MEMBACA AL-QUR'AN • INFO KAJIAN DAN KEGIATAN MASJID DAPAT DILIHAT PADA LAYAR • DONASI PEMBANGUNAN DAN OPERASIONAL MASJID DAPAT DISALURKAN MELALUI QRIS • JAZAKUMULLAHU KHAIRAN •";
 
-    function resetRunningTextDefault() {
-      document.getElementById('runningTextInput').value = DEFAULT_RUNNING_TEXT;
-      showToast("Teks berjalan direset ke default Masjid Ar-Ridho", "info");
-    }
+    // Palette Data for Live Preview
+    const THEME_PALETTES = {
+      JAMID_CYAN: { title: "JAMID App Toska Cyan", color: "#0891b2" },
+      HIJAU_ELEGAN: { title: "Hijau Elegan", color: "#1B6B44" },
+      HIJAU_ZAMRUD: { title: "Hijau Zamrud", color: "#047857" },
+      SULTAN_EMERALD_GOLD: { title: "Sultan Zamrud Emas", color: "#065F46" },
+      ROYAL_SAPPHIRE: { title: "Safir Royal Navy", color: "#1E40AF" },
+      MADINAH_BRONZE: { title: "Madinah Bronze", color: "#92400E" },
+      BIRU_NAVY: { title: "Biru Navy", color: "#1D4ED8" },
+      GOLD_LUXURY: { title: "Gold Luxury", color: "#B45309" },
+      MERAH_MARUN: { title: "Merah Marun", color: "#9F1239" },
+      MONOCHROME_SLATE: { title: "Monokrom Abu", color: "#334155" }
+    };
 
+    const LAYOUT_TITLES = {
+      JAMID_APP: "Layout JAMID App",
+      KLASIK: "Layout Klasik",
+      MODERN: "Layout Modern",
+      MINIMAL: "Layout Minimal",
+      ELEGAN: "Layout Elegan",
+      PENGUMUMAN: "Layout Pengumuman"
+    };
+
+    // --- Tab Switching Logic ---
     function switchTab(tabKey) {
       document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.classList.remove('bg-brand-800', 'text-white', 'border-brand-600');
@@ -507,6 +1091,42 @@
       }
     }
 
+    // --- Theme & Layout Selection UI Handlers ---
+    function selectThemeOption(themeKey) {
+      document.getElementById('selectedThemeKey').value = themeKey;
+      document.querySelectorAll('.theme-card').forEach(card => {
+        card.classList.remove('theme-card-selected');
+        const icon = card.querySelector('.theme-check');
+        if (icon) icon.classList.add('hidden');
+      });
+
+      const selectedCard = document.getElementById('theme-card-' + themeKey);
+      if (selectedCard) {
+        selectedCard.classList.add('theme-card-selected');
+        const icon = selectedCard.querySelector('.theme-check');
+        if (icon) icon.classList.remove('hidden');
+      }
+
+      const info = THEME_PALETTES[themeKey] || { title: themeKey, color: "#0891b2" };
+      document.getElementById('previewThemeTitle').innerText = info.title;
+      document.getElementById('previewColorCircle').style.backgroundColor = info.color;
+    }
+
+    function selectLayoutOption(layoutKey) {
+      document.getElementById('selectedLayoutKey').value = layoutKey;
+      document.querySelectorAll('.layout-card').forEach(card => {
+        card.classList.remove('layout-card-selected');
+      });
+
+      const selectedCard = document.getElementById('layout-card-' + layoutKey);
+      if (selectedCard) {
+        selectedCard.classList.add('layout-card-selected');
+      }
+
+      document.getElementById('previewLayoutTitle').innerText = LAYOUT_TITLES[layoutKey] || layoutKey;
+    }
+
+    // --- Cloud Status Indicator Helper ---
     function updateStatusBadge(isOnline, message) {
       const dot = document.getElementById('cloudStatusDot');
       const text = document.getElementById('cloudStatusText');
@@ -526,35 +1146,49 @@
       }
     }
 
+    // --- Setup Realtime Listener ---
     function setupRealtimeListener() {
-      if (!db) return;
+      const database = getDb();
+      if (!database) return;
       updateStatusBadge(true, "Menghubungkan ke Firestore...");
 
-      db.collection("masjids").document(MASJID_ID)
-        .onSnapshot((doc) => {
-          if (doc.exists) {
-            activeData = doc.data();
-            populateForm(activeData);
-            updateStatusBadge(true, "Tersambung Realtime");
-            const dateStr = activeData.lastUpdatedString || new Date().toLocaleTimeString('id-ID');
-            document.getElementById('lastUpdatedMobile').innerText = "Diperbarui: " + dateStr;
-          } else {
-            console.log("Dokumen belum ada di Firestore, menggunakan template bawaan Ar-Ridho.");
-            populateDefaultArRidho();
-            updateStatusBadge(true, "Siap Simpan (Data Baru)");
-          }
-        }, (error) => {
-          console.error("Firestore listen error:", error);
-          updateStatusBadge(false, "Koneksi Error");
-        });
+      const col = database.collection("masjids");
+      const docRef = (typeof col.doc === "function") ? col.doc(MASJID_ID) : col.document(MASJID_ID);
+
+      docRef.onSnapshot((doc) => {
+        if (doc.exists) {
+          activeData = doc.data();
+          populateForm(activeData);
+          updateStatusBadge(true, "Tersambung Realtime");
+          const dateStr = activeData.lastUpdatedString || new Date().toLocaleTimeString('id-ID');
+          document.getElementById('lastUpdatedMobile').innerText = "Diperbarui: " + dateStr;
+        } else {
+          console.log("Dokumen belum ada di Firestore, menggunakan template bawaan Ar-Ridho.");
+          populateDefaultArRidho();
+          updateStatusBadge(true, "Siap Simpan (Data Baru)");
+        }
+      }, (error) => {
+        console.error("Firestore listen error:", error);
+        updateStatusBadge(false, "Koneksi Error: " + (error.message || error));
+      });
     }
 
+    // --- Default Form Populator ---
     function populateDefaultArRidho() {
       document.getElementById('mosqueName').value = "Masjid Ar-Ridho";
       document.getElementById('mosqueAddress').value = "Jl. Jaksa Agung R. Soeprapto No. 226 Teluk Betung Selatan";
       document.getElementById('mosqueCity').value = "Bandar Lampung";
       document.getElementById('mosqueLeader').value = "DKM Masjid Ar-Ridho Kejati Lampung";
       document.getElementById('mosquePhone').value = "-";
+      document.getElementById('mosqueLatitude').value = -5.4414;
+      document.getElementById('mosqueLongitude').value = 105.2580;
+
+      selectThemeOption('JAMID_CYAN');
+      selectLayoutOption('JAMID_APP');
+      document.getElementById('prayerColorModeSelect').value = "HARMONIOUS";
+      document.getElementById('displayModeSelect').value = "OTOMATIS";
+      document.getElementById('autoMainDurationInput').value = 20;
+      document.getElementById('effect3dEnabled').checked = true;
 
       document.getElementById('runningTextInput').value = DEFAULT_RUNNING_TEXT;
       document.getElementById('runningTextSpeed').value = "45";
@@ -584,49 +1218,93 @@
 
       document.getElementById('ytActive').checked = false;
       document.getElementById('ytVideoId').value = "";
+
+      document.getElementById('adminPinInput').value = "1234";
+      document.getElementById('hijriAdjustmentInput').value = 0;
+
+      document.getElementById('inputNewLicenseCode').value = "JM-2026-DEV-PREMIUM";
+      document.getElementById('licenseCodeDisplay').innerText = "JM-2026-DEV-PREMIUM";
+      document.getElementById('licenseStatusBadge').innerText = "ACTIVE";
     }
 
+    // --- Populate Form from Remote Cloud Snapshot ---
     function populateForm(data) {
       if (!data) return;
 
       if (data.profile) {
         document.getElementById('mosqueName').value = data.profile.name || "Masjid Ar-Ridho";
+        document.getElementById('headerMosqueName').innerText = data.profile.name || "Masjid Ar-Ridho";
         document.getElementById('mosqueAddress').value = data.profile.address || "";
         document.getElementById('mosqueCity').value = data.profile.city || "Bandar Lampung";
         document.getElementById('mosqueLeader').value = data.profile.leaderName || "";
         document.getElementById('mosquePhone').value = data.profile.phoneNumber || "";
+        if (data.profile.latitude) document.getElementById('mosqueLatitude').value = data.profile.latitude;
+        if (data.profile.longitude) document.getElementById('mosqueLongitude').value = data.profile.longitude;
+      }
+
+      if (data.appConfig) {
+        const cfg = data.appConfig;
+        if (cfg.theme) {
+          selectThemeOption(cfg.theme);
+        }
+        if (cfg.tvLayout) {
+          selectLayoutOption(cfg.tvLayout);
+        }
+        if (cfg.prayerColorMode) {
+          document.getElementById('prayerColorModeSelect').value = cfg.prayerColorMode;
+        }
+        if (cfg.displayMode) {
+          document.getElementById('displayModeSelect').value = cfg.displayMode;
+        }
+        if (cfg.autoMainDurationSeconds) {
+          document.getElementById('autoMainDurationInput').value = cfg.autoMainDurationSeconds;
+        }
+        if (typeof cfg.is3dEffectEnabled === "boolean") {
+          document.getElementById('effect3dEnabled').checked = cfg.is3dEffectEnabled;
+        }
+        if (cfg.adminPin) {
+          document.getElementById('adminPinInput').value = cfg.adminPin;
+        }
+        if (typeof cfg.hijriAdjustmentDays === "number") {
+          document.getElementById('hijriAdjustmentInput').value = cfg.hijriAdjustmentDays;
+        }
+
+        if (cfg.iqamahConfig) {
+          const iq = cfg.iqamahConfig;
+          document.getElementById('adzanDurationInput').value = iq.adzanDurationSeconds || 120;
+          document.getElementById('shalatDurationInput').value = iq.shalatBerjamaahDurationMinutes || iq.shalatDurationMinutes || 10;
+          document.getElementById('iqSubuh').value = iq.subuhWaitMinutes || iq.subuhMinutes || 12;
+          document.getElementById('iqDzuhur').value = iq.dzuhurWaitMinutes || iq.dzuhurMinutes || 10;
+          document.getElementById('iqAshar').value = iq.asharWaitMinutes || iq.asharMinutes || 10;
+          document.getElementById('iqMaghrib').value = iq.maghribWaitMinutes || iq.maghribMinutes || 8;
+          document.getElementById('iqIsya').value = iq.isyaWaitMinutes || iq.isyaMinutes || 10;
+        }
+
+        if (cfg.youtubeLiveConfig) {
+          document.getElementById('ytActive').checked = cfg.youtubeLiveConfig.isActive || cfg.youtubeLiveConfig.enabled || false;
+          document.getElementById('ytVideoId').value = cfg.youtubeLiveConfig.videoIdOrUrl || cfg.youtubeLiveConfig.youtubeUrlOrId || "";
+        }
       }
 
       if (data.runningTexts && data.runningTexts.length > 0) {
         document.getElementById('runningTextInput').value = data.runningTexts[0].text || DEFAULT_RUNNING_TEXT;
         document.getElementById('runningTextSpeed').value = data.runningTexts[0].speed || 45;
-        document.getElementById('runningTextActive').value = data.runningTexts[0].isActive ? "true" : "false";
-      }
-
-      if (data.appConfig && data.appConfig.iqamahConfig) {
-        const iq = data.appConfig.iqamahConfig;
-        document.getElementById('adzanDurationInput').value = iq.adzanDurationSeconds || 120;
-        document.getElementById('shalatDurationInput').value = iq.shalatDurationMinutes || 10;
-        document.getElementById('iqSubuh').value = iq.subuhMinutes || 12;
-        document.getElementById('iqDzuhur').value = iq.dzuhurMinutes || 10;
-        document.getElementById('iqAshar').value = iq.asharMinutes || 10;
-        document.getElementById('iqMaghrib').value = iq.maghribMinutes || 8;
-        document.getElementById('iqIsya').value = iq.isyaMinutes || 10;
+        document.getElementById('runningTextActive').value = (data.runningTexts[0].isActive !== false && data.runningTexts[0].enabled !== false) ? "true" : "false";
       }
 
       if (data.kajianList && data.kajianList.length > 0) {
         const k = data.kajianList[0];
-        document.getElementById('kajianTitle').value = k.title || "Kajian Islam Rutin";
-        document.getElementById('kajianSpeaker').value = k.speaker || "Asatidz DKM Ar-Ridho";
-        document.getElementById('kajianSchedule').value = k.dayOrDate || "Setiap Hari Rabu ba'da Shalat Dzuhur";
-        document.getElementById('kajianDescription').value = k.description || "";
+        document.getElementById('kajianTitle').value = k.title || k.judul || "Kajian Islam Rutin";
+        document.getElementById('kajianSpeaker').value = k.speaker || k.pemateri || "Asatidz DKM Ar-Ridho";
+        document.getElementById('kajianSchedule').value = k.dayOrDate || k.hari || "Setiap Hari Rabu ba'da Shalat Dzuhur";
+        document.getElementById('kajianDescription').value = k.description || k.deskripsi || "";
       }
 
       if (data.financialReport) {
-        document.getElementById('finIncome').value = data.financialReport.totalIncome || 0;
-        document.getElementById('finExpense').value = data.financialReport.totalExpense || 0;
-        document.getElementById('finBalance').value = data.financialReport.currentBalance || 0;
-        document.getElementById('financialShowOnTv').checked = data.financialReport.displayOnTv || false;
+        document.getElementById('finIncome').value = data.financialReport.totalIncome || data.financialReport.pemasukan || 0;
+        document.getElementById('finExpense').value = data.financialReport.totalExpense || data.financialReport.pengeluaran || 0;
+        document.getElementById('finBalance').value = data.financialReport.currentBalance || data.financialReport.saldoAkhir || 0;
+        document.getElementById('financialShowOnTv').checked = (data.financialReport.displayOnTv || data.financialReport.enabled || false);
       }
 
       if (data.qrisData) {
@@ -635,14 +1313,27 @@
         document.getElementById('qrisAccountName').value = data.qrisData.accountHolder || "Masjid Ar Ridho Kejati Lampung";
       }
 
-      if (data.appConfig && data.appConfig.youtubeLiveConfig) {
-        document.getElementById('ytActive').checked = data.appConfig.youtubeLiveConfig.isActive || false;
-        document.getElementById('ytVideoId').value = data.appConfig.youtubeLiveConfig.videoIdOrUrl || "";
+      if (data.license) {
+        const lic = data.license;
+        document.getElementById('licenseCodeDisplay').innerText = lic.licenseCode || "JM-2026-DEV-PREMIUM";
+        document.getElementById('inputNewLicenseCode').value = lic.licenseCode || "JM-2026-DEV-PREMIUM";
+        document.getElementById('licenseStatusBadge').innerText = lic.status || "ACTIVE";
+        document.getElementById('selectLicenseStatus').value = lic.status || "ACTIVE";
+        document.getElementById('licenseExpiryDisplay').innerText = lic.expiryDate || "2028-12-31";
+        document.getElementById('inputLicenseExpiry').value = lic.expiryDate || "2028-12-31";
+        if (lic.deviceId) document.getElementById('licenseDeviceDisplay').innerText = lic.deviceId;
       }
     }
 
+    function resetRunningTextDefault() {
+      document.getElementById('runningTextInput').value = DEFAULT_RUNNING_TEXT;
+      showToast("Teks berjalan direset ke default Masjid Ar-Ridho", "info");
+    }
+
+    // --- Save Everything to Firebase Firestore ---
     async function saveAllToCloud() {
-      if (!db) {
+      const database = getDb();
+      if (!database) {
         alert("Firebase belum terhubung. Periksa koneksi internet Anda.");
         return;
       }
@@ -659,15 +1350,20 @@
           hour: '2-digit', minute: '2-digit', second: '2-digit'
         });
 
-        // 1. Profile
+        // 1. Profile Data (Kompatibel dengan MosqueProfile Android)
         const profile = {
-          id: 1,
           name: document.getElementById('mosqueName').value.trim() || "Masjid Ar-Ridho",
           address: document.getElementById('mosqueAddress').value.trim(),
           city: document.getElementById('mosqueCity').value.trim() || "Bandar Lampung",
+          province: "Lampung",
           leaderName: document.getElementById('mosqueLeader').value.trim(),
           phoneNumber: document.getElementById('mosquePhone').value.trim(),
-          logoUri: ""
+          logoUrl: (activeData && activeData.profile && activeData.profile.logoUrl) ? activeData.profile.logoUrl : "",
+          latitude: parseFloat(document.getElementById('mosqueLatitude').value) || -5.4414,
+          longitude: parseFloat(document.getElementById('mosqueLongitude').value) || 105.2580,
+          isLogoEnabled: true,
+          logoPosition: "AUTO",
+          logoSize: "AUTO"
         };
 
         // 2. Running Text
@@ -675,81 +1371,143 @@
         const speed = parseInt(document.getElementById('runningTextSpeed').value) || 45;
         const isActiveText = document.getElementById('runningTextActive').value === "true";
         const runningTexts = [{
-          id: 1,
+          id: "rt_1",
           text: runningTextString,
           speed: speed,
-          isActive: isActiveText
+          enabled: isActiveText,
+          isActive: isActiveText,
+          position: "BOTTOM"
         }];
 
-        // 3. Iqamah Config & App Config
+        // 3. Iqamah Config & App Config (Kompatibel dengan JamMasjid AppConfig Android)
         const adzanDuration = parseInt(document.getElementById('adzanDurationInput').value) || 120;
         const shalatDuration = parseInt(document.getElementById('shalatDurationInput').value) || 10;
         const iqamahConfig = {
+          subuhWaitMinutes: parseInt(document.getElementById('iqSubuh').value) || 12,
+          dzuhurWaitMinutes: parseInt(document.getElementById('iqDzuhur').value) || 10,
+          asharWaitMinutes: parseInt(document.getElementById('iqAshar').value) || 10,
+          maghribWaitMinutes: parseInt(document.getElementById('iqMaghrib').value) || 8,
+          isyaWaitMinutes: parseInt(document.getElementById('iqIsya').value) || 10,
+          adzanDurationSeconds: adzanDuration,
+          shalatBerjamaahDurationMinutes: shalatDuration,
+          // Fallback legacy field names
           subuhMinutes: parseInt(document.getElementById('iqSubuh').value) || 12,
           dzuhurMinutes: parseInt(document.getElementById('iqDzuhur').value) || 10,
           asharMinutes: parseInt(document.getElementById('iqAshar').value) || 10,
           maghribMinutes: parseInt(document.getElementById('iqMaghrib').value) || 8,
           isyaMinutes: parseInt(document.getElementById('iqIsya').value) || 10,
-          adzanDurationSeconds: adzanDuration,
-          shalatDurationMinutes: shalatDuration,
-          beepEnabled: true,
-          beepVolume: 0.8
+          shalatDurationMinutes: shalatDuration
         };
 
         const ytActive = document.getElementById('ytActive').checked;
         const ytUrl = document.getElementById('ytVideoId').value.trim();
 
+        const selectedTheme = document.getElementById('selectedThemeKey').value || "JAMID_CYAN";
+        const selectedLayout = document.getElementById('selectedLayoutKey').value || "JAMID_APP";
+        const selectedPrayerColorMode = document.getElementById('prayerColorModeSelect').value || "HARMONIOUS";
+        const selectedDisplayMode = document.getElementById('displayModeSelect').value || "OTOMATIS";
+        const mainDuration = parseInt(document.getElementById('autoMainDurationInput').value) || 20;
+        const effect3d = document.getElementById('effect3dEnabled').checked;
+        const adminPin = document.getElementById('adminPinInput').value.trim() || "1234";
+        const hijriAdj = parseInt(document.getElementById('hijriAdjustmentInput').value) || 0;
+
         const appConfig = {
-          id: 1,
-          slideIntervalSeconds: 15,
-          darkTheme: true,
-          themeMode: "AUTO_GPS",
+          displayMode: selectedDisplayMode,
+          manualScreen: "MAIN",
+          autoMainDurationSeconds: mainDuration,
+          adminPin: adminPin,
+          theme: selectedTheme,
+          prayerColorMode: selectedPrayerColorMode,
+          tvLayout: selectedLayout,
+          locationSource: "CITY_PRESET",
+          selectedCityName: profile.city,
+          calculationMethod: "KEMENAG_MABIMS",
+          corrections: { subuh: 2, terbit: 2, dzuhur: 2, ashar: 2, maghrib: 2, isya: 2 },
+          hijriAdjustmentDays: hijriAdj,
           iqamahConfig: iqamahConfig,
           youtubeLiveConfig: {
+            enabled: ytActive,
+            isActive: ytActive,
+            youtubeUrlOrId: ytUrl,
             videoIdOrUrl: ytUrl,
             title: "Live Streaming Masjid Ar-Ridho",
-            isActive: ytActive,
-            autoReturnToSignage: true,
-            displayDurationMinutes: 60
-          }
+            durationSeconds: 3600,
+            sortOrder: 99
+          },
+          backgroundConfig: {
+            enabled: true,
+            customImagePath: "",
+            darkOverlayPercent: 30,
+            blurRadiusDp: 0,
+            cropPosition: "CENTER"
+          },
+          is3dEffectEnabled: effect3d
         };
 
-        // 4. Kajian
+        // 4. Kajian List
         const kajianList = [{
-          id: 1,
+          id: "kajian_1",
+          judul: document.getElementById('kajianTitle').value.trim() || "Kajian Islam Rutin",
           title: document.getElementById('kajianTitle').value.trim() || "Kajian Islam Rutin",
-          speaker: document.getElementById('kajianSpeaker').value.trim(),
+          pemateri: document.getElementById('kajianSpeaker').value.trim() || "Asatidz DKM Ar-Ridho",
+          speaker: document.getElementById('kajianSpeaker').value.trim() || "Asatidz DKM Ar-Ridho",
+          hari: document.getElementById('kajianSchedule').value.trim() || "Setiap Hari Rabu",
           dayOrDate: document.getElementById('kajianSchedule').value.trim(),
-          time: "Ba'da Shalat Dzuhur",
+          tanggal: "Setiap Pekan",
+          waktu: "Ba'da Shalat Dzuhur",
+          lokasi: "Masjid Ar-Ridho Kejati Lampung",
+          deskripsi: document.getElementById('kajianDescription').value.trim(),
           description: document.getElementById('kajianDescription').value.trim(),
+          enabled: true,
+          durationSeconds: 10,
           sortOrder: 1
         }];
 
-        // 5. Financial
+        // 5. Financial Report
         const finIncome = parseFloat(document.getElementById('finIncome').value) || 0;
         const finExpense = parseFloat(document.getElementById('finExpense').value) || 0;
         const finBalance = parseFloat(document.getElementById('finBalance').value) || 0;
         const finShow = document.getElementById('financialShowOnTv').checked;
 
         const financialReport = {
-          id: 1,
+          id: "fin_1",
+          periode: "September 2026",
           periodTitle: "Laporan Kas Masjid Ar-Ridho",
+          saldoAwal: 0,
+          pemasukan: finIncome,
           totalIncome: finIncome,
+          pengeluaran: finExpense,
           totalExpense: finExpense,
+          saldoAkhir: finBalance,
           currentBalance: finBalance,
-          bankName: document.getElementById('qrisBank').value.trim(),
-          accountNumber: document.getElementById('qrisAccountNumber').value.trim(),
+          catatan: "Laporan Kas & Infaq Masjid Ar-Ridho Kejati Lampung",
+          enabled: finShow,
           displayOnTv: finShow
         };
 
-        // 6. QRIS
+        // 6. QRIS Data
         const qrisData = {
-          id: 1,
+          id: "qris_1",
           qrisImageUrl: "",
           bankName: document.getElementById('qrisBank').value.trim(),
           accountNumber: document.getElementById('qrisAccountNumber').value.trim(),
           accountHolder: document.getElementById('qrisAccountName').value.trim(),
           infaqDescription: "Donasi pembangunan & operasional Masjid Ar-Ridho dapat disalurkan via QRIS / transfer BSI"
+        };
+
+        // 7. License Data
+        const licenseCode = document.getElementById('inputNewLicenseCode').value.trim() || "JM-2026-DEV-PREMIUM";
+        const licenseStatus = document.getElementById('selectLicenseStatus').value || "ACTIVE";
+        const licenseExpiry = document.getElementById('inputLicenseExpiry').value || "2028-12-31";
+
+        const license = {
+          licenseCode: licenseCode,
+          status: licenseStatus,
+          deviceId: (activeData && activeData.license && activeData.license.deviceId) ? activeData.license.deviceId : "TV-ANDROID-DEFAULT",
+          masjidId: MASJID_ID,
+          activationDate: "2026-09-01",
+          expiryDate: licenseExpiry,
+          lastSync: "Cloud Firestore Synced"
         };
 
         const payload = {
@@ -759,13 +1517,17 @@
           kajianList: kajianList,
           financialReport: financialReport,
           qrisData: qrisData,
+          license: license,
           lastUpdated: now,
           lastUpdatedString: timeStr,
           updatedByDevice: "Web Admin (HP/PC)"
         };
 
-        await db.collection("masjids").document(MASJID_ID).set(payload, { merge: true });
-        showToast("Berhasil disimpan! Layar Android TV di masjid akan otomatis terupdate saat ini juga.", "success");
+        const col = database.collection("masjids");
+        const docRef = (typeof col.doc === "function") ? col.doc(MASJID_ID) : col.document(MASJID_ID);
+        await docRef.set(payload, { merge: true });
+
+        showToast("Berhasil disimpan! Tema warna dan seluruh pengaturan TV langsung terupdate saat ini juga.", "success");
       } catch (err) {
         console.error("Save error:", err);
         showToast("Gagal menyimpan ke cloud: " + err.message, "error");
@@ -775,6 +1537,13 @@
       }
     }
 
+    // --- Apply License Update Directly ---
+    async function applyLicenseUpdate() {
+      await saveAllToCloud();
+      showToast("Lisensi berhasil diperbarui di cloud database!", "success");
+    }
+
+    // --- Toast Notification Helpers ---
     function showToast(message, type = "success") {
       const toast = document.getElementById('toastNotification');
       const toastMsg = document.getElementById('toastMessage');
@@ -801,8 +1570,122 @@
       document.getElementById('toastNotification').classList.add('hidden');
     }
 
-    // Auto-init defaults
+    // ==========================================
+    // 5. FIREBASE AUTHENTICATION LOGIC (NEW!)
+    // ==========================================
+    function checkAuthState() {
+      const authInstance = getAuth();
+      if (!authInstance) {
+        console.warn("Auth SDK not loaded, allowing direct session.");
+        setupRealtimeListener();
+        return;
+      }
+
+      authInstance.onAuthStateChanged((user) => {
+        const authScreen = document.getElementById('authScreen');
+        if (user) {
+          console.log("Logged in user:", user.email);
+          authScreen.classList.add('hidden');
+          setupRealtimeListener();
+        } else {
+          console.log("No user logged in, displaying auth modal.");
+          authScreen.classList.remove('hidden');
+        }
+      });
+    }
+
+    function toggleAuthMode() {
+      isRegisterMode = !isRegisterMode;
+      const title = document.getElementById('authSubmitText');
+      const switchBtn = document.getElementById('authSwitchModeBtn');
+      const alertBox = document.getElementById('authAlert');
+      alertBox.classList.add('hidden');
+
+      if (isRegisterMode) {
+        title.innerText = "Daftar Akun Baru & Masuk";
+        switchBtn.innerText = "Sudah punya akun admin? Masuk disini";
+      } else {
+        title.innerText = "Masuk ke Panel Admin";
+        switchBtn.innerText = "Belum punya akun admin? Buat Akun Baru / Daftar Lisensi";
+      }
+    }
+
+    function toggleAuthPasswordVisibility() {
+      const pass = document.getElementById('authPassword');
+      const icon = document.getElementById('authEyeIcon');
+      if (pass.type === "password") {
+        pass.type = "text";
+        icon.className = "fa-solid fa-eye-slash";
+      } else {
+        pass.type = "password";
+        icon.className = "fa-solid fa-eye";
+      }
+    }
+
+    async function handleAuthSubmit(event) {
+      event.preventDefault();
+      const email = document.getElementById('authEmail').value.trim();
+      const password = document.getElementById('authPassword').value;
+      const alertBox = document.getElementById('authAlert');
+      const alertText = document.getElementById('authAlertText');
+      const btn = document.getElementById('btnAuthSubmit');
+      const originalText = btn.innerHTML;
+
+      alertBox.classList.add('hidden');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Memproses...';
+
+      const authInstance = getAuth();
+      if (!authInstance) {
+        alert("Firebase Auth belum siap.");
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+        return;
+      }
+
+      try {
+        if (isRegisterMode) {
+          await authInstance.createUserWithEmailAndPassword(email, password);
+        } else {
+          await authInstance.signInWithEmailAndPassword(email, password);
+        }
+        document.getElementById('authScreen').classList.add('hidden');
+        showToast("Login berhasil! Selamat datang di Panel Admin JAMID.", "success");
+      } catch (err) {
+        console.error("Auth error:", err);
+        let msg = err.message;
+        if (err.code === "auth/user-not-found" || err.code === "auth/wrong-password" || err.code === "auth/invalid-credential") {
+          msg = "Email atau kata sandi tidak sesuai. Jika ini akun baru, silakan klik 'Buat Akun Baru'.";
+        } else if (err.code === "auth/weak-password") {
+          msg = "Kata sandi terlalu pendek (minimal 6 karakter).";
+        } else if (err.code === "auth/email-already-in-use") {
+          msg = "Email sudah terdaftar. Silakan klik 'Masuk disini'.";
+        }
+        alertBox.className = "mb-4 p-3 rounded-xl border border-rose-700 bg-rose-950/80 text-rose-300 text-xs font-semibold flex items-center space-x-2";
+        alertText.innerText = msg;
+        alertBox.classList.remove('hidden');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+      }
+    }
+
+    async function handleLogout() {
+      const authInstance = getAuth();
+      if (authInstance && confirm("Apakah Anda yakin ingin keluar dari panel admin web?")) {
+        try {
+          await authInstance.signOut();
+          document.getElementById('authScreen').classList.remove('hidden');
+          showToast("Anda telah keluar dari panel admin.", "info");
+        } catch (e) {
+          console.error("Logout error:", e);
+        }
+      }
+    }
+
+    // Auto-init on page load
     populateDefaultArRidho();
+    checkAuthState();
   </script>
 </body>
 </html>
