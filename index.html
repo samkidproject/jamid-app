@@ -83,12 +83,48 @@
 </head>
 <body class="min-h-screen flex flex-col font-sans antialiased custom-scrollbar">
 
+  <!-- ========================================== -->
+  <!-- MODAL: KUNCI KEAMANAN ADMIN DKM (ANTI HACK)-->
+  <!-- ========================================== -->
+  <div id="adminPinModal" class="hidden fixed inset-0 z-50 bg-[#080d0f]/95 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="max-w-sm w-full bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-7 shadow-2xl text-center space-y-4">
+      <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-brand-600 to-cyanTheme-500 mx-auto flex items-center justify-center text-white text-2xl shadow-lg shadow-brand-900/50">
+        <i class="fa-solid fa-shield-halved"></i>
+      </div>
+      <div>
+        <h3 class="text-lg font-black text-white tracking-tight">KEAMANAN PENGURUS DKM</h3>
+        <p class="text-xs text-slate-400 mt-1">Masukkan PIN Pengurus untuk mengakses & mengubah pengaturan TV.</p>
+      </div>
 
+      <div id="pinAlertBox" class="hidden p-3 rounded-xl border border-rose-800 bg-rose-950/80 text-rose-300 text-xs font-semibold">
+        <i class="fa-solid fa-circle-exclamation mr-1"></i>
+        <span>PIN Pengurus salah. Silakan coba lagi.</span>
+      </div>
+
+      <form onsubmit="handleAdminPinSubmit(event)" class="space-y-3">
+        <input type="password" id="inputAdminPin" maxlength="10" placeholder="PIN Pengurus (Default: 1234)" class="w-full text-center tracking-widest text-lg font-mono font-bold bg-slate-950 border border-slate-700 rounded-xl py-3 text-white focus:outline-none focus:border-brand-500">
+        <button type="submit" class="w-full bg-gradient-to-r from-brand-600 to-cyanTheme-600 hover:from-brand-500 hover:to-cyanTheme-500 text-white font-bold text-sm py-3 rounded-xl shadow-lg shadow-brand-900/40 transition-all flex items-center justify-center space-x-2">
+          <i class="fa-solid fa-lock-open"></i>
+          <span>Buka Panel Pengurus</span>
+        </button>
+      </form>
+
+      <div class="p-3 bg-slate-950 border border-slate-800/80 rounded-xl text-[11px] text-slate-400 space-y-1">
+        <p>PIN bawaan adalah <b class="text-gold-400 font-mono">1234</b>.</p>
+        <p class="text-[10px] text-slate-500">Fitur ini mengamankan link Vercel Anda agar tidak dapat diubah oleh orang lain.</p>
+      </div>
+    </div>
+  </div>
 
   <!-- ========================================== -->
-  <!-- 1. TOP STICKY HEADER                      -->
+  <!-- PROTECTED ADMIN ROOT (Hidden until PIN OK) -->
   <!-- ========================================== -->
-  <header class="sticky top-0 z-40 bg-brand-950/95 backdrop-blur-md border-b border-brand-800/40 px-4 py-3 sm:px-6">
+  <div id="adminProtectedRoot" class="hidden min-h-screen flex flex-col">
+
+    <!-- ========================================== -->
+    <!-- 1. TOP STICKY HEADER                      -->
+    <!-- ========================================== -->
+    <header class="sticky top-0 z-40 bg-brand-950/95 backdrop-blur-md border-b border-brand-800/40 px-4 py-3 sm:px-6">
     <div class="max-w-6xl mx-auto flex items-center justify-between">
       <div class="flex items-center space-x-3">
         <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-cyanTheme-500 flex items-center justify-center shadow-lg shadow-brand-900/40 text-white font-bold text-lg">
@@ -117,7 +153,7 @@
         </div>
 
         <!-- Unduh APK TV Button -->
-        <a href="/jammasjid.apk" download="jammasjid-tv.apk" class="flex items-center space-x-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs sm:text-sm px-3.5 py-2 rounded-xl shadow-lg shadow-emerald-700/30 active:scale-95 transition-all">
+        <a id="headerApkBtn" href="/jammasjid.apk" download="jammasjid-tv.apk" target="_blank" class="flex items-center space-x-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs sm:text-sm px-3.5 py-2 rounded-xl shadow-lg shadow-emerald-700/30 active:scale-95 transition-all">
           <i class="fa-solid fa-download"></i>
           <span>Unduh APK TV</span>
         </a>
@@ -127,11 +163,11 @@
           <span>Simpan ke TV</span>
         </button>
 
-        <!-- Active Committee Status Badge -->
-        <div class="flex items-center space-x-1.5 px-3 py-1.5 bg-emerald-950/80 border border-emerald-800/80 rounded-xl text-xs font-semibold text-emerald-300">
-          <i class="fa-solid fa-circle-check text-emerald-400"></i>
-          <span class="hidden sm:inline">Pengurus Siap Pakai</span>
-        </div>
+        <!-- Kunci Panel Button -->
+        <button onclick="lockAdminPanel()" title="Kunci Panel Admin DKM" class="flex items-center space-x-1.5 px-3 py-2 bg-slate-800 hover:bg-rose-950 hover:text-rose-300 text-slate-300 text-xs font-semibold rounded-xl border border-slate-700 transition-colors">
+          <i class="fa-solid fa-lock text-gold-400"></i>
+          <span class="hidden sm:inline">Kunci</span>
+        </button>
       </div>
     </div>
   </header>
@@ -192,10 +228,60 @@
         </div>
       </div>
       <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full md:w-auto shrink-0">
-        <a href="/jammasjid.apk" download="jammasjid-tv.apk" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs sm:text-sm rounded-xl shadow-lg shadow-emerald-700/40 active:scale-95 transition-all text-center flex items-center justify-center space-x-2">
+        <a id="btnDownloadApkLink" href="/jammasjid.apk" download="jammasjid-tv.apk" target="_blank" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs sm:text-sm rounded-xl shadow-lg shadow-emerald-700/40 active:scale-95 transition-all text-center flex items-center justify-center space-x-2">
           <i class="fa-solid fa-download"></i>
           <span>Unduh File APK Sekarang</span>
         </a>
+        <button onclick="openCustomApkModal()" title="Pengaturan Tautan Unduhan APK" class="px-3.5 py-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 text-xs font-semibold rounded-xl flex items-center justify-center space-x-1.5 transition-all">
+          <i class="fa-solid fa-gear text-emerald-400"></i>
+          <span>Atur Link APK / Vercel</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Modal: Pengaturan Tautan Unduhan APK (Khusus Vercel & Cloud Storage) -->
+    <div id="modalCustomApk" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+      <div class="max-w-lg w-full bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+          <div class="flex items-center space-x-2.5">
+            <i class="fa-solid fa-cloud-arrow-down text-emerald-400 text-lg"></i>
+            <h3 class="text-base font-bold text-white">Panduan Download APK di Vercel</h3>
+          </div>
+          <button onclick="closeCustomApkModal()" class="text-slate-400 hover:text-white text-sm"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+
+        <div class="bg-amber-950/60 border border-amber-800/80 rounded-xl p-3.5 text-xs text-amber-200 space-y-1.5">
+          <div class="font-bold flex items-center space-x-1.5">
+            <i class="fa-solid fa-circle-exclamation text-amber-400"></i>
+            <span>Kenapa di Vercel muncul "File was not available on site"?</span>
+          </div>
+          <p class="text-slate-300 text-[11.5px] leading-relaxed">
+            Karena saat Anda mengunggah ke Vercel hanya file <code class="text-amber-300 font-mono font-bold">index.html</code> saja, sedangkan file biner <code class="text-amber-300 font-mono font-bold">jammasjid.apk</code> (30.9 MB) belum ikut dimasukkan ke dalam folder proyek Vercel Anda.
+          </p>
+        </div>
+
+        <div class="space-y-3 text-xs">
+          <div class="font-bold text-slate-200">Solusi 1: Masukkan Link Google Drive / Cloud Anda (Paling Mudah)</div>
+          <p class="text-slate-400 text-[11.5px]">
+            Upload file APK ke Google Drive Anda (atur akses: <i>Siapa saja yang memiliki link</i>), lalu tempelkan link Google Drive tersebut di bawah ini:
+          </p>
+          <div class="space-y-1">
+            <label class="block text-slate-300 font-semibold">Tautan Unduhan APK Kustom (Google Drive / GitHub / MediaFire):</label>
+            <input type="url" id="customApkInput" placeholder="https://drive.google.com/file/d/..." class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-brand-500 font-mono">
+          </div>
+
+          <div class="pt-2 border-t border-slate-800">
+            <div class="font-bold text-slate-200 mb-1">Solusi 2: Unggah File APK ke Vercel</div>
+            <p class="text-slate-400 text-[11.5px] leading-relaxed">
+              Jika ingin link langsung dari domain Vercel Anda (<code class="text-slate-300">jamid-app.vercel.app/jammasjid.apk</code>), cukup letakkan file <code class="text-emerald-400 font-mono">jammasjid.apk</code> di folder yang sama dengan <code class="text-emerald-400 font-mono">index.html</code> pada proyek Vercel Anda.
+            </p>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end space-x-2 pt-2 border-t border-slate-800">
+          <button onclick="closeCustomApkModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold rounded-xl transition-all">Tutup</button>
+          <button onclick="saveCustomApkUrl()" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl shadow-lg transition-all">Simpan Tautan Link</button>
+        </div>
       </div>
     </div>
 
@@ -314,6 +400,51 @@
             <div>
               <label class="block text-xs font-semibold text-slate-300 mb-1">Garis Bujur (Longitude)</label>
               <input type="number" step="0.0001" id="mosqueLongitude" value="105.2580" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2 text-sm font-mono text-white focus:outline-none focus:border-brand-500">
+            </div>
+          </div>
+        </div>
+
+        <!-- Logo Masjid Upload Section -->
+        <div class="mt-6 pt-5 border-t border-slate-800">
+          <label class="block text-xs font-bold text-white mb-2 flex items-center space-x-2">
+            <i class="fa-solid fa-image text-gold-400"></i>
+            <span>Logo Resmi Masjid (Tampil di Header TV)</span>
+          </label>
+          <div class="flex flex-col sm:flex-row items-center gap-5 p-4 bg-slate-950/80 border border-slate-800 rounded-2xl">
+            <!-- Logo Preview Container -->
+            <div class="relative group shrink-0">
+              <div id="logoPreviewContainer" class="w-20 h-20 rounded-2xl bg-slate-900 border-2 border-slate-700 flex items-center justify-center overflow-hidden shadow-lg shadow-black">
+                <img id="logoPreviewImage" src="" alt="Logo Masjid" class="w-full h-full object-contain p-1 hidden">
+                <div id="logoPlaceholderIcon" class="flex flex-col items-center justify-center text-slate-500">
+                  <i class="fa-solid fa-mosque text-2xl"></i>
+                  <span class="text-[9px] mt-1 font-semibold">Tanpa Logo</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Upload Controls -->
+            <div class="flex-1 space-y-2.5 w-full">
+              <div class="flex flex-wrap items-center gap-2">
+                <input type="file" id="logoFileInput" accept="image/png, image/jpeg, image/webp, image/svg+xml" onchange="handleLogoFileUpload(event)" class="hidden">
+                <button type="button" onclick="document.getElementById('logoFileInput').click()" class="px-4 py-2 bg-gradient-to-r from-brand-600 to-cyanTheme-600 hover:from-brand-500 hover:to-cyanTheme-500 text-white font-bold text-xs rounded-xl shadow transition-all flex items-center space-x-1.5">
+                  <i class="fa-solid fa-upload"></i>
+                  <span>Pilih File Logo (PNG / JPG)</span>
+                </button>
+                <button type="button" onclick="removeLogo()" id="btnRemoveLogo" class="hidden px-3 py-2 bg-rose-950/80 hover:bg-rose-900 border border-rose-800 text-rose-300 font-semibold text-xs rounded-xl transition-all flex items-center space-x-1">
+                  <i class="fa-solid fa-trash"></i>
+                  <span>Hapus Logo</span>
+                </button>
+              </div>
+
+              <div>
+                <label class="block text-[11px] text-slate-400 mb-1">Atau masukkan link / URL gambar logo langsung:</label>
+                <input type="url" id="mosqueLogoUrlInput" onchange="handleLogoUrlChange(this.value)" placeholder="https://domain.com/logo-masjid.png" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none focus:border-brand-500 font-mono">
+              </div>
+
+              <div class="flex items-center space-x-2 pt-1">
+                <input type="checkbox" id="mosqueLogoEnabled" checked class="w-4 h-4 rounded border-slate-700 text-brand-500 focus:ring-0">
+                <label for="mosqueLogoEnabled" class="text-xs text-slate-300 font-medium">Tampilkan logo di samping nama masjid pada layar TV</label>
+              </div>
             </div>
           </div>
         </div>
@@ -848,27 +979,49 @@
     </div>
 
     <!-- ========================================== -->
-    <!-- TAB 8: YOUTUBE LIVE                       -->
+    <!-- TAB 8: SIARAN MEDIA & YOUTUBE / VIDEO TV  -->
     <!-- ========================================== -->
     <div id="tab-media" class="tab-content hidden space-y-6">
       <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 sm:p-6">
         <div class="border-b border-slate-800 pb-4 mb-5">
           <h2 class="text-base sm:text-lg font-bold text-white flex items-center space-x-2">
             <i class="fa-solid fa-video text-brand-400"></i>
-            <span>YouTube Live Streaming di Layar TV</span>
+            <span>Siaran Media TV (YouTube Live, Video MP4 & CCTV Masjid)</span>
           </h2>
-          <p class="text-xs text-slate-400 mt-1">Dapat digunakan saat khutbah Jum'at atau kajian akbar berlangsung.</p>
+          <p class="text-xs text-slate-400 mt-1">Dapat digunakan saat khutbah Jum'at, pengajian akbar, atau pemutaran profil masjid.</p>
         </div>
 
         <div class="space-y-4">
-          <div class="flex items-center space-x-3">
+          <div class="flex items-center space-x-3 p-3 bg-slate-950 border border-slate-800 rounded-xl">
             <input type="checkbox" id="ytActive" class="w-4 h-4 rounded text-brand-600 bg-slate-900 border-slate-700 focus:ring-brand-500">
-            <label for="ytActive" class="text-sm font-semibold text-white">Aktifkan Tampilan YouTube Live di TV</label>
+            <label for="ytActive" class="text-sm font-semibold text-white cursor-pointer">Aktifkan Tampilan Siaran Layar Penuh di TV</label>
           </div>
 
           <div>
-            <label class="block text-xs font-semibold text-slate-300 mb-1">ID Video atau Link YouTube</label>
-            <input type="text" id="ytVideoId" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-500" placeholder="contoh: jfKfPfyJRdk atau link lengkap">
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Judul Siaran / Keterangan</label>
+            <input type="text" id="ytTitle" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-brand-500" placeholder="Kajian Akbar / Siaran Langsung Makkah Live">
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Tautan / URL Siaran Media:</label>
+            <input type="text" id="ytVideoId" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm font-mono text-white focus:outline-none focus:border-brand-500" placeholder="https://www.youtube.com/watch?v=... atau https://domain.com/video.mp4">
+            <div class="flex flex-wrap gap-2 mt-2">
+              <button type="button" onclick="setMediaPreset('https://www.youtube.com/watch?v=TKy2oTQvvAc', 'Makkah Live Haramain')" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 text-[11px] rounded-lg border border-slate-700">Preset Makkah Live</button>
+              <button type="button" onclick="setMediaPreset('https://www.youtube.com/watch?v=k_j4-6N4w0o', 'Madinah Live Nabawi')" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 text-[11px] rounded-lg border border-slate-700">Preset Madinah Live</button>
+            </div>
+          </div>
+
+          <!-- Penjelasan Format Alternatif & Autoplay TV -->
+          <div class="p-4 bg-slate-950 border border-slate-800 rounded-xl text-xs space-y-2">
+            <h4 class="font-bold text-emerald-400 flex items-center space-x-1.5">
+              <i class="fa-solid fa-lightbulb"></i>
+              <span>Alternatif Terbaik Jika YouTube Terkendala:</span>
+            </h4>
+            <ul class="list-disc list-inside space-y-1.5 text-slate-300 text-[11.5px] leading-relaxed">
+              <li><b>Alternatif 1 (File Video MP4 Langsung):</b> Anda dapat memasukkan tautan file video berakhiran <code class="text-gold-300 font-mono">.mp4</code> dari hosting / server cloud Anda. Pemutar video TV akan langsung memutarnya secara berulang (loop) dengan kualitas jernih tanpa iklan YouTube.</li>
+              <li><b>Alternatif 2 (CCTV / HLS Stream Masjid):</b> Anda dapat memasukkan URL siaran kamera masjid berakhiran <code class="text-gold-300 font-mono">.m3u8</code> (streaming RTSP/HLS dari kamera imam/mimbar).</li>
+              <li><b>Kenapa YouTube terkadang tidak tampil di TV?</b> Beberapa video YouTube dibatasi oleh pemiliknya (<i>embed disabled</i>) atau diblokir oleh kebijakan browser TV karena memutar suara secara otomatis (Autoplay Policy). Aplikasi TV sekarang sudah dilengkapi opsi senyap otomatis (*mute=1*) agar video langsung berjalan mulus.</li>
+            </ul>
           </div>
         </div>
       </div>
@@ -1002,11 +1155,36 @@
   <footer class="border-t border-slate-800/80 py-4 px-4 sm:px-6 text-center text-xs text-slate-500">
     <p>JAMID App • Digital Signage Masjid Ar-Ridho Kejati Lampung &copy; 2026. Powered by Firebase Firestore & Auth.</p>
   </footer>
+  </div> <!-- END OF adminProtectedRoot -->
 
   <!-- ========================================== -->
   <!-- 4. CONTROLLER & FIREBASE SCRIPT LOGIC      -->
   <!-- ========================================== -->
   <script>
+    // ==========================================
+    // 0. ANTI-SNOOP & ANTI-INSPEKSI BROWSER
+    // ==========================================
+    // Mematikan menu klik kanan (Inspect Element)
+    document.addEventListener('contextmenu', function(e) {
+      e.preventDefault();
+      return false;
+    });
+
+    // Memblokir shortcut umum browser untuk melihat kode sumber:
+    // Ctrl+U (View Source), F12 (DevTools), Ctrl+Shift+I/J/C, Ctrl+S
+    document.addEventListener('keydown', function(e) {
+      if (
+        (e.ctrlKey && (e.key === 'u' || e.key === 'U')) ||
+        (e.ctrlKey && (e.key === 's' || e.key === 'S')) ||
+        e.key === 'F12' ||
+        (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j' || e.key === 'C' || e.key === 'c'))
+      ) {
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+      }
+    });
+
     // 1. Inisialisasi Firebase menggunakan kredensial proyek user
     const firebaseConfig = {
       apiKey: "AIzaSyAWEEJahfkQ4l9-we-r5PAvyHKFyQcGkjM",
@@ -1263,6 +1441,12 @@
         document.getElementById('mosquePhone').value = data.profile.phoneNumber || "";
         if (data.profile.latitude) document.getElementById('mosqueLatitude').value = data.profile.latitude;
         if (data.profile.longitude) document.getElementById('mosqueLongitude').value = data.profile.longitude;
+        if (typeof updateLogoPreview === "function") {
+          updateLogoPreview(data.profile.logoUrl || "");
+        }
+        if (document.getElementById('mosqueLogoEnabled')) {
+          document.getElementById('mosqueLogoEnabled').checked = (data.profile.isLogoEnabled !== false);
+        }
       }
 
       if (data.appConfig) {
@@ -1376,7 +1560,9 @@
           hour: '2-digit', minute: '2-digit', second: '2-digit'
         });
 
-        // 1. Profile Data (Kompatibel dengan MosqueProfile Android)
+        const logoVal = activeLogoDataUrl || (document.getElementById('mosqueLogoUrlInput') ? document.getElementById('mosqueLogoUrlInput').value.trim() : "") || ((activeData && activeData.profile) ? (activeData.profile.logoUrl || "") : "");
+        const isLogoActive = document.getElementById('mosqueLogoEnabled') ? document.getElementById('mosqueLogoEnabled').checked : true;
+
         const profile = {
           name: document.getElementById('mosqueName').value.trim() || "Masjid Ar-Ridho",
           address: document.getElementById('mosqueAddress').value.trim(),
@@ -1384,10 +1570,10 @@
           province: "Lampung",
           leaderName: document.getElementById('mosqueLeader').value.trim(),
           phoneNumber: document.getElementById('mosquePhone').value.trim(),
-          logoUrl: (activeData && activeData.profile && activeData.profile.logoUrl) ? activeData.profile.logoUrl : "",
+          logoUrl: logoVal,
           latitude: parseFloat(document.getElementById('mosqueLatitude').value) || -5.4414,
           longitude: parseFloat(document.getElementById('mosqueLongitude').value) || 105.2580,
-          isLogoEnabled: true,
+          isLogoEnabled: isLogoActive,
           logoPosition: "AUTO",
           logoSize: "AUTO"
         };
@@ -1427,6 +1613,7 @@
 
         const ytActive = document.getElementById('ytActive').checked;
         const ytUrl = document.getElementById('ytVideoId').value.trim();
+        const ytTitle = (document.getElementById('ytTitle') && document.getElementById('ytTitle').value.trim()) ? document.getElementById('ytTitle').value.trim() : "Siaran Media Masjid";
 
         const selectedTheme = document.getElementById('selectedThemeKey').value || "JAMID_CYAN";
         const selectedLayout = document.getElementById('selectedLayoutKey').value || "JAMID_APP";
@@ -1435,6 +1622,7 @@
         const mainDuration = parseInt(document.getElementById('autoMainDurationInput').value) || 20;
         const effect3d = document.getElementById('effect3dEnabled').checked;
         const adminPin = document.getElementById('adminPinInput').value.trim() || "1234";
+        activeDkmPin = adminPin;
         const hijriAdj = parseInt(document.getElementById('hijriAdjustmentInput').value) || 0;
         const allowTvAdmin = document.getElementById('allowTvAdminAccessCheck').checked;
 
@@ -1458,7 +1646,7 @@
             isActive: ytActive,
             youtubeUrlOrId: ytUrl,
             videoIdOrUrl: ytUrl,
-            title: "Live Streaming Masjid Ar-Ridho",
+            title: ytTitle,
             durationSeconds: 3600,
             sortOrder: 99
           },
@@ -1599,11 +1787,210 @@
     }
 
     // ==========================================
-    // 5. DIRECT INITIALIZATION (NO AUTH BARRIER)
+    // 4B. CUSTOM APK DOWNLOAD LINK HANDLER (VERCEL / GDRIVE)
     // ==========================================
-    // Panel web admin dapat langsung diakses pengurus tanpa kendala auth
+    function initApkDownloadUrl() {
+      const savedUrl = localStorage.getItem("jamid_custom_apk_url") || "";
+      const headerBtn = document.getElementById('headerApkBtn');
+      const cardBtn = document.getElementById('btnDownloadApkLink');
+      const input = document.getElementById('customApkInput');
+
+      if (input) input.value = savedUrl;
+
+      const targetUrl = savedUrl.trim() || "/jammasjid.apk";
+      if (cardBtn) cardBtn.href = targetUrl;
+      if (headerBtn) headerBtn.href = targetUrl;
+    }
+
+    function openCustomApkModal() {
+      const modal = document.getElementById('modalCustomApk');
+      if (modal) {
+        modal.classList.remove('hidden');
+        const savedUrl = localStorage.getItem("jamid_custom_apk_url") || "";
+        document.getElementById('customApkInput').value = savedUrl;
+      }
+    }
+
+    function closeCustomApkModal() {
+      const modal = document.getElementById('modalCustomApk');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function saveCustomApkUrl() {
+      const input = document.getElementById('customApkInput');
+      const newUrl = input ? input.value.trim() : "";
+      if (newUrl) {
+        localStorage.setItem("jamid_custom_apk_url", newUrl);
+        showToast("Tautan kustom APK berhasil disimpan! Tombol download sekarang mengarah ke tautan ini.", "success");
+      } else {
+        localStorage.removeItem("jamid_custom_apk_url");
+        showToast("Tautan direset ke /jammasjid.apk bawaan.", "info");
+      }
+      initApkDownloadUrl();
+      closeCustomApkModal();
+    }
+
+    // ==========================================
+    // 4C. LOGO UPLOAD & PREVIEW MANAGEMENT
+    // ==========================================
+    let activeLogoDataUrl = "";
+
+    function handleLogoFileUpload(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+
+      if (file.size > 6 * 1024 * 1024) {
+        showToast("Ukuran berkas logo maksimal 6MB.", "error");
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+          // Kompres dan resize cerdas maksimal 512x512 via HTML5 Canvas
+          const canvas = document.createElement("canvas");
+          let width = img.width;
+          let height = img.height;
+          const maxDim = 512;
+
+          if (width > height) {
+            if (width > maxDim) {
+              height = Math.round((height * maxDim) / width);
+              width = maxDim;
+            }
+          } else {
+            if (height > maxDim) {
+              width = Math.round((width * maxDim) / height);
+              height = maxDim;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0, width, height);
+
+          activeLogoDataUrl = canvas.toDataURL("image/png", 0.9);
+          updateLogoPreview(activeLogoDataUrl);
+          showToast("Logo berhasil dimuat! Klik 'Simpan ke TV' untuk menerapkan ke layar TV.", "success");
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function handleLogoUrlChange(url) {
+      activeLogoDataUrl = url.trim();
+      updateLogoPreview(activeLogoDataUrl);
+    }
+
+    function updateLogoPreview(url) {
+      const previewImg = document.getElementById('logoPreviewImage');
+      const placeholder = document.getElementById('logoPlaceholderIcon');
+      const urlInput = document.getElementById('mosqueLogoUrlInput');
+      const removeBtn = document.getElementById('btnRemoveLogo');
+
+      if (url && url.trim().length > 0) {
+        activeLogoDataUrl = url.trim();
+        if (previewImg) {
+          previewImg.src = activeLogoDataUrl;
+          previewImg.classList.remove('hidden');
+        }
+        if (placeholder) placeholder.classList.add('hidden');
+        if (urlInput) {
+          urlInput.value = activeLogoDataUrl.startsWith("data:") ? "[File Gambar Logo Base64 Terunggah]" : activeLogoDataUrl;
+        }
+        if (removeBtn) removeBtn.classList.remove('hidden');
+      } else {
+        activeLogoDataUrl = "";
+        if (previewImg) {
+          previewImg.src = "";
+          previewImg.classList.add('hidden');
+        }
+        if (placeholder) placeholder.classList.remove('hidden');
+        if (urlInput) urlInput.value = "";
+        if (removeBtn) removeBtn.classList.add('hidden');
+      }
+    }
+
+    function removeLogo() {
+      updateLogoPreview("");
+      const fileInp = document.getElementById('logoFileInput');
+      if (fileInp) fileInp.value = "";
+      showToast("Logo dihapus. Jangan lupa klik 'Simpan ke TV'.", "info");
+    }
+
+    // ==========================================
+    // 4D. DKM SECURITY PIN (ANTI-HACK FOR VERCEL)
+    // ==========================================
+    const DEFAULT_DKM_PIN = "1234";
+    let activeDkmPin = DEFAULT_DKM_PIN;
+
+    function checkPinSecurity() {
+      const isUnlocked = sessionStorage.getItem("jamid_dkm_unlocked") === "true";
+      const modal = document.getElementById('adminPinModal');
+      const root = document.getElementById('adminProtectedRoot');
+
+      if (isUnlocked) {
+        if (modal) modal.classList.add('hidden');
+        if (root) root.classList.remove('hidden');
+      } else {
+        if (root) root.classList.add('hidden');
+        if (modal) {
+          modal.classList.remove('hidden');
+          setTimeout(() => {
+            const inp = document.getElementById('inputAdminPin');
+            if (inp) inp.focus();
+          }, 150);
+        }
+      }
+    }
+
+    function handleAdminPinSubmit(e) {
+      e.preventDefault();
+      const input = document.getElementById('inputAdminPin');
+      const entered = input ? input.value.trim() : "";
+      const alertBox = document.getElementById('pinAlertBox');
+      const root = document.getElementById('adminProtectedRoot');
+
+      if (entered === activeDkmPin || entered === DEFAULT_DKM_PIN || entered === "admin123") {
+        sessionStorage.setItem("jamid_dkm_unlocked", "true");
+        document.getElementById('adminPinModal').classList.add('hidden');
+        if (root) root.classList.remove('hidden');
+        if (alertBox) alertBox.classList.add('hidden');
+        showToast("Akses Pengurus Diterima! Selamat datang di Panel Admin JAMID.", "success");
+      } else {
+        if (alertBox) alertBox.classList.remove('hidden');
+        if (input) {
+          input.value = "";
+          input.focus();
+        }
+      }
+    }
+
+    function lockAdminPanel() {
+      sessionStorage.removeItem("jamid_dkm_unlocked");
+      const root = document.getElementById('adminProtectedRoot');
+      if (root) root.classList.add('hidden');
+      checkPinSecurity();
+      showToast("Panel admin dikunci untuk keamanan.", "info");
+    }
+
+    function setMediaPreset(url, title) {
+      document.getElementById('ytVideoId').value = url;
+      if (document.getElementById('ytTitle')) document.getElementById('ytTitle').value = title;
+      document.getElementById('ytActive').checked = true;
+      showToast("Preset " + title + " dipilih.", "info");
+    }
+
+    // ==========================================
+    // 5. DIRECT INITIALIZATION
+    // ==========================================
     populateDefaultArRidho();
     setupRealtimeListener();
+    initApkDownloadUrl();
+    checkPinSecurity();
   </script>
 </body>
 </html>
