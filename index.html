@@ -298,6 +298,112 @@
       </div>
     </div>
 
+    <!-- Modal: Tambah & Edit Agenda Kajian (Multi-Item) -->
+    <div id="modalKajianEditor" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+      <div class="max-w-lg w-full bg-slate-900 border border-slate-800 rounded-3xl p-5 sm:p-6 shadow-2xl space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+          <div class="flex items-center space-x-2.5">
+            <div class="w-8 h-8 rounded-xl bg-indigo-600/30 text-indigo-400 flex items-center justify-center">
+              <i class="fa-solid fa-book-quran text-sm"></i>
+            </div>
+            <h3 id="modalKajianTitle" class="text-sm sm:text-base font-bold text-white">Tambah Agenda Kajian Baru</h3>
+          </div>
+          <button type="button" onclick="closeKajianModal()" class="text-slate-400 hover:text-white text-sm"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+
+        <input type="hidden" id="editKajianId" value="">
+
+        <div class="space-y-3 text-xs">
+          <div>
+            <label class="block text-slate-300 font-semibold mb-1">Judul / Tema Kajian *</label>
+            <input type="text" id="modalKajianJudul" placeholder="Contoh: Kajian Fiqih Ibadah & Tazkiyatun Nafs" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-white focus:outline-none focus:border-indigo-500 text-xs">
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-slate-300 font-semibold mb-1">Penceramah / Ustadz</label>
+              <input type="text" id="modalKajianPemateri" placeholder="Contoh: Asatidz DKM Ar-Ridho" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-white focus:outline-none focus:border-indigo-500 text-xs">
+            </div>
+            <div>
+              <label class="block text-slate-300 font-semibold mb-1">Hari & Waktu</label>
+              <input type="text" id="modalKajianHari" placeholder="Setiap Rabu ba'da Dzuhur" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-white focus:outline-none focus:border-indigo-500 text-xs">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-slate-300 font-semibold mb-1">Lokasi Kegiatan</label>
+            <input type="text" id="modalKajianLokasi" placeholder="Ruang Utama Masjid Ar-Ridho Kejati Lampung" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-white focus:outline-none focus:border-indigo-500 text-xs">
+          </div>
+
+          <div>
+            <label class="block text-slate-300 font-semibold mb-1">Deskripsi Tambahan / Jamaah Sasaran</label>
+            <textarea id="modalKajianDeskripsi" rows="2" placeholder="Terbuka untuk umum, pegawai Kejati Lampung, dan jamaah sekitar." class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2 text-white focus:outline-none focus:border-indigo-500 text-xs"></textarea>
+          </div>
+
+          <div class="flex items-center space-x-2 pt-1">
+            <input type="checkbox" id="modalKajianEnabled" checked class="w-4 h-4 rounded text-indigo-600 bg-slate-950 border-slate-700 focus:ring-indigo-500">
+            <label for="modalKajianEnabled" class="text-xs text-slate-300 font-medium cursor-pointer">Tayangkan agenda kajian ini secara aktif pada layar TV</label>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end space-x-2 pt-3 border-t border-slate-800">
+          <button type="button" onclick="closeKajianModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold rounded-xl transition-all">Batal</button>
+          <button type="button" onclick="saveKajianModalData()" class="px-5 py-2 bg-gradient-to-r from-indigo-600 to-brand-600 hover:from-indigo-500 hover:to-brand-500 text-white text-xs font-bold rounded-xl shadow-lg shadow-indigo-950/60 transition-all flex items-center space-x-1.5">
+            <i class="fa-solid fa-check"></i>
+            <span>Simpan Agenda</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Tambah & Edit Maklumat / Info Pengumuman Masjid (Multi-Item) -->
+    <div id="modalAnnouncementEditor" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+      <div class="max-w-lg w-full bg-slate-900 border border-slate-800 rounded-3xl p-5 sm:p-6 shadow-2xl space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+          <div class="flex items-center space-x-2.5">
+            <div class="w-8 h-8 rounded-xl bg-teal-600/30 text-teal-400 flex items-center justify-center">
+              <i class="fa-solid fa-bullhorn text-sm"></i>
+            </div>
+            <h3 id="modalAnnouncementTitle" class="text-sm sm:text-base font-bold text-white">Tambah Maklumat & Info Baru</h3>
+          </div>
+          <button type="button" onclick="closeAnnouncementModal()" class="text-slate-400 hover:text-white text-sm"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+
+        <input type="hidden" id="editAnnouncementId" value="">
+
+        <div class="space-y-3 text-xs">
+          <div>
+            <label class="block text-slate-300 font-semibold mb-1">Judul Maklumat / Info Pengumuman *</label>
+            <input type="text" id="modalAnnouncementJudul" placeholder="Contoh: Himbauan Kebersihan & Kerapian Sandal" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-white focus:outline-none focus:border-teal-500 text-xs">
+          </div>
+
+          <div>
+            <label class="block text-slate-300 font-semibold mb-1">Isi Pesan / Maklumat Pengumuman *</label>
+            <textarea id="modalAnnouncementMessage" rows="3" placeholder="Tuliskan isi pengumuman lengkap yang akan tampil di layar TV secara bergantian..." class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-white focus:outline-none focus:border-teal-500 text-xs leading-relaxed"></textarea>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-slate-300 font-semibold mb-1">Durasi Tayang di TV (Detik)</label>
+              <input type="number" id="modalAnnouncementDuration" min="5" max="60" value="8" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-white focus:outline-none focus:border-teal-500 text-xs font-mono">
+            </div>
+            <div class="flex items-center pt-5">
+              <input type="checkbox" id="modalAnnouncementEnabled" checked class="w-4 h-4 rounded text-teal-600 bg-slate-950 border-slate-700 focus:ring-teal-500">
+              <label for="modalAnnouncementEnabled" class="text-xs text-slate-300 font-medium ml-2 cursor-pointer">Tayangkan aktif di TV</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end space-x-2 pt-3 border-t border-slate-800">
+          <button type="button" onclick="closeAnnouncementModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold rounded-xl transition-all">Batal</button>
+          <button type="button" onclick="saveAnnouncementModalData()" class="px-5 py-2 bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-500 hover:to-emerald-500 text-white text-xs font-bold rounded-xl shadow-lg shadow-teal-950/60 transition-all flex items-center space-x-1.5">
+            <i class="fa-solid fa-check"></i>
+            <span>Simpan Maklumat</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- Live Preview Banner for TV Theme & Layout -->
     <div id="themePreviewBanner" class="mb-6 p-4 rounded-2xl bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border border-slate-700/70 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
       <div class="flex items-center space-x-3.5">
@@ -793,16 +899,17 @@
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
           <div>
-            <label class="block text-xs font-semibold text-slate-300 mb-2">Variasi Warna Jadwal Shalat</label>
-            <select id="prayerColorModeSelect" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-500">
-              <option value="HARMONIOUS">Warna-warni Harmonis (Rekomendasi)</option>
-              <option value="UNIFORM">Seragam Mengikuti Tema Terpilih</option>
+            <label class="block text-xs font-semibold text-slate-300 mb-2">Variasi Warna Jadwal Shalat & Blok</label>
+            <select id="prayerColorModeSelect" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-brand-500 font-semibold">
+              <option value="HARMONIOUS">🌈 Warna-Warni Cerah per Blok (Subuh, Dzuhur, Ashar, Maghrib, Isya)</option>
+              <option value="UNIFORM">💎 Seragam 1 Warna Mengikuti Tema</option>
             </select>
+            <span class="text-[11px] text-slate-400 mt-1 block">Setiap blok shalat memiliki aksen gradasi cerah tersendiri agar tampilan lebih hidup.</span>
           </div>
 
           <div>
             <label class="block text-xs font-semibold text-slate-300 mb-2">Mode Pergantian Layar TV</label>
-            <select id="displayModeSelect" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-500">
+            <select id="displayModeSelect" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-brand-500">
               <option value="OTOMATIS">Mode Otomatis (Jam + Slideshow)</option>
               <option value="MANUAL">Mode Manual (Statis)</option>
               <option value="FULL_PENGUMUMAN">Mode Full Pengumuman</option>
@@ -818,11 +925,29 @@
           </div>
         </div>
 
+        <!-- Pengaturan Transparansi / Glassmorphism Kaca Kartu -->
+        <div class="mt-5 pt-4 border-t border-slate-800/80 space-y-2">
+          <div class="flex items-center justify-between">
+            <label class="text-xs font-bold text-white flex items-center space-x-2">
+              <i class="fa-solid fa-wand-magic-sparkles text-cyan-400"></i>
+              <span>Tingkat Transparansi / Glassmorphism Kartu TV (Morphone)</span>
+            </label>
+            <span id="glassOpacityLabel" class="text-xs font-mono font-bold px-2.5 py-0.5 rounded-lg bg-cyan-950 text-cyan-300 border border-cyan-800">85% (Kaca Akrilik Modern)</span>
+          </div>
+          <p class="text-[11.5px] text-slate-400">Atur seberapa tembus pandang atau pekat kartu-kartu informasi di atas gambar latar belakang masjid.</p>
+          <input type="range" id="glassOpacitySlider" min="30" max="100" value="85" oninput="updateGlassOpacityLabel(this.value)" class="w-full accent-cyan-400 h-2 bg-slate-950 rounded-lg cursor-pointer">
+          <div class="flex justify-between text-[10px] text-slate-500 font-mono">
+            <span>30% (Kaca Bening / Transparan Tinggi)</span>
+            <span>85% (Kaca Akrilik Mewah)</span>
+            <span>100% (Solid Pekat)</span>
+          </div>
+        </div>
+
         <div class="mt-4 pt-4 border-t border-slate-800/80 flex items-center justify-between">
           <div class="flex items-center space-x-3">
             <input type="checkbox" id="effect3dEnabled" checked class="w-4 h-4 rounded text-brand-600 bg-slate-950 border-slate-700 focus:ring-brand-500">
             <div>
-              <label for="effect3dEnabled" class="text-sm font-semibold text-white">Aktifkan Efek Kedalaman 3D & Bayangan Kartu</label>
+              <label for="effect3dEnabled" class="text-xs sm:text-sm font-semibold text-white">Aktifkan Efek Kedalaman 3D & Bayangan Kartu</label>
               <p class="text-xs text-slate-400">Memberikan efek visual melayang modern pada setiap kartu informasi di layar TV.</p>
             </div>
           </div>
@@ -948,43 +1073,102 @@
     </div>
 
     <!-- ========================================== -->
-    <!-- TAB 5: KAJIAN & INFO                      -->
+    <!-- TAB 5: KAJIAN & INFO (MULTI-ITEM DYNAMIC) -->
     <!-- ========================================== -->
     <div id="tab-kajian" class="tab-content hidden space-y-6">
-      <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 sm:p-6">
-        <div class="flex items-center justify-between border-b border-slate-800 pb-4 mb-5">
+      <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 sm:p-6 shadow-xl">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-4 mb-5">
           <div>
-            <h2 class="text-base sm:text-lg font-bold text-white flex items-center space-x-2">
-              <i class="fa-solid fa-book-quran text-brand-400"></i>
-              <span>Jadwal Kajian & Kegiatan Masjid</span>
-            </h2>
-            <p class="text-xs text-slate-400 mt-1">Tampil bergantian pada slide layar informasi Android TV.</p>
+            <div class="flex items-center space-x-2">
+              <h2 class="text-base sm:text-lg font-bold text-white flex items-center space-x-2">
+                <i class="fa-solid fa-book-quran text-indigo-400"></i>
+                <span>Agenda Kajian & Maklumat Masjid</span>
+              </h2>
+              <span id="kajianCountBadge" class="px-2 py-0.5 rounded-full bg-indigo-950 text-indigo-300 border border-indigo-800 text-[11px] font-mono font-bold">2 Agenda</span>
+            </div>
+            <p class="text-xs text-slate-400 mt-1">Buat beberapa agenda kajian & maklumat masjid. Seluruh agenda aktif akan tampil bergantian secara elegan di TV.</p>
           </div>
+          <button type="button" onclick="openAddKajianModal()" class="px-4 py-2.5 bg-gradient-to-r from-indigo-600 to-brand-600 hover:from-indigo-500 hover:to-brand-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-indigo-950/60 flex items-center justify-center space-x-2 active:scale-95 transition-all">
+            <i class="fa-solid fa-plus"></i>
+            <span>+ Tambah Agenda Kajian</span>
+          </button>
         </div>
 
-        <div class="space-y-4">
-          <div class="bg-slate-950 border border-slate-800 p-4 rounded-xl">
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div class="sm:col-span-2">
-                <label class="block text-xs font-semibold text-slate-300 mb-1">Judul / Tema Kajian</label>
-                <input type="text" id="kajianTitle" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-brand-500" value="Kajian Islam Rutin">
-              </div>
+        <!-- Daftar Kartu Agenda Kajian Aktif -->
+        <div id="kajianCardsContainer" class="space-y-3">
+          <!-- Rendered dynamically by renderKajianCards() -->
+        </div>
 
-              <div>
-                <label class="block text-xs font-semibold text-slate-300 mb-1">Pemateri / Ustadz</label>
-                <input type="text" id="kajianSpeaker" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-brand-500" value="Asatidz DKM Ar-Ridho">
-              </div>
+        <!-- Tombol Tambah Cepat Template Kajian -->
+        <div class="mt-5 pt-4 border-t border-slate-800/80">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs text-slate-400 font-semibold flex items-center space-x-1.5">
+              <i class="fa-solid fa-wand-magic-sparkles text-gold-400"></i>
+              <span>Tambah Cepat dari Template:</span>
+            </span>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <button type="button" onclick="addQuickKajian('Kajian Rutin Subuh Berkah', 'Asatidz DKM Ar-Ridho', 'Setiap Ahad Subuh', 'Ruang Utama Masjid', 'Kajian tafsir & tazkiyatun nafs')" class="px-3 py-1.5 bg-slate-950 hover:bg-slate-800 border border-slate-700/80 rounded-xl text-xs text-slate-300 transition-all flex items-center space-x-1">
+              <i class="fa-solid fa-sun text-amber-400 text-[10px]"></i>
+              <span>+ Subuh Berkah</span>
+            </button>
+            <button type="button" onclick="addQuickKajian('Kajian Fiqih Ibadah', 'Ustadz Pembina DKM', 'Setiap Rabu ba\'da Dzuhur', 'Masjid Ar-Ridho', 'Membahas fiqih shalat dan muamalah praktis')" class="px-3 py-1.5 bg-slate-950 hover:bg-slate-800 border border-slate-700/80 rounded-xl text-xs text-slate-300 transition-all flex items-center space-x-1">
+              <i class="fa-solid fa-book text-emerald-400 text-[10px]"></i>
+              <span>+ Fiqih Dzuhur</span>
+            </button>
+            <button type="button" onclick="addQuickKajian('Tabligh Akbar & Doa Bersama', 'Penceramah Tamu / Ulama', 'Sabtu Malam Ahad (Pekan 1)', 'Halaman & Masjid Ar-Ridho', 'Disediakan jamuan & ramah tamah bersama jamaah')" class="px-3 py-1.5 bg-slate-950 hover:bg-slate-800 border border-slate-700/80 rounded-xl text-xs text-slate-300 transition-all flex items-center space-x-1">
+              <i class="fa-solid fa-users text-cyan-400 text-[10px]"></i>
+              <span>+ Tabligh Akbar</span>
+            </button>
+          </div>
+        </div>
+      </div>
 
-              <div>
-                <label class="block text-xs font-semibold text-slate-300 mb-1">Hari & Waktu</label>
-                <input type="text" id="kajianSchedule" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-brand-500" value="Setiap Hari Rabu ba'da Shalat Dzuhur">
-              </div>
-
-              <div class="sm:col-span-2">
-                <label class="block text-xs font-semibold text-slate-300 mb-1">Deskripsi Tambahan</label>
-                <input type="text" id="kajianDescription" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-brand-500" value="Terbuka untuk umum, pegawai Kejati Lampung, dan jamaah sekitar.">
-              </div>
+      <!-- Blok B: Maklumat & Info Pengumuman Masjid (Multi-Item) -->
+      <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 sm:p-6 shadow-xl">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-4 mb-5">
+          <div>
+            <div class="flex items-center space-x-2">
+              <h2 class="text-base sm:text-lg font-bold text-white flex items-center space-x-2">
+                <i class="fa-solid fa-bullhorn text-teal-400"></i>
+                <span>Maklumat & Info Pengumuman Masjid</span>
+              </h2>
+              <span id="announcementCountBadge" class="px-2 py-0.5 rounded-full bg-teal-950 text-teal-300 border border-teal-800 text-[11px] font-mono font-bold">2 Info</span>
             </div>
+            <p class="text-xs text-slate-400 mt-1">Buat himbauan, pengumuman ibadah, atau maklumat penting. Seluruh pengumuman aktif akan tayang bergantian di layar TV.</p>
+          </div>
+          <button type="button" onclick="openAddAnnouncementModal()" class="px-4 py-2.5 bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-500 hover:to-emerald-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-teal-950/60 flex items-center justify-center space-x-2 active:scale-95 transition-all">
+            <i class="fa-solid fa-plus"></i>
+            <span>+ Tambah Info / Maklumat</span>
+          </button>
+        </div>
+
+        <!-- Daftar Kartu Maklumat / Info Aktif -->
+        <div id="announcementCardsContainer" class="space-y-3">
+          <!-- Rendered dynamically by renderAnnouncementCards() -->
+        </div>
+
+        <!-- Tombol Tambah Cepat Template Pengumuman -->
+        <div class="mt-5 pt-4 border-t border-slate-800/80">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs text-slate-400 font-semibold flex items-center space-x-1.5">
+              <i class="fa-solid fa-wand-magic-sparkles text-amber-400"></i>
+              <span>Tambah Cepat dari Template:</span>
+            </span>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <button type="button" onclick="addQuickAnnouncement('Himbauan Menjaga Kebersihan & Kerapian Sandal', 'Mohon meletakkan alas kaki dan sandal jamaah pada rak yang telah disediakan di serambi demi kenyamanan bersama.')" class="px-3 py-1.5 bg-slate-950 hover:bg-slate-800 border border-slate-700/80 rounded-xl text-xs text-slate-300 transition-all flex items-center space-x-1">
+              <i class="fa-solid fa-shoe-prints text-teal-400 text-[10px]"></i>
+              <span>+ Rak Sandal & Sepatu</span>
+            </button>
+            <button type="button" onclick="addQuickAnnouncement('Infaq & Shadaqah Jumat Berkah', 'Salurkan sedekah terbaik Anda ke kotak infaq atau rekening BSI resmi Masjid Ar-Ridho Kejati Lampung.')" class="px-3 py-1.5 bg-slate-950 hover:bg-slate-800 border border-slate-700/80 rounded-xl text-xs text-slate-300 transition-all flex items-center space-x-1">
+              <i class="fa-solid fa-hand-holding-heart text-rose-400 text-[10px]"></i>
+              <span>+ Infaq Jumat</span>
+            </button>
+            <button type="button" onclick="addQuickAnnouncement('Heningkan Ponsel Saat Masuk Waktu Shalat', 'Demi menjaga kekhusyukan ibadah shalat berjamaah, mohon menonaktifkan atau mematikan nada dering handphone Anda.')" class="px-3 py-1.5 bg-slate-950 hover:bg-slate-800 border border-slate-700/80 rounded-xl text-xs text-slate-300 transition-all flex items-center space-x-1">
+              <i class="fa-solid fa-volume-xmark text-amber-400 text-[10px]"></i>
+              <span>+ Mode Hening HP</span>
+            </button>
           </div>
         </div>
       </div>
@@ -1554,10 +1738,9 @@
       document.getElementById('iqMaghrib').value = 8;
       document.getElementById('iqIsya').value = 10;
 
-      document.getElementById('kajianTitle').value = "Kajian Islam Rutin";
-      document.getElementById('kajianSpeaker').value = "Asatidz DKM Ar-Ridho";
-      document.getElementById('kajianSchedule').value = "Setiap Hari Rabu ba'da Shalat Dzuhur";
-      document.getElementById('kajianDescription').value = "Terbuka untuk umum, pegawai Kejati Lampung, dan jamaah sekitar.";
+      renderKajianCards();
+      renderAnnouncementCards();
+      updateGlassOpacityLabel(85);
 
       document.getElementById('finIncome').value = 0;
       document.getElementById('finExpense').value = 0;
@@ -1612,6 +1795,11 @@
         if (cfg.prayerColorMode) {
           document.getElementById('prayerColorModeSelect').value = cfg.prayerColorMode;
         }
+        if (typeof cfg.glassEffectIntensity === "number" && document.getElementById('glassOpacitySlider')) {
+          const val = Math.round(cfg.glassEffectIntensity * 100);
+          document.getElementById('glassOpacitySlider').value = val;
+          updateGlassOpacityLabel(val);
+        }
         if (cfg.displayMode) {
           document.getElementById('displayModeSelect').value = cfg.displayMode;
         }
@@ -1654,13 +1842,15 @@
         document.getElementById('runningTextActive').value = (data.runningTexts[0].isActive !== false && data.runningTexts[0].enabled !== false) ? "true" : "false";
       }
 
-      if (data.kajianList && data.kajianList.length > 0) {
-        const k = data.kajianList[0];
-        document.getElementById('kajianTitle').value = k.title || k.judul || "Kajian Islam Rutin";
-        document.getElementById('kajianSpeaker').value = k.speaker || k.pemateri || "Asatidz DKM Ar-Ridho";
-        document.getElementById('kajianSchedule').value = k.dayOrDate || k.hari || "Setiap Hari Rabu ba'da Shalat Dzuhur";
-        document.getElementById('kajianDescription').value = k.description || k.deskripsi || "";
+      if (data.kajianList && Array.isArray(data.kajianList) && data.kajianList.length > 0) {
+        activeKajianList = data.kajianList;
       }
+      renderKajianCards();
+
+      if (data.announcements && Array.isArray(data.announcements) && data.announcements.length > 0) {
+        activeAnnouncementList = data.announcements;
+      }
+      renderAnnouncementCards();
 
       if (data.financialReport) {
         document.getElementById('finIncome').value = data.financialReport.totalIncome || data.financialReport.pemasukan || 0;
@@ -1712,7 +1902,11 @@
           hour: '2-digit', minute: '2-digit', second: '2-digit'
         });
 
-        const logoVal = activeLogoDataUrl || (document.getElementById('mosqueLogoUrlInput') ? document.getElementById('mosqueLogoUrlInput').value.trim() : "") || ((activeData && activeData.profile) ? (activeData.profile.logoUrl || "") : "");
+        // Validate and clean logo URL
+        const rawLogoInp = document.getElementById('mosqueLogoUrlInput') ? document.getElementById('mosqueLogoUrlInput').value.trim() : "";
+        const logoVal = (activeLogoDataUrl && !activeLogoDataUrl.includes("[File")) ? activeLogoDataUrl :
+          (!rawLogoInp.includes("[File") && rawLogoInp.length > 0) ? rawLogoInp :
+          ((activeData && activeData.profile) ? (activeData.profile.logoUrl || "") : "");
         const isLogoActive = document.getElementById('mosqueLogoEnabled') ? document.getElementById('mosqueLogoEnabled').checked : true;
 
         const profile = {
@@ -1725,7 +1919,7 @@
           logoUrl: logoVal,
           latitude: parseFloat(document.getElementById('mosqueLatitude').value) || -5.4414,
           longitude: parseFloat(document.getElementById('mosqueLongitude').value) || 105.2580,
-          isLogoEnabled: isLogoActive,
+          isLogoEnabled: (logoVal && logoVal.length > 0) ? true : isLogoActive,
           logoPosition: "AUTO",
           logoSize: "AUTO"
         };
@@ -1777,6 +1971,7 @@
         activeDkmPin = adminPin;
         const hijriAdj = parseInt(document.getElementById('hijriAdjustmentInput').value) || 0;
         const allowTvAdmin = document.getElementById('allowTvAdminAccessCheck').checked;
+        const glassIntensity = (parseFloat(document.getElementById('glassOpacitySlider').value) / 100) || 0.85;
 
         const appConfig = {
           displayMode: selectedDisplayMode,
@@ -1809,27 +2004,13 @@
             blurRadiusDp: 0,
             cropPosition: "CENTER"
           },
-          is3dEffectEnabled: effect3d
+          is3dEffectEnabled: effect3d,
+          glassEffectIntensity: glassIntensity
         };
 
-        // 4. Kajian List
-        const kajianList = [{
-          id: "kajian_1",
-          judul: document.getElementById('kajianTitle').value.trim() || "Kajian Islam Rutin",
-          title: document.getElementById('kajianTitle').value.trim() || "Kajian Islam Rutin",
-          pemateri: document.getElementById('kajianSpeaker').value.trim() || "Asatidz DKM Ar-Ridho",
-          speaker: document.getElementById('kajianSpeaker').value.trim() || "Asatidz DKM Ar-Ridho",
-          hari: document.getElementById('kajianSchedule').value.trim() || "Setiap Hari Rabu",
-          dayOrDate: document.getElementById('kajianSchedule').value.trim(),
-          tanggal: "Setiap Pekan",
-          waktu: "Ba'da Shalat Dzuhur",
-          lokasi: "Masjid Ar-Ridho Kejati Lampung",
-          deskripsi: document.getElementById('kajianDescription').value.trim(),
-          description: document.getElementById('kajianDescription').value.trim(),
-          enabled: true,
-          durationSeconds: 10,
-          sortOrder: 1
-        }];
+        // 4. Kajian List & Announcements (Multi-Item Dinamis)
+        const kajianList = (activeKajianList && Array.isArray(activeKajianList) && activeKajianList.length > 0) ? activeKajianList : defaultKajianList;
+        const announcements = (activeAnnouncementList && Array.isArray(activeAnnouncementList) && activeAnnouncementList.length > 0) ? activeAnnouncementList : defaultAnnouncementList;
 
         // 5. Financial Report
         const finIncome = parseFloat(document.getElementById('finIncome').value) || 0;
@@ -1863,7 +2044,51 @@
           infaqDescription: "Donasi pembangunan & operasional Masjid Ar-Ridho dapat disalurkan via QRIS / transfer BSI"
         };
 
-        // 7. License Data
+        // 7. Dynamic TV Playlist (Menggilir seluruh kajian, maklumat, QRIS & kas)
+        const generatedPlaylist = [];
+        let pOrder = 1;
+        kajianList.filter(k => k.enabled !== false).forEach(k => {
+          generatedPlaylist.push({
+            id: "pl_" + k.id,
+            title: k.judul || "Agenda Kajian",
+            type: "KAJIAN",
+            durationSeconds: k.durationSeconds || 10,
+            enabled: true,
+            sortOrder: pOrder++,
+            contentReferenceId: k.id
+          });
+        });
+        announcements.filter(a => a.enabled !== false).forEach(a => {
+          generatedPlaylist.push({
+            id: "pl_" + a.id,
+            title: a.title || "Maklumat",
+            type: "ANNOUNCEMENT",
+            durationSeconds: a.durationSeconds || 8,
+            enabled: true,
+            sortOrder: pOrder++,
+            contentReferenceId: a.id
+          });
+        });
+        generatedPlaylist.push({
+          id: "pl_qris",
+          title: "Rekening Bank & QRIS",
+          type: "QRIS",
+          durationSeconds: 10,
+          enabled: true,
+          sortOrder: pOrder++
+        });
+        if (finShow) {
+          generatedPlaylist.push({
+            id: "pl_finance",
+            title: "Laporan Kas",
+            type: "FINANCIAL",
+            durationSeconds: 8,
+            enabled: true,
+            sortOrder: pOrder++
+          });
+        }
+
+        // 8. License Data
         const licenseCode = document.getElementById('inputNewLicenseCode').value.trim() || "JM-2026-DEV-PREMIUM";
         const licenseStatus = document.getElementById('selectLicenseStatus').value || "ACTIVE";
         const licenseExpiry = document.getElementById('inputLicenseExpiry').value || "2028-12-31";
@@ -1884,6 +2109,8 @@
           runningTexts: runningTexts,
           appConfig: appConfig,
           kajianList: kajianList,
+          announcements: announcements,
+          playlist: generatedPlaylist,
           financialReport: financialReport,
           qrisData: qrisData,
           license: license,
@@ -1992,8 +2219,8 @@
       const file = event.target.files && event.target.files[0];
       if (!file) return;
 
-      if (file.size > 6 * 1024 * 1024) {
-        showToast("Ukuran berkas logo maksimal 6MB.", "error");
+      if (file.size > 8 * 1024 * 1024) {
+        showToast("Ukuran berkas logo maksimal 8MB.", "error");
         return;
       }
 
@@ -2001,11 +2228,11 @@
       reader.onload = function(e) {
         const img = new Image();
         img.onload = function() {
-          // Kompres dan resize cerdas maksimal 512x512 via HTML5 Canvas
+          // Kompres dan resize cerdas maksimal 240x240 via HTML5 Canvas agar ringan & pas di Firestore (<35KB)
           const canvas = document.createElement("canvas");
           let width = img.width;
           let height = img.height;
-          const maxDim = 512;
+          const maxDim = 240;
 
           if (width > height) {
             if (width > maxDim) {
@@ -2024,9 +2251,10 @@
           const ctx = canvas.getContext("2d");
           ctx.drawImage(img, 0, 0, width, height);
 
-          activeLogoDataUrl = canvas.toDataURL("image/png", 0.9);
+          // Simpan sebagai PNG transparan optimal
+          activeLogoDataUrl = canvas.toDataURL("image/png");
           updateLogoPreview(activeLogoDataUrl);
-          showToast("Logo berhasil dimuat! Klik 'Simpan ke TV' untuk menerapkan ke layar TV.", "success");
+          showToast("Logo berhasil dimuat & dikompres optimal! Klik 'Simpan ke TV' untuk menerapkan.", "success");
         };
         img.src = e.target.result;
       };
@@ -2072,6 +2300,449 @@
       const fileInp = document.getElementById('logoFileInput');
       if (fileInp) fileInp.value = "";
       showToast("Logo dihapus. Jangan lupa klik 'Simpan ke TV'.", "info");
+    }
+
+    // ==========================================
+    // 4C-1. GLASSMORPHISM / MORPHONE INTENSITY
+    // ==========================================
+    function updateGlassOpacityLabel(val) {
+      const label = document.getElementById('glassOpacityLabel');
+      if (!label) return;
+      const num = parseInt(val) || 85;
+      let desc = "Kaca Akrilik Modern";
+      if (num <= 40) desc = "Bening / Sangat Transparan";
+      else if (num <= 65) desc = "Transparan Sedang";
+      else if (num <= 85) desc = "Kaca Akrilik Modern";
+      else desc = "Pekat / Solid Bersih";
+      label.innerText = `${num}% (${desc})`;
+    }
+
+    // ==========================================
+    // 4C-2. MULTI-ITEM KAJIAN MANAGEMENT
+    // ==========================================
+    const defaultKajianList = [
+      {
+        id: "kajian_1",
+        judul: "Kajian Fiqih Ibadah & Muamalah",
+        title: "Kajian Fiqih Ibadah & Muamalah",
+        pemateri: "Ustadz Pembina DKM Ar-Ridho",
+        speaker: "Ustadz Pembina DKM Ar-Ridho",
+        hari: "Setiap Rabu ba'da Dzuhur",
+        dayOrDate: "Setiap Rabu ba'da Dzuhur",
+        tanggal: "Setiap Pekan",
+        waktu: "Ba'da Shalat Dzuhur",
+        lokasi: "Ruang Utama Masjid Ar-Ridho",
+        deskripsi: "Membahas fiqih ibadah sehari-hari, thaharah, dan shalat berjamaah.",
+        description: "Membahas fiqih ibadah sehari-hari, thaharah, dan shalat berjamaah.",
+        enabled: true,
+        durationSeconds: 10,
+        sortOrder: 1
+      },
+      {
+        id: "kajian_2",
+        judul: "Kajian Subuh Berkah & Tafsir Al-Qur'an",
+        title: "Kajian Subuh Berkah & Tafsir Al-Qur'an",
+        pemateri: "Asatidz Kejati Lampung",
+        speaker: "Asatidz Kejati Lampung",
+        hari: "Setiap Ahad Subuh",
+        dayOrDate: "Setiap Ahad Subuh",
+        tanggal: "Pekan 1 & 3",
+        waktu: "Ba'da Shalat Subuh",
+        lokasi: "Masjid Ar-Ridho Kejati Lampung",
+        deskripsi: "Tadabbur ayat-ayat Al-Qur'an dan tazkiyatun nufus bersama jamaah.",
+        description: "Tadabbur ayat-ayat Al-Qur'an dan tazkiyatun nufus bersama jamaah.",
+        enabled: true,
+        durationSeconds: 10,
+        sortOrder: 2
+      }
+    ];
+
+    let activeKajianList = JSON.parse(JSON.stringify(defaultKajianList));
+
+    function renderKajianCards() {
+      const container = document.getElementById('kajianCardsContainer');
+      const badge = document.getElementById('kajianCountBadge');
+      if (!container) return;
+
+      const activeCount = activeKajianList.filter(k => k.enabled !== false).length;
+      if (badge) badge.innerText = `${activeCount} Agenda Aktif (${activeKajianList.length} Total)`;
+
+      if (activeKajianList.length === 0) {
+        container.innerHTML = `
+          <div class="p-6 text-center rounded-2xl bg-slate-950/60 border border-slate-800 text-slate-400">
+            <i class="fa-solid fa-book-open text-2xl mb-2 text-slate-600 block"></i>
+            <span class="text-xs">Belum ada agenda kajian yang dibuat. Klik tombol <b>+ Tambah Agenda Kajian</b> di atas.</span>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = activeKajianList.map((item, idx) => {
+        const isAct = item.enabled !== false;
+        return `
+          <div class="group p-4 rounded-2xl border transition-all ${isAct ? 'bg-slate-950/90 border-slate-700/80 hover:border-indigo-500/80 shadow-md' : 'bg-slate-950/40 border-slate-800/60 opacity-60'}">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div class="flex items-start space-x-3 flex-1 min-w-0">
+                <div class="w-9 h-9 rounded-xl ${isAct ? 'bg-indigo-950 text-indigo-400 border border-indigo-700/60' : 'bg-slate-900 text-slate-500 border border-slate-800'} flex items-center justify-center shrink-0 mt-0.5">
+                  <i class="fa-solid fa-book-quran text-sm"></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <div class="flex flex-wrap items-center gap-2 mb-1">
+                    <span class="text-sm font-bold text-white truncate">${escapeHtml(item.judul || item.title || "Agenda Kajian")}</span>
+                    <span class="text-[10px] px-2 py-0.5 rounded-full font-semibold ${isAct ? 'bg-indigo-900/60 text-indigo-300 border border-indigo-700/50' : 'bg-slate-800 text-slate-400'}">
+                      <i class="fa-solid fa-user-tie text-[9px] mr-1"></i>${escapeHtml(item.pemateri || item.speaker || "Asatidz")}
+                    </span>
+                  </div>
+                  <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-400 mb-1">
+                    <span class="flex items-center space-x-1">
+                      <i class="fa-solid fa-calendar-day text-amber-400 text-[11px]"></i>
+                      <span>${escapeHtml(item.hari || item.dayOrDate || "Setiap Pekan")}</span>
+                    </span>
+                    <span class="flex items-center space-x-1">
+                      <i class="fa-solid fa-location-dot text-emerald-400 text-[11px]"></i>
+                      <span class="truncate max-w-[200px]">${escapeHtml(item.lokasi || "Masjid Ar-Ridho")}</span>
+                    </span>
+                  </div>
+                  ${item.deskripsi ? `<p class="text-[11.5px] text-slate-400 line-clamp-1">${escapeHtml(item.deskripsi)}</p>` : ''}
+                </div>
+              </div>
+
+              <!-- Action Buttons & Toggle Switch -->
+              <div class="flex items-center space-x-2 shrink-0 self-end sm:self-center pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-800/80 w-full sm:w-auto justify-end">
+                <label class="flex items-center space-x-1.5 cursor-pointer text-xs ${isAct ? 'text-indigo-300 font-semibold' : 'text-slate-500'} mr-2">
+                  <input type="checkbox" onchange="toggleKajianActive('${item.id}', this.checked)" ${isAct ? 'checked' : ''} class="w-4 h-4 rounded text-indigo-600 bg-slate-900 border-slate-700 focus:ring-0">
+                  <span>${isAct ? 'Aktif di TV' : 'Nonaktif'}</span>
+                </label>
+                <button type="button" onclick="openEditKajianModal('${item.id}')" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-xl border border-slate-700 flex items-center space-x-1 transition-all">
+                  <i class="fa-solid fa-pen-to-square text-[10px]"></i>
+                  <span>Edit</span>
+                </button>
+                <button type="button" onclick="deleteKajian('${item.id}')" class="px-3 py-1.5 bg-rose-950/60 hover:bg-rose-900 text-rose-300 text-xs font-semibold rounded-xl border border-rose-800/80 flex items-center space-x-1 transition-all">
+                  <i class="fa-solid fa-trash text-[10px]"></i>
+                  <span>Hapus</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function openAddKajianModal() {
+      document.getElementById('editKajianId').value = "";
+      document.getElementById('modalKajianTitle').innerText = "Tambah Agenda Kajian Baru";
+      document.getElementById('modalKajianJudul').value = "";
+      document.getElementById('modalKajianPemateri').value = "";
+      document.getElementById('modalKajianHari').value = "Setiap Rabu ba'da Dzuhur";
+      document.getElementById('modalKajianLokasi').value = "Ruang Utama Masjid Ar-Ridho Kejati Lampung";
+      document.getElementById('modalKajianDeskripsi').value = "";
+      document.getElementById('modalKajianEnabled').checked = true;
+      document.getElementById('modalKajianEditor').classList.remove('hidden');
+    }
+
+    function openEditKajianModal(id) {
+      const item = activeKajianList.find(k => k.id === id);
+      if (!item) return;
+
+      document.getElementById('editKajianId').value = item.id;
+      document.getElementById('modalKajianTitle').innerText = "Edit Agenda Kajian";
+      document.getElementById('modalKajianJudul').value = item.judul || item.title || "";
+      document.getElementById('modalKajianPemateri').value = item.pemateri || item.speaker || "";
+      document.getElementById('modalKajianHari').value = item.hari || item.dayOrDate || "";
+      document.getElementById('modalKajianLokasi').value = item.lokasi || "";
+      document.getElementById('modalKajianDeskripsi').value = item.deskripsi || item.description || "";
+      document.getElementById('modalKajianEnabled').checked = item.enabled !== false;
+      document.getElementById('modalKajianEditor').classList.remove('hidden');
+    }
+
+    function closeKajianModal() {
+      document.getElementById('modalKajianEditor').classList.add('hidden');
+    }
+
+    function saveKajianModalData() {
+      const judul = document.getElementById('modalKajianJudul').value.trim();
+      if (!judul) {
+        showToast("Judul kajian wajib diisi.", "error");
+        return;
+      }
+
+      const id = document.getElementById('editKajianId').value.trim();
+      const pemateri = document.getElementById('modalKajianPemateri').value.trim() || "Asatidz DKM Ar-Ridho";
+      const hari = document.getElementById('modalKajianHari').value.trim() || "Setiap Hari";
+      const lokasi = document.getElementById('modalKajianLokasi').value.trim() || "Masjid Ar-Ridho Kejati Lampung";
+      const deskripsi = document.getElementById('modalKajianDeskripsi').value.trim();
+      const isAct = document.getElementById('modalKajianEnabled').checked;
+
+      if (id) {
+        const idx = activeKajianList.findIndex(k => k.id === id);
+        if (idx !== -1) {
+          activeKajianList[idx] = {
+            ...activeKajianList[idx],
+            judul: judul,
+            title: judul,
+            pemateri: pemateri,
+            speaker: pemateri,
+            hari: hari,
+            dayOrDate: hari,
+            lokasi: lokasi,
+            deskripsi: deskripsi,
+            description: deskripsi,
+            enabled: isAct
+          };
+          showToast("Agenda kajian berhasil diperbarui!", "success");
+        }
+      } else {
+        const newId = "kajian_" + Date.now();
+        activeKajianList.push({
+          id: newId,
+          judul: judul,
+          title: judul,
+          pemateri: pemateri,
+          speaker: pemateri,
+          hari: hari,
+          dayOrDate: hari,
+          tanggal: "Setiap Pekan",
+          waktu: hari,
+          lokasi: lokasi,
+          deskripsi: deskripsi,
+          description: deskripsi,
+          enabled: isAct,
+          durationSeconds: 10,
+          sortOrder: activeKajianList.length + 1
+        });
+        showToast("Agenda kajian baru ditambahkan!", "success");
+      }
+
+      closeKajianModal();
+      renderKajianCards();
+    }
+
+    function deleteKajian(id) {
+      if (!confirm("Hapus agenda kajian ini?")) return;
+      activeKajianList = activeKajianList.filter(k => k.id !== id);
+      renderKajianCards();
+      showToast("Agenda kajian dihapus.", "info");
+    }
+
+    function toggleKajianActive(id, checked) {
+      const item = activeKajianList.find(k => k.id === id);
+      if (item) {
+        item.enabled = checked;
+        renderKajianCards();
+      }
+    }
+
+    function addQuickKajian(judul, pemateri, hari, lokasi, deskripsi) {
+      const newId = "kajian_" + Date.now();
+      activeKajianList.push({
+        id: newId,
+        judul: judul,
+        title: judul,
+        pemateri: pemateri,
+        speaker: pemateri,
+        hari: hari,
+        dayOrDate: hari,
+        tanggal: "Setiap Pekan",
+        waktu: hari,
+        lokasi: lokasi,
+        deskripsi: deskripsi,
+        description: deskripsi,
+        enabled: true,
+        durationSeconds: 10,
+        sortOrder: activeKajianList.length + 1
+      });
+      renderKajianCards();
+      showToast(`Template "${judul}" ditambahkan ke agenda!`, "success");
+    }
+
+    // ==========================================
+    // 4C-3. MULTI-ITEM ANNOUNCEMENTS / MAKLUMAT
+    // ==========================================
+    const defaultAnnouncementList = [
+      {
+        id: "ann_1",
+        title: "Himbauan Menjaga Kebersihan & Kerapian Sandal",
+        message: "Demi kenyamanan dan kekhusyukan jamaah, mohon merapikan dan meletakkan sandal pada rak yang telah disediakan di serambi masjid.",
+        enabled: true,
+        durationSeconds: 8,
+        sortOrder: 1
+      },
+      {
+        id: "ann_2",
+        title: "Infaq & Sedekah Pembangunan Masjid",
+        message: "Salurkan infaq dan sedekah terbaik Anda melalui kotak amal resmi masjid atau transfer ke rekening BSI Masjid Ar-Ridho Kejati Lampung.",
+        enabled: true,
+        durationSeconds: 8,
+        sortOrder: 2
+      }
+    ];
+
+    let activeAnnouncementList = JSON.parse(JSON.stringify(defaultAnnouncementList));
+
+    function renderAnnouncementCards() {
+      const container = document.getElementById('announcementCardsContainer');
+      const badge = document.getElementById('announcementCountBadge');
+      if (!container) return;
+
+      const activeCount = activeAnnouncementList.filter(a => a.enabled !== false).length;
+      if (badge) badge.innerText = `${activeCount} Info Aktif (${activeAnnouncementList.length} Total)`;
+
+      if (activeAnnouncementList.length === 0) {
+        container.innerHTML = `
+          <div class="p-6 text-center rounded-2xl bg-slate-950/60 border border-slate-800 text-slate-400">
+            <i class="fa-solid fa-bullhorn text-2xl mb-2 text-slate-600 block"></i>
+            <span class="text-xs">Belum ada maklumat / info pengumuman yang dibuat. Klik tombol <b>+ Tambah Info / Maklumat</b> di atas.</span>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = activeAnnouncementList.map((item) => {
+        const isAct = item.enabled !== false;
+        return `
+          <div class="group p-4 rounded-2xl border transition-all ${isAct ? 'bg-slate-950/90 border-slate-700/80 hover:border-teal-500/80 shadow-md' : 'bg-slate-950/40 border-slate-800/60 opacity-60'}">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div class="flex items-start space-x-3 flex-1 min-w-0">
+                <div class="w-9 h-9 rounded-xl ${isAct ? 'bg-teal-950 text-teal-400 border border-teal-700/60' : 'bg-slate-900 text-slate-500 border border-slate-800'} flex items-center justify-center shrink-0 mt-0.5">
+                  <i class="fa-solid fa-bullhorn text-sm"></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <div class="flex flex-wrap items-center gap-2 mb-1">
+                    <span class="text-sm font-bold text-white truncate">${escapeHtml(item.title || "Maklumat")}</span>
+                    <span class="text-[10px] px-2 py-0.5 rounded-full font-semibold bg-slate-800 text-slate-300 border border-slate-700">
+                      ⏱️ ${item.durationSeconds || 8} Detik di TV
+                    </span>
+                  </div>
+                  <p class="text-xs text-slate-300 leading-relaxed">${escapeHtml(item.message || "")}</p>
+                </div>
+              </div>
+
+              <!-- Action Buttons & Toggle Switch -->
+              <div class="flex items-center space-x-2 shrink-0 self-end sm:self-center pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-800/80 w-full sm:w-auto justify-end">
+                <label class="flex items-center space-x-1.5 cursor-pointer text-xs ${isAct ? 'text-teal-300 font-semibold' : 'text-slate-500'} mr-2">
+                  <input type="checkbox" onchange="toggleAnnouncementActive('${item.id}', this.checked)" ${isAct ? 'checked' : ''} class="w-4 h-4 rounded text-teal-600 bg-slate-900 border-slate-700 focus:ring-0">
+                  <span>${isAct ? 'Aktif di TV' : 'Nonaktif'}</span>
+                </label>
+                <button type="button" onclick="openEditAnnouncementModal('${item.id}')" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-xl border border-slate-700 flex items-center space-x-1 transition-all">
+                  <i class="fa-solid fa-pen-to-square text-[10px]"></i>
+                  <span>Edit</span>
+                </button>
+                <button type="button" onclick="deleteAnnouncement('${item.id}')" class="px-3 py-1.5 bg-rose-950/60 hover:bg-rose-900 text-rose-300 text-xs font-semibold rounded-xl border border-rose-800/80 flex items-center space-x-1 transition-all">
+                  <i class="fa-solid fa-trash text-[10px]"></i>
+                  <span>Hapus</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function openAddAnnouncementModal() {
+      document.getElementById('editAnnouncementId').value = "";
+      document.getElementById('modalAnnouncementTitle').innerText = "Tambah Maklumat & Info Baru";
+      document.getElementById('modalAnnouncementJudul').value = "";
+      document.getElementById('modalAnnouncementMessage').value = "";
+      document.getElementById('modalAnnouncementDuration').value = 8;
+      document.getElementById('modalAnnouncementEnabled').checked = true;
+      document.getElementById('modalAnnouncementEditor').classList.remove('hidden');
+    }
+
+    function openEditAnnouncementModal(id) {
+      const item = activeAnnouncementList.find(a => a.id === id);
+      if (!item) return;
+
+      document.getElementById('editAnnouncementId').value = item.id;
+      document.getElementById('modalAnnouncementTitle').innerText = "Edit Maklumat & Info";
+      document.getElementById('modalAnnouncementJudul').value = item.title || "";
+      document.getElementById('modalAnnouncementMessage').value = item.message || "";
+      document.getElementById('modalAnnouncementDuration').value = item.durationSeconds || 8;
+      document.getElementById('modalAnnouncementEnabled').checked = item.enabled !== false;
+      document.getElementById('modalAnnouncementEditor').classList.remove('hidden');
+    }
+
+    function closeAnnouncementModal() {
+      document.getElementById('modalAnnouncementEditor').classList.add('hidden');
+    }
+
+    function saveAnnouncementModalData() {
+      const title = document.getElementById('modalAnnouncementJudul').value.trim();
+      const message = document.getElementById('modalAnnouncementMessage').value.trim();
+      if (!title || !message) {
+        showToast("Judul dan pesan maklumat wajib diisi.", "error");
+        return;
+      }
+
+      const id = document.getElementById('editAnnouncementId').value.trim();
+      const duration = parseInt(document.getElementById('modalAnnouncementDuration').value) || 8;
+      const isAct = document.getElementById('modalAnnouncementEnabled').checked;
+
+      if (id) {
+        const idx = activeAnnouncementList.findIndex(a => a.id === id);
+        if (idx !== -1) {
+          activeAnnouncementList[idx] = {
+            ...activeAnnouncementList[idx],
+            title: title,
+            message: message,
+            durationSeconds: duration,
+            enabled: isAct
+          };
+          showToast("Maklumat berhasil diperbarui!", "success");
+        }
+      } else {
+        const newId = "ann_" + Date.now();
+        activeAnnouncementList.push({
+          id: newId,
+          title: title,
+          message: message,
+          durationSeconds: duration,
+          enabled: isAct,
+          sortOrder: activeAnnouncementList.length + 1
+        });
+        showToast("Maklumat baru berhasil ditambahkan!", "success");
+      }
+
+      closeAnnouncementModal();
+      renderAnnouncementCards();
+    }
+
+    function deleteAnnouncement(id) {
+      if (!confirm("Hapus maklumat ini?")) return;
+      activeAnnouncementList = activeAnnouncementList.filter(a => a.id !== id);
+      renderAnnouncementCards();
+      showToast("Maklumat dihapus.", "info");
+    }
+
+    function toggleAnnouncementActive(id, checked) {
+      const item = activeAnnouncementList.find(a => a.id === id);
+      if (item) {
+        item.enabled = checked;
+        renderAnnouncementCards();
+      }
+    }
+
+    function addQuickAnnouncement(title, message) {
+      const newId = "ann_" + Date.now();
+      activeAnnouncementList.push({
+        id: newId,
+        title: title,
+        message: message,
+        durationSeconds: 8,
+        enabled: true,
+        sortOrder: activeAnnouncementList.length + 1
+      });
+      renderAnnouncementCards();
+      showToast(`Maklumat "${title}" ditambahkan!`, "success");
+    }
+
+    function escapeHtml(str) {
+      if (!str) return "";
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
     }
 
     // ==========================================
