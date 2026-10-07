@@ -404,6 +404,54 @@
       </div>
     </div>
 
+    <!-- Modal: Tambah & Edit Quotes / Kata Mutiara Islami -->
+    <div id="modalQuoteEditor" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+      <div class="max-w-lg w-full bg-slate-900 border border-slate-800 rounded-3xl p-5 sm:p-6 shadow-2xl space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+          <div class="flex items-center space-x-2.5">
+            <div class="w-8 h-8 rounded-xl bg-amber-600/30 text-amber-400 flex items-center justify-center">
+              <i class="fa-solid fa-quote-left text-sm"></i>
+            </div>
+            <h3 id="modalQuoteTitle" class="text-sm sm:text-base font-bold text-white">Tambah Quotes / Mutiara Hikmah</h3>
+          </div>
+          <button type="button" onclick="closeQuoteModal()" class="text-slate-400 hover:text-white text-sm"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+
+        <input type="hidden" id="editQuoteId" value="">
+
+        <div class="space-y-3 text-xs">
+          <div>
+            <label class="block text-slate-300 font-semibold mb-1">Teks Quotes / Hadits / Kata Bijak *</label>
+            <textarea id="modalQuoteText" rows="3" placeholder="Contoh: Sebaik-baik manusia di antara kalian adalah yang paling banyak memberi manfaat bagi sesamanya." class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-white focus:outline-none focus:border-amber-500 text-xs leading-relaxed"></textarea>
+          </div>
+
+          <div>
+            <label class="block text-slate-300 font-semibold mb-1">Sumber / Perawi / Penulis *</label>
+            <input type="text" id="modalQuoteSource" placeholder="Contoh: HR. Ahmad & Thabrani / Hasan Al-Bashri" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-white focus:outline-none focus:border-amber-500 text-xs">
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-slate-300 font-semibold mb-1">Durasi Tayang di TV (Detik)</label>
+              <input type="number" id="modalQuoteDuration" min="5" max="60" value="10" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-white focus:outline-none focus:border-amber-500 text-xs font-mono">
+            </div>
+            <div class="flex items-center pt-5">
+              <input type="checkbox" id="modalQuoteEnabled" checked class="w-4 h-4 rounded text-amber-600 bg-slate-950 border-slate-700 focus:ring-amber-500">
+              <label for="modalQuoteEnabled" class="text-xs text-slate-300 font-medium ml-2 cursor-pointer">Tayangkan di slide TV</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end space-x-2 pt-3 border-t border-slate-800">
+          <button type="button" onclick="closeQuoteModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold rounded-xl transition-all">Batal</button>
+          <button type="button" onclick="saveQuoteModalData()" class="px-5 py-2 bg-gradient-to-r from-amber-600 to-gold-600 hover:from-amber-500 hover:to-gold-500 text-slate-950 text-xs font-black rounded-xl shadow-lg shadow-amber-950/60 transition-all flex items-center space-x-1.5">
+            <i class="fa-solid fa-check"></i>
+            <span>Simpan Quotes</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- Live Preview Banner for TV Theme & Layout -->
     <div id="themePreviewBanner" class="mb-6 p-4 rounded-2xl bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border border-slate-700/70 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
       <div class="flex items-center space-x-3.5">
@@ -1172,6 +1220,113 @@
           </div>
         </div>
       </div>
+
+      <!-- Blok C: Petugas Shalat Jum'at (Khatib & Judul Khutbah Khusus Hari Jum'at) -->
+      <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 sm:p-6 shadow-xl">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-4 mb-5">
+          <div>
+            <div class="flex items-center space-x-2">
+              <h2 class="text-base sm:text-lg font-bold text-white flex items-center space-x-2">
+                <i class="fa-solid fa-mosque text-amber-400"></i>
+                <span>Petugas Shalat Jum'at (Khatib & Judul Khutbah)</span>
+              </h2>
+              <span class="px-2 py-0.5 rounded-full bg-amber-950 text-amber-300 border border-amber-800 text-[11px] font-mono font-bold">Khusus Hari Jum'at</span>
+            </div>
+            <p class="text-xs text-slate-400 mt-1">Atur nama khatib, judul khutbah, imam, dan muadzin untuk shalat Jum'at. Informasi ini otomatis tampil istimewa di slide TV pada hari Jum'at.</p>
+          </div>
+          <div class="flex items-center space-x-2">
+            <input type="checkbox" id="khutbahEnabled" checked class="w-4 h-4 rounded text-amber-600 bg-slate-950 border-slate-700 focus:ring-amber-500">
+            <label for="khutbahEnabled" class="text-xs text-amber-300 font-bold cursor-pointer">Aktifkan Slide Jum'at</label>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+          <div>
+            <label class="block text-slate-300 font-semibold mb-1">Nama Khatib Shalat Jum'at *</label>
+            <div class="relative">
+              <i class="fa-solid fa-user-tie absolute left-3.5 top-3 text-slate-500"></i>
+              <input type="text" id="khutbahKhatibName" placeholder="Contoh: Ustadz Dr. H. Ahmad Fauzi, Lc., M.A." class="w-full bg-slate-950 border border-slate-700 rounded-xl pl-9 pr-3.5 py-2.5 text-white focus:outline-none focus:border-amber-500 text-xs">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-slate-300 font-semibold mb-1">Judul Khutbah Shalat Jum'at *</label>
+            <div class="relative">
+              <i class="fa-solid fa-book-open-reader absolute left-3.5 top-3 text-slate-500"></i>
+              <input type="text" id="khutbahTitle" placeholder="Contoh: Menjaga Ketaqwaan & Merawat Ukhuwah Islamiyah" class="w-full bg-slate-950 border border-slate-700 rounded-xl pl-9 pr-3.5 py-2.5 text-white focus:outline-none focus:border-amber-500 text-xs font-semibold">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-slate-300 font-semibold mb-1">Imam Shalat Jum'at (Opsional)</label>
+            <div class="relative">
+              <i class="fa-solid fa-user-check absolute left-3.5 top-3 text-slate-500"></i>
+              <input type="text" id="khutbahImamName" placeholder="Contoh: Ustadz M. Ridwan Al-Hafizh" class="w-full bg-slate-950 border border-slate-700 rounded-xl pl-9 pr-3.5 py-2.5 text-white focus:outline-none focus:border-amber-500 text-xs">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-slate-300 font-semibold mb-1">Muadzin & Tanggal / Periode</label>
+            <div class="grid grid-cols-2 gap-2">
+              <input type="text" id="khutbahMuadzinName" placeholder="Muadzin: Ust. Bilal" class="bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-amber-500 text-xs">
+              <input type="text" id="khutbahDateOrPeriod" placeholder="Periode: Jum'at Pekan Ini" class="bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-amber-500 text-xs">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Blok D: Pengaturan Quotes & Kata Mutiara Islami (Tampil Seperti Pengumuman) -->
+      <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 sm:p-6 shadow-xl">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-4 mb-5">
+          <div>
+            <div class="flex items-center space-x-2">
+              <h2 class="text-base sm:text-lg font-bold text-white flex items-center space-x-2">
+                <i class="fa-solid fa-quote-left text-amber-400"></i>
+                <span>Pengaturan Quotes & Kata Mutiara Islami</span>
+              </h2>
+              <span id="quotesCountBadge" class="px-2 py-0.5 rounded-full bg-amber-950 text-amber-300 border border-amber-800 text-[11px] font-mono font-bold">2 Quotes</span>
+            </div>
+            <p class="text-xs text-slate-400 mt-1">Quotes, hadits shahih, dan mutiara hikmah akan tayang di layar TV bergantian menyerupai pengumuman resmi.</p>
+          </div>
+          <button type="button" onclick="openAddQuoteModal()" class="px-4 py-2.5 bg-gradient-to-r from-amber-600 to-gold-600 hover:from-amber-500 hover:to-gold-500 text-slate-950 font-black text-xs rounded-xl shadow-lg shadow-amber-950/60 flex items-center justify-center space-x-2 active:scale-95 transition-all">
+            <i class="fa-solid fa-plus"></i>
+            <span>+ Tambah Quotes Baru</span>
+          </button>
+        </div>
+
+        <!-- Daftar Kartu Quotes Aktif -->
+        <div id="quotesCardsContainer" class="space-y-3">
+          <!-- Rendered dynamically by renderQuotesCards() -->
+        </div>
+
+        <!-- Tombol Tambah Cepat Template Quotes Hadits -->
+        <div class="mt-5 pt-4 border-t border-slate-800/80">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs text-slate-400 font-semibold flex items-center space-x-1.5">
+              <i class="fa-solid fa-wand-magic-sparkles text-amber-400"></i>
+              <span>Tambah Cepat dari Pilihan Hadits:</span>
+            </span>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <button type="button" onclick="addQuickQuote('Sebaik-baik manusia di antara kalian adalah yang paling banyak memberi manfaat bagi sesamanya.', 'HR. Ahmad & Thabrani')" class="px-3 py-1.5 bg-slate-950 hover:bg-slate-800 border border-slate-700/80 rounded-xl text-xs text-slate-300 transition-all flex items-center space-x-1">
+              <i class="fa-solid fa-heart text-rose-400 text-[10px]"></i>
+              <span>+ Paling Bermanfaat</span>
+            </button>
+            <button type="button" onclick="addQuickQuote('Shalat berjamaah lebih utama dua puluh tujuh derajat dibanding shalat sendirian.', 'HR. Al-Bukhari & Muslim')" class="px-3 py-1.5 bg-slate-950 hover:bg-slate-800 border border-slate-700/80 rounded-xl text-xs text-slate-300 transition-all flex items-center space-x-1">
+              <i class="fa-solid fa-people-group text-emerald-400 text-[10px]"></i>
+              <span>+ Keutamaan Berjamaah</span>
+            </button>
+            <button type="button" onclick="addQuickQuote('Senyummu di hadapan saudaramu adalah sedekah bagimu.', 'HR. At-Tirmidzi')" class="px-3 py-1.5 bg-slate-950 hover:bg-slate-800 border border-slate-700/80 rounded-xl text-xs text-slate-300 transition-all flex items-center space-x-1">
+              <i class="fa-solid fa-face-smile text-amber-400 text-[10px]"></i>
+              <span>+ Senyum Sedekah</span>
+            </button>
+            <button type="button" onclick="addQuickQuote('Barangsiapa menempuh jalan untuk mencari ilmu, Allah mudahkan baginya jalan menuju surga.', 'HR. Muslim')" class="px-3 py-1.5 bg-slate-950 hover:bg-slate-800 border border-slate-700/80 rounded-xl text-xs text-slate-300 transition-all flex items-center space-x-1">
+              <i class="fa-solid fa-graduation-cap text-cyan-400 text-[10px]"></i>
+              <span>+ Menuntut Ilmu</span>
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- ========================================== -->
@@ -1740,6 +1895,7 @@
 
       renderKajianCards();
       renderAnnouncementCards();
+      renderQuotesCards();
       updateGlassOpacityLabel(85);
 
       document.getElementById('finIncome').value = 0;
@@ -1833,6 +1989,21 @@
         if (cfg.youtubeLiveConfig) {
           document.getElementById('ytActive').checked = cfg.youtubeLiveConfig.isActive || cfg.youtubeLiveConfig.enabled || false;
           document.getElementById('ytVideoId').value = cfg.youtubeLiveConfig.videoIdOrUrl || cfg.youtubeLiveConfig.youtubeUrlOrId || "";
+        }
+
+        if (cfg.fridayKhutbahInfo) {
+          const fk = cfg.fridayKhutbahInfo;
+          if (document.getElementById('khutbahEnabled')) document.getElementById('khutbahEnabled').checked = fk.enabled !== false;
+          if (document.getElementById('khutbahKhatibName')) document.getElementById('khutbahKhatibName').value = fk.khatibName || "";
+          if (document.getElementById('khutbahTitle')) document.getElementById('khutbahTitle').value = fk.khutbahTitle || "";
+          if (document.getElementById('khutbahImamName')) document.getElementById('khutbahImamName').value = fk.imamName || "";
+          if (document.getElementById('khutbahMuadzinName')) document.getElementById('khutbahMuadzinName').value = fk.muadzinName || "";
+          if (document.getElementById('khutbahDateOrPeriod')) document.getElementById('khutbahDateOrPeriod').value = fk.dateOrPeriod || "";
+        }
+
+        if (cfg.quotes && Array.isArray(cfg.quotes) && cfg.quotes.length > 0) {
+          activeQuotesList = cfg.quotes;
+          renderQuotesCards();
         }
       }
 
@@ -2005,7 +2176,16 @@
             cropPosition: "CENTER"
           },
           is3dEffectEnabled: effect3d,
-          glassEffectIntensity: glassIntensity
+          glassEffectIntensity: glassIntensity,
+          fridayKhutbahInfo: {
+            enabled: document.getElementById('khutbahEnabled')?.checked ?? true,
+            khatibName: document.getElementById('khutbahKhatibName')?.value?.trim() || "Ustadz H. Ahmad Fauzi, Lc., M.A.",
+            khutbahTitle: document.getElementById('khutbahTitle')?.value?.trim() || "Menjaga Ketaqwaan & Merawat Ukhuwah Islamiyah",
+            imamName: document.getElementById('khutbahImamName')?.value?.trim() || "Ustadz M. Ridwan Al-Hafizh",
+            muadzinName: document.getElementById('khutbahMuadzinName')?.value?.trim() || "Ust. Bilal",
+            dateOrPeriod: document.getElementById('khutbahDateOrPeriod')?.value?.trim() || "Jum'at Pekan Ini"
+          },
+          quotes: (activeQuotesList && Array.isArray(activeQuotesList) && activeQuotesList.length > 0) ? activeQuotesList : defaultQuotesList
         };
 
         // 4. Kajian List & Announcements (Multi-Item Dinamis)
@@ -2733,6 +2913,188 @@
       });
       renderAnnouncementCards();
       showToast(`Maklumat "${title}" ditambahkan!`, "success");
+    }
+
+    // ==========================================
+    // 4C-4. QUOTES & MUTIARA HIKMAH (MULTI-ITEM)
+    // ==========================================
+    const defaultQuotesList = [
+      {
+        id: "quote_1",
+        quoteText: "Sebaik-baik manusia di antara kalian adalah yang paling banyak memberi manfaat bagi sesamanya.",
+        sourceOrAuthor: "HR. Ahmad & Thabrani",
+        enabled: true,
+        durationSeconds: 10,
+        sortOrder: 1
+      },
+      {
+        id: "quote_2",
+        quoteText: "Shalat berjamaah lebih utama dua puluh tujuh derajat dibanding shalat sendirian.",
+        sourceOrAuthor: "HR. Al-Bukhari & Muslim",
+        enabled: true,
+        durationSeconds: 10,
+        sortOrder: 2
+      }
+    ];
+
+    let activeQuotesList = JSON.parse(JSON.stringify(defaultQuotesList));
+
+    function renderQuotesCards() {
+      const container = document.getElementById('quotesCardsContainer');
+      const badge = document.getElementById('quotesCountBadge');
+      if (!container) return;
+
+      const activeCount = activeQuotesList.filter(q => q.enabled !== false).length;
+      if (badge) badge.innerText = `${activeCount} Quotes Aktif (${activeQuotesList.length} Total)`;
+
+      if (activeQuotesList.length === 0) {
+        container.innerHTML = `
+          <div class="p-6 text-center rounded-2xl bg-slate-950/60 border border-slate-800 text-slate-400">
+            <i class="fa-solid fa-quote-left text-2xl mb-2 text-slate-600 block"></i>
+            <span class="text-xs">Belum ada quotes atau mutiara hikmah yang dibuat. Klik tombol <b>+ Tambah Quotes Baru</b> di atas.</span>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = activeQuotesList.map((item) => {
+        const isAct = item.enabled !== false;
+        return `
+          <div class="group p-4 rounded-2xl border transition-all ${isAct ? 'bg-slate-950/90 border-slate-700/80 hover:border-amber-500/80 shadow-md' : 'bg-slate-950/40 border-slate-800/60 opacity-60'}">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div class="flex items-start space-x-3 flex-1 min-w-0">
+                <div class="w-9 h-9 rounded-xl bg-amber-600/20 text-amber-400 flex items-center justify-center shrink-0 border border-amber-500/30">
+                  <i class="fa-solid fa-quote-left text-xs"></i>
+                </div>
+                <div class="space-y-1 min-w-0 flex-1">
+                  <p class="text-xs text-white font-medium italic line-clamp-2">"${escapeHtml(item.quoteText)}"</p>
+                  <div class="flex flex-wrap items-center gap-2 pt-0.5">
+                    <span class="text-[11px] text-amber-300 font-bold flex items-center space-x-1">
+                      <i class="fa-solid fa-book-open text-[10px]"></i>
+                      <span>— ${escapeHtml(item.sourceOrAuthor || 'Hadits')}</span>
+                    </span>
+                    <span class="text-[10px] text-slate-400 bg-slate-900 border border-slate-800 px-2 py-0.5 rounded-lg flex items-center space-x-1">
+                      <i class="fa-solid fa-stopwatch text-slate-500"></i>
+                      <span>${item.durationSeconds || 10} detik</span>
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="flex items-center space-x-2 shrink-0 self-end sm:self-center border-t sm:border-t-0 border-slate-800/80 pt-2 sm:pt-0">
+                <label class="relative inline-flex items-center cursor-pointer mr-2">
+                  <input type="checkbox" onchange="toggleQuoteActive('${item.id}', this.checked)" ${isAct ? 'checked' : ''} class="sr-only peer">
+                  <div class="w-8 h-4 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3.5 after:transition-all peer-checked:bg-amber-600"></div>
+                </label>
+                <button type="button" onclick="openEditQuoteModal('${item.id}')" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-xl transition-all flex items-center space-x-1">
+                  <i class="fa-solid fa-pen-to-square text-amber-400"></i>
+                  <span>Edit</span>
+                </button>
+                <button type="button" onclick="deleteQuoteItem('${item.id}')" class="px-2.5 py-1.5 bg-rose-950/60 hover:bg-rose-900 text-rose-300 border border-rose-800/50 text-xs rounded-xl transition-all">
+                  <i class="fa-solid fa-trash-can"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function openAddQuoteModal() {
+      document.getElementById('editQuoteId').value = "";
+      document.getElementById('modalQuoteTitle').innerText = "Tambah Quotes / Mutiara Hikmah Baru";
+      document.getElementById('modalQuoteText').value = "";
+      document.getElementById('modalQuoteSource').value = "";
+      document.getElementById('modalQuoteDuration').value = 10;
+      document.getElementById('modalQuoteEnabled').checked = true;
+      document.getElementById('modalQuoteEditor').classList.remove('hidden');
+    }
+
+    function openEditQuoteModal(id) {
+      const item = activeQuotesList.find(q => q.id === id);
+      if (!item) return;
+
+      document.getElementById('editQuoteId').value = item.id;
+      document.getElementById('modalQuoteTitle').innerText = "Edit Quotes / Mutiara Hikmah";
+      document.getElementById('modalQuoteText').value = item.quoteText || "";
+      document.getElementById('modalQuoteSource').value = item.sourceOrAuthor || "";
+      document.getElementById('modalQuoteDuration').value = item.durationSeconds || 10;
+      document.getElementById('modalQuoteEnabled').checked = item.enabled !== false;
+      document.getElementById('modalQuoteEditor').classList.remove('hidden');
+    }
+
+    function closeQuoteModal() {
+      document.getElementById('modalQuoteEditor').classList.add('hidden');
+    }
+
+    function saveQuoteModalData() {
+      const text = document.getElementById('modalQuoteText').value.trim();
+      const source = document.getElementById('modalQuoteSource').value.trim();
+      if (!text) {
+        showToast("Teks quotes / hadits wajib diisi.", "error");
+        return;
+      }
+
+      const id = document.getElementById('editQuoteId').value.trim();
+      const duration = parseInt(document.getElementById('modalQuoteDuration').value) || 10;
+      const isAct = document.getElementById('modalQuoteEnabled').checked;
+
+      if (id) {
+        const idx = activeQuotesList.findIndex(q => q.id === id);
+        if (idx !== -1) {
+          activeQuotesList[idx] = {
+            ...activeQuotesList[idx],
+            quoteText: text,
+            sourceOrAuthor: source || "Hadits",
+            durationSeconds: duration,
+            enabled: isAct
+          };
+          showToast("Quotes berhasil diperbarui!", "success");
+        }
+      } else {
+        const newId = "quote_" + Date.now();
+        activeQuotesList.push({
+          id: newId,
+          quoteText: text,
+          sourceOrAuthor: source || "Hadits",
+          durationSeconds: duration,
+          enabled: isAct,
+          sortOrder: activeQuotesList.length + 1
+        });
+        showToast("Quotes baru berhasil ditambahkan!", "success");
+      }
+
+      closeQuoteModal();
+      renderQuotesCards();
+    }
+
+    function deleteQuoteItem(id) {
+      if (!confirm("Hapus quotes ini?")) return;
+      activeQuotesList = activeQuotesList.filter(q => q.id !== id);
+      renderQuotesCards();
+      showToast("Quotes dihapus.", "info");
+    }
+
+    function toggleQuoteActive(id, checked) {
+      const item = activeQuotesList.find(q => q.id === id);
+      if (item) {
+        item.enabled = checked;
+        renderQuotesCards();
+      }
+    }
+
+    function addQuickQuote(text, source) {
+      const newId = "quote_" + Date.now();
+      activeQuotesList.push({
+        id: newId,
+        quoteText: text,
+        sourceOrAuthor: source,
+        durationSeconds: 10,
+        enabled: true,
+        sortOrder: activeQuotesList.length + 1
+      });
+      renderQuotesCards();
+      showToast(`Quotes "${source}" ditambahkan!`, "success");
     }
 
     function escapeHtml(str) {
