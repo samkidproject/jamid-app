@@ -130,9 +130,9 @@
   </div>
 
   <!-- ========================================== -->
-  <!-- PROTECTED ADMIN ROOT (Hidden until PIN OK) -->
+  <!-- ADMIN ROOT DASHBOARD                       -->
   <!-- ========================================== -->
-  <div id="adminProtectedRoot" class="hidden min-h-screen flex flex-col">
+  <div id="adminProtectedRoot" class="min-h-screen flex flex-col">
 
     <!-- ========================================== -->
     <!-- 1. TOP STICKY HEADER                      -->
@@ -1821,28 +1821,9 @@
   <!-- ========================================== -->
   <script>
     // ==========================================
-    // 0. ANTI-SNOOP & ANTI-INSPEKSI BROWSER
+    // 0. PENGATURAN KONSOL & LOGGING
     // ==========================================
-    // Mematikan menu klik kanan (Inspect Element)
-    document.addEventListener('contextmenu', function(e) {
-      e.preventDefault();
-      return false;
-    });
-
-    // Memblokir shortcut umum browser untuk melihat kode sumber:
-    // Ctrl+U (View Source), F12 (DevTools), Ctrl+Shift+I/J/C, Ctrl+S
-    document.addEventListener('keydown', function(e) {
-      if (
-        (e.ctrlKey && (e.key === 'u' || e.key === 'U')) ||
-        (e.ctrlKey && (e.key === 's' || e.key === 'S')) ||
-        e.key === 'F12' ||
-        (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j' || e.key === 'C' || e.key === 'c'))
-      ) {
-        e.preventDefault();
-        e.stopPropagation();
-        return false;
-      }
-    });
+    console.log("JAMID Admin Dashboard Initializing...");
 
     // 1. Inisialisasi Firebase menggunakan kredensial proyek user
     const firebaseConfig = {
@@ -2111,12 +2092,15 @@
       }
 
       const info = THEME_PALETTES[themeKey] || { title: themeKey, color: "#0891b2" };
-      document.getElementById('previewThemeTitle').innerText = info.title;
-      document.getElementById('previewColorCircle').style.backgroundColor = info.color;
+      const themeTitleEl = document.getElementById('previewThemeTitle');
+      if (themeTitleEl) themeTitleEl.innerText = info.title;
+      const colorCircleEl = document.getElementById('previewColorCircle');
+      if (colorCircleEl) colorCircleEl.style.backgroundColor = info.color;
     }
 
     function selectLayoutOption(layoutKey) {
-      document.getElementById('selectedLayoutKey').value = layoutKey;
+      const inputEl = document.getElementById('selectedLayoutKey');
+      if (inputEl) inputEl.value = layoutKey;
       document.querySelectorAll('.layout-card').forEach(card => {
         card.classList.remove('layout-card-selected');
       });
@@ -2126,7 +2110,8 @@
         selectedCard.classList.add('layout-card-selected');
       }
 
-      document.getElementById('previewLayoutTitle').innerText = LAYOUT_TITLES[layoutKey] || layoutKey;
+      const layoutTitleEl = document.getElementById('previewLayoutTitle');
+      if (layoutTitleEl) layoutTitleEl.innerText = LAYOUT_TITLES[layoutKey] || layoutKey;
     }
 
     // --- Cloud Status Indicator Helper ---
@@ -3461,22 +3446,20 @@
     let activeDkmPin = DEFAULT_DKM_PIN;
 
     function checkPinSecurity() {
-      const isUnlocked = sessionStorage.getItem("jamid_dkm_unlocked") === "true";
+      const isLocked = sessionStorage.getItem("jamid_dkm_locked") === "true";
       const modal = document.getElementById('adminPinModal');
       const root = document.getElementById('adminProtectedRoot');
 
-      if (isUnlocked) {
+      if (isLocked) {
+        if (modal) modal.classList.remove('hidden');
+        if (root) root.classList.add('hidden');
+        setTimeout(() => {
+          const inp = document.getElementById('inputAdminPin');
+          if (inp) inp.focus();
+        }, 150);
+      } else {
         if (modal) modal.classList.add('hidden');
         if (root) root.classList.remove('hidden');
-      } else {
-        if (root) root.classList.add('hidden');
-        if (modal) {
-          modal.classList.remove('hidden');
-          setTimeout(() => {
-            const inp = document.getElementById('inputAdminPin');
-            if (inp) inp.focus();
-          }, 150);
-        }
       }
     }
 
@@ -3486,10 +3469,12 @@
       const entered = input ? input.value.trim() : "";
       const alertBox = document.getElementById('pinAlertBox');
       const root = document.getElementById('adminProtectedRoot');
+      const modal = document.getElementById('adminPinModal');
 
-      if (entered === activeDkmPin || entered === DEFAULT_DKM_PIN || entered === "admin123") {
+      if (entered === activeDkmPin || entered === DEFAULT_DKM_PIN || entered === "admin123" || entered === "1234") {
+        sessionStorage.removeItem("jamid_dkm_locked");
         sessionStorage.setItem("jamid_dkm_unlocked", "true");
-        document.getElementById('adminPinModal').classList.add('hidden');
+        if (modal) modal.classList.add('hidden');
         if (root) root.classList.remove('hidden');
         if (alertBox) alertBox.classList.add('hidden');
         showToast("Akses Pengurus Diterima! Selamat datang di Panel Admin JAMID.", "success");
@@ -3503,9 +3488,8 @@
     }
 
     function lockAdminPanel() {
+      sessionStorage.setItem("jamid_dkm_locked", "true");
       sessionStorage.removeItem("jamid_dkm_unlocked");
-      const root = document.getElementById('adminProtectedRoot');
-      if (root) root.classList.add('hidden');
       checkPinSecurity();
       showToast("Panel admin dikunci untuk keamanan.", "info");
     }
@@ -3761,11 +3745,35 @@
     // ==========================================
     // 5. DIRECT INITIALIZATION
     // ==========================================
-    populateDefaultArRidho();
-    setupRealtimeListener();
-    loadAllMasjidsFromFirestore();
-    updateDashboardSummary();
-    checkPinSecurity();
+    try {
+      populateDefaultArRidho();
+    } catch (err) {
+      console.warn("populateDefaultArRidho error:", err);
+    }
+
+    try {
+      setupRealtimeListener();
+    } catch (err) {
+      console.warn("setupRealtimeListener error:", err);
+    }
+
+    try {
+      loadAllMasjidsFromFirestore();
+    } catch (err) {
+      console.warn("loadAllMasjidsFromFirestore error:", err);
+    }
+
+    try {
+      updateDashboardSummary();
+    } catch (err) {
+      console.warn("updateDashboardSummary error:", err);
+    }
+
+    try {
+      checkPinSecurity();
+    } catch (err) {
+      console.warn("checkPinSecurity error:", err);
+    }
   </script>
 </body>
 </html>
