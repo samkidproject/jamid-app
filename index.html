@@ -154,22 +154,18 @@
 
       <!-- Cloud Status, Save Action & User Auth Profile -->
       <div class="flex items-center space-x-2 sm:space-x-3">
-        <!-- Target Mosque ID Selector Badge -->
-        <div class="hidden md:flex items-center space-x-1.5 px-2.5 py-1.5 bg-slate-900/90 border border-slate-800 rounded-lg text-xs font-mono text-slate-400">
-          <i class="fa-solid fa-database text-brand-400 text-[10px]"></i>
-          <span id="targetMasjidIdLabel">ID: masjid_001</span>
+        <!-- Target Mosque Selector in Header -->
+        <div class="flex items-center space-x-1.5 px-2.5 py-1.5 bg-slate-900 border border-slate-700/80 rounded-xl text-xs font-semibold">
+          <i class="fa-solid fa-mosque text-brand-400 text-xs"></i>
+          <select id="headerMasjidSelect" onchange="changeTargetMasjid(this.value)" class="bg-transparent text-white font-bold focus:outline-none cursor-pointer max-w-[130px] sm:max-w-[200px] truncate text-xs">
+            <option value="masjid_001">Masjid Ar-Ridho (masjid_001)</option>
+          </select>
         </div>
 
         <div id="cloudStatusBadge" class="hidden sm:flex items-center space-x-2 px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-900 border border-slate-700/60 text-slate-300">
           <span class="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse" id="cloudStatusDot"></span>
           <span id="cloudStatusText">Menghubungkan...</span>
         </div>
-
-        <!-- Unduh APK TV Button -->
-        <a id="headerApkBtn" href="/jammasjid.apk" download="jammasjid-tv.apk" target="_blank" class="flex items-center space-x-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs sm:text-sm px-3.5 py-2 rounded-xl shadow-lg shadow-emerald-700/30 active:scale-95 transition-all">
-          <i class="fa-solid fa-download"></i>
-          <span>Unduh APK TV</span>
-        </a>
 
         <button onclick="saveAllToCloud()" id="btnSaveAll" class="flex items-center space-x-2 bg-gradient-to-r from-brand-600 to-cyanTheme-600 hover:from-brand-500 hover:to-cyanTheme-500 text-white font-bold text-xs sm:text-sm px-4 py-2 rounded-xl shadow-lg shadow-brand-600/30 active:scale-95 transition-all">
           <i class="fa-solid fa-cloud-arrow-up"></i>
@@ -221,82 +217,7 @@
       <button onclick="hideToast()" class="text-slate-400 hover:text-white text-sm"><i class="fa-solid fa-xmark"></i></button>
     </div>
 
-    <!-- Card Download File APK TV Siap Pasang -->
-    <div class="mb-6 p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-emerald-950/80 via-slate-900 to-slate-900 border border-emerald-600/70 shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-      <div class="flex items-start sm:items-center space-x-3.5">
-        <div class="w-12 h-12 rounded-2xl bg-emerald-600 text-white flex items-center justify-center text-xl shadow-lg shadow-emerald-900/50 shrink-0">
-          <i class="fa-brands fa-android"></i>
-        </div>
-        <div>
-          <div class="flex flex-wrap items-center gap-2">
-            <h3 class="text-sm sm:text-base font-bold text-white">File APK Aplikasi TV Android (Siap Pasang)</h3>
-            <span class="px-2 py-0.5 rounded-full bg-emerald-900 text-emerald-300 text-[10px] font-mono font-bold border border-emerald-700">APK TERBARU</span>
-          </div>
-          <p class="text-xs text-slate-300 mt-1">Unduh file <code class="text-emerald-400 font-mono font-bold">jammasjid.apk</code> untuk dipasang di Android TV, Smart TV Box, atau STB masjid.</p>
-          <div class="flex flex-wrap items-center gap-3 mt-2 text-[11px] text-slate-400">
-            <span><i class="fa-solid fa-file-zipper text-emerald-400 mr-1"></i> Ukuran: 30.9 MB</span>
-            <span><i class="fa-solid fa-tv text-emerald-400 mr-1"></i> Kompatibel: Android 7.0 s/d Android 15 TV</span>
-            <span><i class="fa-solid fa-shield-halved text-emerald-400 mr-1"></i> Mode TV: 100% Display Murni</span>
-          </div>
-        </div>
-      </div>
-      <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full md:w-auto shrink-0">
-        <a id="btnDownloadApkLink" href="/jammasjid.apk" download="jammasjid-tv.apk" target="_blank" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs sm:text-sm rounded-xl shadow-lg shadow-emerald-700/40 active:scale-95 transition-all text-center flex items-center justify-center space-x-2">
-          <i class="fa-solid fa-download"></i>
-          <span>Unduh File APK Sekarang</span>
-        </a>
-        <button onclick="openCustomApkModal()" title="Pengaturan Tautan Unduhan APK" class="px-3.5 py-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 text-xs font-semibold rounded-xl flex items-center justify-center space-x-1.5 transition-all">
-          <i class="fa-solid fa-gear text-emerald-400"></i>
-          <span>Atur Link APK / Vercel</span>
-        </button>
-      </div>
-    </div>
 
-    <!-- Modal: Pengaturan Tautan Unduhan APK (Khusus Vercel & Cloud Storage) -->
-    <div id="modalCustomApk" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-      <div class="max-w-lg w-full bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-4">
-        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-          <div class="flex items-center space-x-2.5">
-            <i class="fa-solid fa-cloud-arrow-down text-emerald-400 text-lg"></i>
-            <h3 class="text-base font-bold text-white">Panduan Download APK di Vercel</h3>
-          </div>
-          <button onclick="closeCustomApkModal()" class="text-slate-400 hover:text-white text-sm"><i class="fa-solid fa-xmark"></i></button>
-        </div>
-
-        <div class="bg-amber-950/60 border border-amber-800/80 rounded-xl p-3.5 text-xs text-amber-200 space-y-1.5">
-          <div class="font-bold flex items-center space-x-1.5">
-            <i class="fa-solid fa-circle-exclamation text-amber-400"></i>
-            <span>Kenapa di Vercel muncul "File was not available on site"?</span>
-          </div>
-          <p class="text-slate-300 text-[11.5px] leading-relaxed">
-            Karena saat Anda mengunggah ke Vercel hanya file <code class="text-amber-300 font-mono font-bold">index.html</code> saja, sedangkan file biner <code class="text-amber-300 font-mono font-bold">jammasjid.apk</code> (30.9 MB) belum ikut dimasukkan ke dalam folder proyek Vercel Anda.
-          </p>
-        </div>
-
-        <div class="space-y-3 text-xs">
-          <div class="font-bold text-slate-200">Solusi 1: Masukkan Link Google Drive / Cloud Anda (Paling Mudah)</div>
-          <p class="text-slate-400 text-[11.5px]">
-            Upload file APK ke Google Drive Anda (atur akses: <i>Siapa saja yang memiliki link</i>), lalu tempelkan link Google Drive tersebut di bawah ini:
-          </p>
-          <div class="space-y-1">
-            <label class="block text-slate-300 font-semibold">Tautan Unduhan APK Kustom (Google Drive / GitHub / MediaFire):</label>
-            <input type="url" id="customApkInput" placeholder="https://drive.google.com/file/d/..." class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-brand-500 font-mono">
-          </div>
-
-          <div class="pt-2 border-t border-slate-800">
-            <div class="font-bold text-slate-200 mb-1">Solusi 2: Unggah File APK ke Vercel</div>
-            <p class="text-slate-400 text-[11.5px] leading-relaxed">
-              Jika ingin link langsung dari domain Vercel Anda (<code class="text-slate-300">jamid-app.vercel.app/jammasjid.apk</code>), cukup letakkan file <code class="text-emerald-400 font-mono">jammasjid.apk</code> di folder yang sama dengan <code class="text-emerald-400 font-mono">index.html</code> pada proyek Vercel Anda.
-            </p>
-          </div>
-        </div>
-
-        <div class="flex items-center justify-end space-x-2 pt-2 border-t border-slate-800">
-          <button onclick="closeCustomApkModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold rounded-xl transition-all">Tutup</button>
-          <button onclick="saveCustomApkUrl()" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl shadow-lg transition-all">Simpan Tautan Link</button>
-        </div>
-      </div>
-    </div>
 
     <!-- Modal: Tambah & Edit Agenda Kajian (Multi-Item) -->
     <div id="modalKajianEditor" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
@@ -452,92 +373,359 @@
       </div>
     </div>
 
-    <!-- Live Preview Banner for TV Theme & Layout -->
-    <div id="themePreviewBanner" class="mb-6 p-4 rounded-2xl bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border border-slate-700/70 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-      <div class="flex items-center space-x-3.5">
-        <div id="previewColorCircle" class="w-10 h-10 rounded-xl bg-cyan-600 border-2 border-white shadow-md flex items-center justify-center text-white">
-          <i class="fa-solid fa-tv text-sm"></i>
-        </div>
-        <div>
-          <div class="flex items-center space-x-2">
-            <span class="text-xs text-slate-400">Konfigurasi Tampilan Aktif:</span>
-            <span id="previewThemeTitle" class="text-xs font-bold px-2 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-700/50">JAMID App Toska Cyan</span>
-            <span id="previewLayoutTitle" class="text-xs font-bold px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">Layout JAMID App</span>
+    <!-- ========================================== -->
+    <!-- DASHBOARD UTAMA (Eksklusif Mobile & Android) -->
+    <!-- ========================================== -->
+    <div id="dashboardHomeView" class="block space-y-5">
+      <!-- 1. Hero Card: Status Masjid & Kendali TV Real-time -->
+      <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-950 via-slate-900 to-slate-950 border border-emerald-800/50 p-5 sm:p-6 shadow-2xl">
+        <div class="absolute -right-8 -top-8 w-40 h-40 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <div class="flex items-center space-x-2 mb-1.5">
+              <span class="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-emerald-900/80 text-emerald-300 border border-emerald-600/40">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span>TV Live Sinkron</span>
+              </span>
+              <span id="dashMosqueIdBadge" class="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-slate-800 text-cyan-300 border border-slate-700">ID: masjid_001</span>
+            </div>
+            <h2 id="dashMosqueName" class="text-xl sm:text-2xl font-black text-white tracking-tight">Masjid Ar-Ridho</h2>
+            <p id="dashMosqueAddress" class="text-xs text-slate-300 mt-1 max-w-lg">Jl. Jaksa Agung R. Soeprapto No. 226 • Bandar Lampung</p>
           </div>
-          <p class="text-xs text-slate-300 mt-1">Perubahan tema warna, latar belakang, dan susunan layout di bawah akan langsung diterapkan di layar TV saat Anda menekan tombol <b>Simpan ke TV</b>.</p>
+
+          <!-- Selector Switch Masjid & Tambah Masjid -->
+          <div class="flex flex-col sm:items-end gap-2 shrink-0">
+            <div class="flex items-center space-x-2">
+              <select id="dashMasjidSelect" onchange="changeTargetMasjid(this.value)" class="bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs font-bold text-white focus:outline-none focus:border-brand-500 cursor-pointer max-w-[200px] truncate">
+                <option value="masjid_001">Masjid Ar-Ridho (masjid_001)</option>
+              </select>
+              <button onclick="promptAddNewMasjid()" title="Tambah Masjid Baru" class="px-3 py-2 bg-emerald-700 hover:bg-emerald-600 text-white font-bold text-xs rounded-xl flex items-center space-x-1 shadow-md transition-all">
+                <i class="fa-solid fa-plus"></i>
+                <span class="hidden sm:inline">Masjid Baru</span>
+              </button>
+            </div>
+            <button onclick="saveAllToCloud()" class="w-full bg-gradient-to-r from-emerald-600 via-brand-600 to-cyanTheme-600 hover:from-emerald-500 hover:to-cyanTheme-500 text-white font-extrabold text-xs sm:text-sm px-4 py-2.5 rounded-xl shadow-lg shadow-emerald-950/80 flex items-center justify-center space-x-2 active:scale-95 transition-all">
+              <i class="fa-solid fa-cloud-arrow-up"></i>
+              <span>Simpan ke TV Sekarang</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Mini TV Preview Pills -->
+        <div class="mt-4 pt-4 border-t border-slate-800/80 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-400">
+          <div class="flex items-center space-x-2">
+            <span>Tema Aktif:</span>
+            <span id="previewThemeTitle" class="px-2 py-0.5 rounded-md bg-cyan-950 text-cyan-300 border border-cyan-800 text-[11px] font-bold">JAMID App Toska Cyan</span>
+            <span id="previewLayoutTitle" class="px-2 py-0.5 rounded-md bg-slate-800 text-slate-300 border border-slate-700 text-[11px] font-bold">Layout Standar</span>
+          </div>
+          <button onclick="openMenuFromDashboard('theme')" class="text-gold-400 hover:text-gold-300 font-bold text-[11px] flex items-center space-x-1">
+            <i class="fa-solid fa-palette"></i>
+            <span>Ubah Tampilan</span>
+          </button>
         </div>
       </div>
-      <button onclick="switchTab('theme')" class="text-xs font-bold text-gold-400 hover:text-gold-300 bg-slate-950/80 hover:bg-slate-950 border border-gold-500/30 px-3 py-1.5 rounded-lg flex items-center space-x-1.5 transition-all">
-        <i class="fa-solid fa-palette"></i>
-        <span>Ganti Tema Sekarang</span>
-      </button>
-    </div>
 
-    <!-- Quick Mobile Portrait Tab Dropdown (Memudahkan Navigasi di Layar HP Android Tegak) -->
-    <div class="sm:hidden mb-4 bg-slate-900/90 border border-slate-800 rounded-2xl p-2.5 flex items-center justify-between gap-2 shadow-lg">
-      <div class="flex items-center space-x-2 text-xs font-bold text-slate-300 shrink-0">
-        <i class="fa-solid fa-list-check text-emerald-400 text-sm"></i>
-        <span>Pilih Menu:</span>
-      </div>
-      <div class="relative flex-1">
-        <select id="mobileTabSelector" onchange="switchTab(this.value)" class="w-full bg-slate-950 border border-slate-700 text-white text-xs font-bold py-2 px-3 rounded-xl focus:outline-none focus:border-brand-500">
-          <option value="profile">📍 1. Profil & Peta Lokasi</option>
-          <option value="theme">🎨 2. Tema & Layout TV</option>
-          <option value="runningText">📜 3. Running Text Berjalan</option>
-          <option value="iqamah">⏱️ 4. Jeda Waktu Iqamah</option>
-          <option value="kajian">📖 5. Agenda Kajian & Info</option>
-          <option value="financial">💰 6. Laporan Kas Masjid</option>
-          <option value="qris">📱 7. Rekening Bank & QRIS</option>
-          <option value="media">🎥 8. Siaran Media / YouTube</option>
-          <option value="system">🛡️ 9. Sistem & PIN Pengurus</option>
-          <option value="license">👑 10. Lisensi & Super Admin</option>
-        </select>
-      </div>
-    </div>
+      <!-- 2. Grid Menu Dashboard Elegan (Pilihan Menu Dashboard) -->
+      <div>
+        <div class="flex items-center justify-between mb-3 px-1">
+          <h3 class="text-xs sm:text-sm font-extrabold uppercase tracking-wider text-slate-300 flex items-center space-x-2">
+            <i class="fa-solid fa-shapes text-emerald-400"></i>
+            <span>PILIH MENU PENGATURAN TV:</span>
+          </h3>
+          <span class="text-[11px] text-slate-500 font-medium">Ketuk kartu untuk mengatur</span>
+        </div>
 
-    <!-- Navigation Tabs (Mobile-First Scrolling Chips dengan Icon Eksklusif) -->
-    <div class="flex space-x-2 overflow-x-auto pb-2.5 mb-5 border-b border-slate-800 custom-scrollbar text-xs sm:text-sm font-semibold">
-      <button onclick="switchTab('profile')" id="tab-btn-profile" class="tab-btn flex items-center space-x-2 px-3.5 py-2.5 rounded-xl bg-brand-800 text-white border border-brand-600 whitespace-nowrap active:scale-95 transition-all">
-        <i class="fa-solid fa-map-location-dot text-emerald-300"></i>
-        <span>1. Profil & Peta</span>
-      </button>
-      <button onclick="switchTab('theme')" id="tab-btn-theme" class="tab-btn flex items-center space-x-2 px-3.5 py-2.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent whitespace-nowrap active:scale-95 transition-all">
-        <i class="fa-solid fa-palette text-cyan-400"></i>
-        <span>2. Tema & TV</span>
-      </button>
-      <button onclick="switchTab('runningText')" id="tab-btn-runningText" class="tab-btn flex items-center space-x-2 px-3.5 py-2.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent whitespace-nowrap active:scale-95 transition-all">
-        <i class="fa-solid fa-scroll text-amber-400"></i>
-        <span>3. Running Text</span>
-      </button>
-      <button onclick="switchTab('iqamah')" id="tab-btn-iqamah" class="tab-btn flex items-center space-x-2 px-3.5 py-2.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent whitespace-nowrap active:scale-95 transition-all">
-        <i class="fa-solid fa-stopwatch text-rose-400"></i>
-        <span>4. Jeda Iqamah</span>
-      </button>
-      <button onclick="switchTab('kajian')" id="tab-btn-kajian" class="tab-btn flex items-center space-x-2 px-3.5 py-2.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent whitespace-nowrap active:scale-95 transition-all">
-        <i class="fa-solid fa-book-quran text-indigo-400"></i>
-        <span>5. Kajian & Info</span>
-      </button>
-      <button onclick="switchTab('financial')" id="tab-btn-financial" class="tab-btn flex items-center space-x-2 px-3.5 py-2.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent whitespace-nowrap active:scale-95 transition-all">
-        <i class="fa-solid fa-wallet text-teal-400"></i>
-        <span>6. Laporan Kas</span>
-      </button>
-      <button onclick="switchTab('qris')" id="tab-btn-qris" class="tab-btn flex items-center space-x-2 px-3.5 py-2.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent whitespace-nowrap active:scale-95 transition-all">
-        <i class="fa-solid fa-qrcode text-violet-400"></i>
-        <span>7. Rekening & QRIS</span>
-      </button>
-      <button onclick="switchTab('media')" id="tab-btn-media" class="tab-btn flex items-center space-x-2 px-3.5 py-2.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent whitespace-nowrap active:scale-95 transition-all">
-        <i class="fa-solid fa-video text-red-400"></i>
-        <span>8. Siaran Media</span>
-      </button>
-      <button onclick="switchTab('system')" id="tab-btn-system" class="tab-btn flex items-center space-x-2 px-3.5 py-2.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent whitespace-nowrap active:scale-95 transition-all">
-        <i class="fa-solid fa-shield-halved text-blue-400"></i>
-        <span>9. Sistem & PIN</span>
-      </button>
-      <button onclick="switchTab('license')" id="tab-btn-license" class="tab-btn flex items-center space-x-2 px-3.5 py-2.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent whitespace-nowrap active:scale-95 transition-all">
-        <i class="fa-solid fa-crown text-gold-400"></i>
-        <span>10. Lisensi Super</span>
-      </button>
-    </div>
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
+          <!-- Card 1: Profil & Peta -->
+          <div onclick="openMenuFromDashboard('profile')" class="cursor-pointer group rounded-2xl bg-slate-900/90 hover:bg-slate-800/90 border border-slate-800 hover:border-emerald-500/50 p-4 transition-all duration-200 shadow-lg hover:shadow-emerald-950/40 flex flex-col justify-between space-y-3">
+            <div class="flex items-start justify-between">
+              <div class="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-lg shadow-md group-hover:scale-105 transition-transform">
+                <i class="fa-solid fa-map-location-dot"></i>
+              </div>
+              <span id="dashBadgeProfile" class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-800/60 font-bold truncate max-w-[100px]">Peta & GPS</span>
+            </div>
+            <div>
+              <h4 class="text-sm font-bold text-white group-hover:text-emerald-300 transition-colors">1. Profil & Peta</h4>
+              <p class="text-[11px] text-slate-400 mt-0.5 line-clamp-2">Nama masjid, alamat, dan GPS jadwal shalat</p>
+            </div>
+            <div class="flex items-center text-[10px] font-bold text-emerald-400 space-x-1 pt-1 border-t border-slate-800/60">
+              <span>Buka Menu</span>
+              <i class="fa-solid fa-chevron-right text-[9px] group-hover:translate-x-0.5 transition-transform"></i>
+            </div>
+          </div>
+
+          <!-- Card 2: Tema & TV -->
+          <div onclick="openMenuFromDashboard('theme')" class="cursor-pointer group rounded-2xl bg-slate-900/90 hover:bg-slate-800/90 border border-slate-800 hover:border-cyan-500/50 p-4 transition-all duration-200 shadow-lg hover:shadow-cyan-950/40 flex flex-col justify-between space-y-3">
+            <div class="flex items-start justify-between">
+              <div class="w-10 h-10 rounded-xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center text-lg shadow-md group-hover:scale-105 transition-transform">
+                <i class="fa-solid fa-palette"></i>
+              </div>
+              <span id="dashBadgeTheme" class="text-[10px] px-2 py-0.5 rounded-full bg-cyan-950 text-cyan-300 border border-cyan-800/60 font-bold truncate max-w-[100px]">Toska Cyan</span>
+            </div>
+            <div>
+              <h4 class="text-sm font-bold text-white group-hover:text-cyan-300 transition-colors">2. Tema & Layout TV</h4>
+              <p class="text-[11px] text-slate-400 mt-0.5 line-clamp-2">Pilihan tema warna, jam & efek 3D kaca</p>
+            </div>
+            <div class="flex items-center text-[10px] font-bold text-cyan-400 space-x-1 pt-1 border-t border-slate-800/60">
+              <span>Buka Menu</span>
+              <i class="fa-solid fa-chevron-right text-[9px] group-hover:translate-x-0.5 transition-transform"></i>
+            </div>
+          </div>
+
+          <!-- Card 3: Running Text -->
+          <div onclick="openMenuFromDashboard('runningText')" class="cursor-pointer group rounded-2xl bg-slate-900/90 hover:bg-slate-800/90 border border-slate-800 hover:border-amber-500/50 p-4 transition-all duration-200 shadow-lg hover:shadow-amber-950/40 flex flex-col justify-between space-y-3">
+            <div class="flex items-start justify-between">
+              <div class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-lg shadow-md group-hover:scale-105 transition-transform">
+                <i class="fa-solid fa-scroll"></i>
+              </div>
+              <span id="dashBadgeRunningText" class="text-[10px] px-2 py-0.5 rounded-full bg-amber-950 text-amber-300 border border-amber-800/60 font-bold">Aktif di TV</span>
+            </div>
+            <div>
+              <h4 class="text-sm font-bold text-white group-hover:text-amber-300 transition-colors">3. Running Text</h4>
+              <p class="text-[11px] text-slate-400 mt-0.5 line-clamp-2">Maklumat teks berjalan di bawah layar</p>
+            </div>
+            <div class="flex items-center text-[10px] font-bold text-amber-400 space-x-1 pt-1 border-t border-slate-800/60">
+              <span>Buka Menu</span>
+              <i class="fa-solid fa-chevron-right text-[9px] group-hover:translate-x-0.5 transition-transform"></i>
+            </div>
+          </div>
+
+          <!-- Card 4: Jeda Iqamah -->
+          <div onclick="openMenuFromDashboard('iqamah')" class="cursor-pointer group rounded-2xl bg-slate-900/90 hover:bg-slate-800/90 border border-slate-800 hover:border-rose-500/50 p-4 transition-all duration-200 shadow-lg hover:shadow-rose-950/40 flex flex-col justify-between space-y-3">
+            <div class="flex items-start justify-between">
+              <div class="w-10 h-10 rounded-xl bg-rose-500/20 text-rose-400 flex items-center justify-center text-lg shadow-md group-hover:scale-105 transition-transform">
+                <i class="fa-solid fa-stopwatch"></i>
+              </div>
+              <span id="dashBadgeIqamah" class="text-[10px] px-2 py-0.5 rounded-full bg-rose-950 text-rose-300 border border-rose-800/60 font-bold truncate max-w-[100px]">5 Waktu</span>
+            </div>
+            <div>
+              <h4 class="text-sm font-bold text-white group-hover:text-rose-300 transition-colors">4. Jeda Iqamah</h4>
+              <p class="text-[11px] text-slate-400 mt-0.5 line-clamp-2">Hitung mundur iqamah, adzan & shalat</p>
+            </div>
+            <div class="flex items-center text-[10px] font-bold text-rose-400 space-x-1 pt-1 border-t border-slate-800/60">
+              <span>Buka Menu</span>
+              <i class="fa-solid fa-chevron-right text-[9px] group-hover:translate-x-0.5 transition-transform"></i>
+            </div>
+          </div>
+
+          <!-- Card 5: Kajian & Info -->
+          <div onclick="openMenuFromDashboard('kajian')" class="cursor-pointer group rounded-2xl bg-slate-900/90 hover:bg-slate-800/90 border border-slate-800 hover:border-indigo-500/50 p-4 transition-all duration-200 shadow-lg hover:shadow-indigo-950/40 flex flex-col justify-between space-y-3">
+            <div class="flex items-start justify-between">
+              <div class="w-10 h-10 rounded-xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center text-lg shadow-md group-hover:scale-105 transition-transform">
+                <i class="fa-solid fa-book-quran"></i>
+              </div>
+              <span id="dashBadgeKajian" class="text-[10px] px-2 py-0.5 rounded-full bg-indigo-950 text-indigo-300 border border-indigo-800/60 font-bold truncate max-w-[100px]">Agenda</span>
+            </div>
+            <div>
+              <h4 class="text-sm font-bold text-white group-hover:text-indigo-300 transition-colors">5. Agenda Kajian & Info</h4>
+              <p class="text-[11px] text-slate-400 mt-0.5 line-clamp-2">Jadwal kajian ustadz & slide pengumuman</p>
+            </div>
+            <div class="flex items-center text-[10px] font-bold text-indigo-400 space-x-1 pt-1 border-t border-slate-800/60">
+              <span>Buka Menu</span>
+              <i class="fa-solid fa-chevron-right text-[9px] group-hover:translate-x-0.5 transition-transform"></i>
+            </div>
+          </div>
+
+          <!-- Card 6: Khutbah Jum'at & Quotes -->
+          <div onclick="openMenuFromDashboard('kajian', 'khutbah')" class="cursor-pointer group rounded-2xl bg-slate-900/90 hover:bg-slate-800/90 border border-slate-800 hover:border-gold-500/50 p-4 transition-all duration-200 shadow-lg hover:shadow-gold-950/40 flex flex-col justify-between space-y-3">
+            <div class="flex items-start justify-between">
+              <div class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-lg shadow-md group-hover:scale-105 transition-transform">
+                <i class="fa-solid fa-mosque"></i>
+              </div>
+              <span id="dashBadgeKhutbah" class="text-[10px] px-2 py-0.5 rounded-full bg-amber-950 text-gold-300 border border-gold-800/60 font-bold truncate max-w-[100px]">Jum'at</span>
+            </div>
+            <div>
+              <h4 class="text-sm font-bold text-white group-hover:text-gold-300 transition-colors">6. Khutbah & Quotes</h4>
+              <p class="text-[11px] text-slate-400 mt-0.5 line-clamp-2">Petugas shalat Jum'at & kata mutiara hadits</p>
+            </div>
+            <div class="flex items-center text-[10px] font-bold text-gold-400 space-x-1 pt-1 border-t border-slate-800/60">
+              <span>Buka Menu</span>
+              <i class="fa-solid fa-chevron-right text-[9px] group-hover:translate-x-0.5 transition-transform"></i>
+            </div>
+          </div>
+
+          <!-- Card 7: Laporan Kas -->
+          <div onclick="openMenuFromDashboard('financial')" class="cursor-pointer group rounded-2xl bg-slate-900/90 hover:bg-slate-800/90 border border-slate-800 hover:border-teal-500/50 p-4 transition-all duration-200 shadow-lg hover:shadow-teal-950/40 flex flex-col justify-between space-y-3">
+            <div class="flex items-start justify-between">
+              <div class="w-10 h-10 rounded-xl bg-teal-500/20 text-teal-400 flex items-center justify-center text-lg shadow-md group-hover:scale-105 transition-transform">
+                <i class="fa-solid fa-wallet"></i>
+              </div>
+              <span id="dashBadgeKas" class="text-[10px] px-2 py-0.5 rounded-full bg-teal-950 text-teal-300 border border-teal-800/60 font-bold truncate max-w-[100px]">Kas</span>
+            </div>
+            <div>
+              <h4 class="text-sm font-bold text-white group-hover:text-teal-300 transition-colors">7. Laporan Kas Masjid</h4>
+              <p class="text-[11px] text-slate-400 mt-0.5 line-clamp-2">Pemasukan, pengeluaran & saldo infaq</p>
+            </div>
+            <div class="flex items-center text-[10px] font-bold text-teal-400 space-x-1 pt-1 border-t border-slate-800/60">
+              <span>Buka Menu</span>
+              <i class="fa-solid fa-chevron-right text-[9px] group-hover:translate-x-0.5 transition-transform"></i>
+            </div>
+          </div>
+
+          <!-- Card 8: Rekening & QRIS -->
+          <div onclick="openMenuFromDashboard('qris')" class="cursor-pointer group rounded-2xl bg-slate-900/90 hover:bg-slate-800/90 border border-slate-800 hover:border-violet-500/50 p-4 transition-all duration-200 shadow-lg hover:shadow-violet-950/40 flex flex-col justify-between space-y-3">
+            <div class="flex items-start justify-between">
+              <div class="w-10 h-10 rounded-xl bg-violet-500/20 text-violet-400 flex items-center justify-center text-lg shadow-md group-hover:scale-105 transition-transform">
+                <i class="fa-solid fa-qrcode"></i>
+              </div>
+              <span id="dashBadgeQris" class="text-[10px] px-2 py-0.5 rounded-full bg-violet-950 text-violet-300 border border-violet-800/60 font-bold truncate max-w-[100px]">QRIS</span>
+            </div>
+            <div>
+              <h4 class="text-sm font-bold text-white group-hover:text-violet-300 transition-colors">8. Rekening Bank & QRIS</h4>
+              <p class="text-[11px] text-slate-400 mt-0.5 line-clamp-2">Informasi bank & barcode donasi digital</p>
+            </div>
+            <div class="flex items-center text-[10px] font-bold text-violet-400 space-x-1 pt-1 border-t border-slate-800/60">
+              <span>Buka Menu</span>
+              <i class="fa-solid fa-chevron-right text-[9px] group-hover:translate-x-0.5 transition-transform"></i>
+            </div>
+          </div>
+
+          <!-- Card 9: Media & YouTube Live -->
+          <div onclick="openMenuFromDashboard('media')" class="cursor-pointer group rounded-2xl bg-slate-900/90 hover:bg-slate-800/90 border border-slate-800 hover:border-red-500/50 p-4 transition-all duration-200 shadow-lg hover:shadow-red-950/40 flex flex-col justify-between space-y-3">
+            <div class="flex items-start justify-between">
+              <div class="w-10 h-10 rounded-xl bg-red-500/20 text-red-400 flex items-center justify-center text-lg shadow-md group-hover:scale-105 transition-transform">
+                <i class="fa-solid fa-video"></i>
+              </div>
+              <span id="dashBadgeMedia" class="text-[10px] px-2 py-0.5 rounded-full bg-red-950 text-red-300 border border-red-800/60 font-bold">YouTube</span>
+            </div>
+            <div>
+              <h4 class="text-sm font-bold text-white group-hover:text-red-300 transition-colors">9. Siaran YouTube Live</h4>
+              <p class="text-[11px] text-slate-400 mt-0.5 line-clamp-2">Live stream kajian atau siaran langsung TV</p>
+            </div>
+            <div class="flex items-center text-[10px] font-bold text-red-400 space-x-1 pt-1 border-t border-slate-800/60">
+              <span>Buka Menu</span>
+              <i class="fa-solid fa-chevron-right text-[9px] group-hover:translate-x-0.5 transition-transform"></i>
+            </div>
+          </div>
+
+          <!-- Card 10: PIN & Keamanan -->
+          <div onclick="openMenuFromDashboard('system')" class="cursor-pointer group rounded-2xl bg-slate-900/90 hover:bg-slate-800/90 border border-slate-800 hover:border-blue-500/50 p-4 transition-all duration-200 shadow-lg hover:shadow-blue-950/40 flex flex-col justify-between space-y-3">
+            <div class="flex items-start justify-between">
+              <div class="w-10 h-10 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center text-lg shadow-md group-hover:scale-105 transition-transform">
+                <i class="fa-solid fa-shield-halved"></i>
+              </div>
+              <span id="dashBadgeSystem" class="text-[10px] px-2 py-0.5 rounded-full bg-blue-950 text-blue-300 border border-blue-800/60 font-bold">PIN DKM</span>
+            </div>
+            <div>
+              <h4 class="text-sm font-bold text-white group-hover:text-blue-300 transition-colors">10. PIN & Keamanan</h4>
+              <p class="text-[11px] text-slate-400 mt-0.5 line-clamp-2">Proteksi keamanan panel admin pengurus</p>
+            </div>
+            <div class="flex items-center text-[10px] font-bold text-blue-400 space-x-1 pt-1 border-t border-slate-800/60">
+              <span>Buka Menu</span>
+              <i class="fa-solid fa-chevron-right text-[9px] group-hover:translate-x-0.5 transition-transform"></i>
+            </div>
+          </div>
+
+          <!-- Card 11: TV & Multi-Masjid -->
+          <div onclick="openMenuFromDashboard('license')" class="cursor-pointer group rounded-2xl bg-slate-900/90 hover:bg-slate-800/90 border border-slate-800 hover:border-gold-500/50 p-4 transition-all duration-200 shadow-lg hover:shadow-gold-950/40 flex flex-col justify-between space-y-3 col-span-2 md:col-span-1">
+            <div class="flex items-start justify-between">
+              <div class="w-10 h-10 rounded-xl bg-gold-500/20 text-gold-400 flex items-center justify-center text-lg shadow-md group-hover:scale-105 transition-transform">
+                <i class="fa-solid fa-tv"></i>
+              </div>
+              <span id="dashBadgeLicense" class="text-[10px] px-2 py-0.5 rounded-full bg-amber-950 text-gold-300 border border-gold-800/60 font-bold">Multi-TV</span>
+            </div>
+            <div>
+              <h4 class="text-sm font-bold text-white group-hover:text-gold-300 transition-colors">11. Manajemen TV Masjid</h4>
+              <p class="text-[11px] text-slate-400 mt-0.5 line-clamp-2">Kelola ID masjid untuk banyak TV & lisensi</p>
+            </div>
+            <div class="flex items-center text-[10px] font-bold text-gold-400 space-x-1 pt-1 border-t border-slate-800/60">
+              <span>Buka Menu</span>
+              <i class="fa-solid fa-chevron-right text-[9px] group-hover:translate-x-0.5 transition-transform"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div> <!-- END OF dashboardHomeView -->
+
+    <!-- ========================================== -->
+    <!-- SECTION DETAIL VIEW (Tampil saat menu dipilih) -->
+    <!-- ========================================== -->
+    <div id="sectionDetailView" class="hidden space-y-5">
+
+      <!-- Header Navigasi Kembali ke Dashboard -->
+      <div class="flex items-center justify-between bg-slate-900/95 border border-slate-800 rounded-2xl p-3 sm:p-4 shadow-xl">
+        <button onclick="backToDashboard()" class="flex items-center space-x-2 px-3 sm:px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-xs sm:text-sm font-bold border border-slate-700 active:scale-95 transition-all">
+          <i class="fa-solid fa-arrow-left text-emerald-400"></i>
+          <span>Menu Dashboard</span>
+        </button>
+
+        <div id="currentSectionTitle" class="flex items-center space-x-2 text-xs sm:text-sm font-black text-white">
+          <i class="fa-solid fa-map-location-dot text-emerald-400"></i>
+          <span>1. Profil & Peta Lokasi</span>
+        </div>
+
+        <button onclick="saveAllToCloud()" class="bg-gradient-to-r from-emerald-600 to-cyanTheme-600 hover:from-emerald-500 hover:to-cyanTheme-500 text-white font-extrabold text-xs sm:text-sm px-3.5 sm:px-4 py-2 rounded-xl shadow-lg flex items-center space-x-1.5 active:scale-95 transition-all">
+          <i class="fa-solid fa-cloud-arrow-up"></i>
+          <span class="hidden sm:inline">Simpan ke TV</span>
+          <span class="sm:hidden">Simpan</span>
+        </button>
+      </div>
+
+      <!-- Quick Mobile Portrait Tab Dropdown (Memudahkan Navigasi di Layar HP Android Tegak) -->
+      <div class="sm:hidden bg-slate-900/90 border border-slate-800 rounded-2xl p-2.5 flex items-center justify-between gap-2 shadow-lg">
+        <div class="flex items-center space-x-2 text-xs font-bold text-slate-300 shrink-0">
+          <i class="fa-solid fa-list-check text-emerald-400 text-sm"></i>
+          <span>Ganti:</span>
+        </div>
+        <div class="relative flex-1">
+          <select id="mobileTabSelector" onchange="switchTab(this.value)" class="w-full bg-slate-950 border border-slate-700 text-white text-xs font-bold py-2 px-3 rounded-xl focus:outline-none focus:border-brand-500">
+            <option value="profile">📍 1. Profil & Peta Lokasi</option>
+            <option value="theme">🎨 2. Tema & Layout TV</option>
+            <option value="runningText">📜 3. Running Text Berjalan</option>
+            <option value="iqamah">⏱️ 4. Jeda Waktu Iqamah</option>
+            <option value="kajian">📖 5. Agenda Kajian & Info</option>
+            <option value="financial">💰 6. Laporan Kas Masjid</option>
+            <option value="qris">📱 7. Rekening Bank & QRIS</option>
+            <option value="media">🎥 8. Siaran Media / YouTube</option>
+            <option value="system">🛡️ 9. Sistem & PIN Pengurus</option>
+            <option value="license">👑 10. Lisensi & Super Admin</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs Chips (Horizontal Fast Switcher) -->
+      <div class="flex space-x-2 overflow-x-auto pb-2 border-b border-slate-800 custom-scrollbar text-xs font-semibold">
+        <button onclick="switchTab('profile')" id="tab-btn-profile" class="tab-btn flex items-center space-x-2 px-3.5 py-2 rounded-xl bg-brand-800 text-white border border-brand-600 whitespace-nowrap active:scale-95 transition-all">
+          <i class="fa-solid fa-map-location-dot text-emerald-300"></i>
+          <span>1. Profil & Peta</span>
+        </button>
+        <button onclick="switchTab('theme')" id="tab-btn-theme" class="tab-btn flex items-center space-x-2 px-3.5 py-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent whitespace-nowrap active:scale-95 transition-all">
+          <i class="fa-solid fa-palette text-cyan-400"></i>
+          <span>2. Tema & TV</span>
+        </button>
+        <button onclick="switchTab('runningText')" id="tab-btn-runningText" class="tab-btn flex items-center space-x-2 px-3.5 py-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent whitespace-nowrap active:scale-95 transition-all">
+          <i class="fa-solid fa-scroll text-amber-400"></i>
+          <span>3. Running Text</span>
+        </button>
+        <button onclick="switchTab('iqamah')" id="tab-btn-iqamah" class="tab-btn flex items-center space-x-2 px-3.5 py-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent whitespace-nowrap active:scale-95 transition-all">
+          <i class="fa-solid fa-stopwatch text-rose-400"></i>
+          <span>4. Jeda Iqamah</span>
+        </button>
+        <button onclick="switchTab('kajian')" id="tab-btn-kajian" class="tab-btn flex items-center space-x-2 px-3.5 py-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent whitespace-nowrap active:scale-95 transition-all">
+          <i class="fa-solid fa-book-quran text-indigo-400"></i>
+          <span>5. Kajian & Info</span>
+        </button>
+        <button onclick="switchTab('financial')" id="tab-btn-financial" class="tab-btn flex items-center space-x-2 px-3.5 py-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent whitespace-nowrap active:scale-95 transition-all">
+          <i class="fa-solid fa-wallet text-teal-400"></i>
+          <span>6. Laporan Kas</span>
+        </button>
+        <button onclick="switchTab('qris')" id="tab-btn-qris" class="tab-btn flex items-center space-x-2 px-3.5 py-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent whitespace-nowrap active:scale-95 transition-all">
+          <i class="fa-solid fa-qrcode text-violet-400"></i>
+          <span>7. Rekening & QRIS</span>
+        </button>
+        <button onclick="switchTab('media')" id="tab-btn-media" class="tab-btn flex items-center space-x-2 px-3.5 py-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent whitespace-nowrap active:scale-95 transition-all">
+          <i class="fa-solid fa-video text-red-400"></i>
+          <span>8. Siaran Media</span>
+        </button>
+        <button onclick="switchTab('system')" id="tab-btn-system" class="tab-btn flex items-center space-x-2 px-3.5 py-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent whitespace-nowrap active:scale-95 transition-all">
+          <i class="fa-solid fa-shield-halved text-blue-400"></i>
+          <span>9. Sistem & PIN</span>
+        </button>
+        <button onclick="switchTab('license')" id="tab-btn-license" class="tab-btn flex items-center space-x-2 px-3.5 py-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent whitespace-nowrap active:scale-95 transition-all">
+          <i class="fa-solid fa-crown text-gold-400"></i>
+          <span>10. Lisensi Super</span>
+        </button>
+      </div>
 
     <!-- ========================================== -->
     <!-- TAB 1: PROFIL MASJID                      -->
@@ -1599,7 +1787,8 @@
           </p>
         </div>
       </div>
-    </div>
+      </div> <!-- END OF tab-license -->
+    </div> <!-- END OF sectionDetailView -->
 
   </main>
 
@@ -1612,11 +1801,15 @@
 
   <!-- STICKY MOBILE BOTTOM SAVE BAR (PRIORITAS PORTRAIT ANDROID) -->
   <div class="fixed bottom-0 inset-x-0 z-40 bg-slate-950/95 backdrop-blur-md border-t border-slate-800 px-3 py-2.5 sm:hidden shadow-2xl flex items-center space-x-2">
+    <button onclick="backToDashboard()" class="px-3.5 py-3 bg-slate-900 hover:bg-slate-800 text-slate-300 rounded-xl border border-slate-800 active:scale-95 transition-all flex items-center space-x-1.5 text-xs font-bold">
+      <i class="fa-solid fa-shapes text-emerald-400 text-sm"></i>
+      <span>Menu</span>
+    </button>
     <button onclick="saveAllToCloud()" class="flex-1 bg-gradient-to-r from-emerald-600 via-brand-600 to-cyanTheme-600 hover:from-emerald-500 hover:to-cyanTheme-500 text-white font-extrabold text-xs py-3 rounded-xl shadow-lg shadow-emerald-950/80 active:scale-95 transition-all flex items-center justify-center space-x-2">
       <i class="fa-solid fa-cloud-arrow-up text-sm"></i>
       <span>Simpan ke Layar TV</span>
     </button>
-    <button onclick="lockAdminPanel()" title="Kunci Admin" class="px-3.5 py-3 bg-slate-900 hover:bg-rose-950 text-slate-300 rounded-xl border border-slate-800 active:scale-95 transition-all">
+    <button onclick="lockAdminPanel()" title="Kunci Admin" class="px-3 py-3 bg-slate-900 hover:bg-rose-950 text-slate-300 rounded-xl border border-slate-800 active:scale-95 transition-all">
       <i class="fa-solid fa-lock text-gold-400"></i>
     </button>
   </div>
@@ -1735,8 +1928,135 @@
       PENGUMUMAN: "Layout Pengumuman"
     };
 
+    const SECTION_TITLES = {
+      profile: { title: "1. Profil & Peta Lokasi", icon: "fa-map-location-dot", color: "text-emerald-400" },
+      theme: { title: "2. Tema & Layout TV", icon: "fa-palette", color: "text-cyan-400" },
+      runningText: { title: "3. Running Text Berjalan", icon: "fa-scroll", color: "text-amber-400" },
+      iqamah: { title: "4. Jeda Waktu Iqamah & Adzan", icon: "fa-stopwatch", color: "text-rose-400" },
+      kajian: { title: "5. Agenda Kajian & Info", icon: "fa-book-quran", color: "text-indigo-400" },
+      financial: { title: "6. Laporan Kas Masjid", icon: "fa-wallet", color: "text-teal-400" },
+      qris: { title: "7. Rekening Bank & QRIS", icon: "fa-qrcode", color: "text-violet-400" },
+      media: { title: "8. Siaran Media / YouTube", icon: "fa-video", color: "text-red-400" },
+      system: { title: "9. Sistem & PIN Pengurus", icon: "fa-shield-halved", color: "text-blue-400" },
+      license: { title: "10. Manajemen TV & Multi-Masjid", icon: "fa-crown", color: "text-gold-400" }
+    };
+
+    // --- Dashboard & Menu Navigation Logic ---
+    function openMenuFromDashboard(tabKey, subTarget) {
+      const dash = document.getElementById('dashboardHomeView');
+      const detail = document.getElementById('sectionDetailView');
+      if (dash) dash.classList.add('hidden');
+      if (detail) detail.classList.remove('hidden');
+
+      switchTab(tabKey);
+
+      if (subTarget === 'khutbah') {
+        setTimeout(() => {
+          const el = document.getElementById('khutbahKhatibName');
+          if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 250);
+      } else {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+
+    function backToDashboard() {
+      const dash = document.getElementById('dashboardHomeView');
+      const detail = document.getElementById('sectionDetailView');
+      if (detail) detail.classList.add('hidden');
+      if (dash) dash.classList.remove('hidden');
+
+      updateDashboardSummary();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function updateDashboardSummary() {
+      const mosqueName = document.getElementById('mosqueName')?.value || "Masjid Ar-Ridho";
+      const mosqueCity = document.getElementById('mosqueCity')?.value || "Bandar Lampung";
+      const mosqueAddr = document.getElementById('mosqueAddress')?.value || "";
+      const themeKey = document.getElementById('selectedThemeKey')?.value || "JAMID_CYAN";
+      const themeTitle = THEME_PALETTES[themeKey]?.title || "Toska Cyan";
+      const layoutKey = document.getElementById('selectedLayoutKey')?.value || "JAMID_APP";
+      const layoutTitle = LAYOUT_TITLES[layoutKey] || "Layout Standar";
+
+      // Header and Hero elements
+      const hMosque = document.getElementById('headerMosqueName');
+      if (hMosque) hMosque.innerText = mosqueName + (mosqueCity ? " • " + mosqueCity : "");
+
+      const dashMosqueName = document.getElementById('dashMosqueName');
+      if (dashMosqueName) dashMosqueName.innerText = mosqueName;
+
+      const dashMosqueAddress = document.getElementById('dashMosqueAddress');
+      if (dashMosqueAddress) dashMosqueAddress.innerText = (mosqueAddr ? mosqueAddr + " • " : "") + mosqueCity;
+
+      const dashIdBadge = document.getElementById('dashMosqueIdBadge');
+      if (dashIdBadge) dashIdBadge.innerText = "ID: " + currentMasjidId;
+
+      // Badges on dashboard cards
+      const bProf = document.getElementById('dashBadgeProfile');
+      if (bProf) bProf.innerText = mosqueCity || "Peta GPS";
+
+      const bTheme = document.getElementById('dashBadgeTheme');
+      if (bTheme) bTheme.innerText = themeTitle;
+
+      const bRun = document.getElementById('dashBadgeRunningText');
+      if (bRun) {
+        const isAct = document.getElementById('runningTextActive')?.value === "true";
+        bRun.innerText = isAct ? "Aktif di TV" : "Mati";
+      }
+
+      const bIq = document.getElementById('dashBadgeIqamah');
+      if (bIq) {
+        const sub = document.getElementById('iqSubuh')?.value || "12";
+        const dzu = document.getElementById('iqDzuhur')?.value || "10";
+        bIq.innerText = `Subuh ${sub}m • Dzuhur ${dzu}m`;
+      }
+
+      const bKaj = document.getElementById('dashBadgeKajian');
+      if (bKaj) {
+        const kCount = (activeKajianList && Array.isArray(activeKajianList)) ? activeKajianList.length : 1;
+        const aCount = (activeAnnouncementList && Array.isArray(activeAnnouncementList)) ? activeAnnouncementList.length : 1;
+        bKaj.innerText = `${kCount} Kajian • ${aCount} Info`;
+      }
+
+      const bKhut = document.getElementById('dashBadgeKhutbah');
+      if (bKhut) {
+        const khatib = document.getElementById('khutbahKhatibName')?.value || "";
+        bKhut.innerText = khatib ? "Khatib Siap" : "Jum'at";
+      }
+
+      const bKas = document.getElementById('dashBadgeKas');
+      if (bKas) {
+        const bal = parseFloat(document.getElementById('finBalance')?.value || 0);
+        bKas.innerText = "Rp " + bal.toLocaleString('id-ID');
+      }
+
+      const bQr = document.getElementById('dashBadgeQris');
+      if (bQr) {
+        const bank = document.getElementById('qrisBank')?.value || "BSI";
+        bQr.innerText = bank.substring(0, 14);
+      }
+
+      const bYt = document.getElementById('dashBadgeMedia');
+      if (bYt) {
+        const ytOn = document.getElementById('ytActive')?.checked;
+        bYt.innerText = ytOn ? "Live On" : "Off";
+      }
+
+      const bLic = document.getElementById('dashBadgeLicense');
+      if (bLic) {
+        bLic.innerText = currentMasjidId;
+      }
+    }
+
     // --- Tab Switching Logic ---
     function switchTab(tabKey) {
+      const info = SECTION_TITLES[tabKey] || { title: tabKey, icon: "fa-shapes", color: "text-white" };
+      const titleEl = document.getElementById('currentSectionTitle');
+      if (titleEl) {
+        titleEl.innerHTML = `<i class="fa-solid ${info.icon} ${info.color}"></i><span>${info.title}</span>`;
+      }
+
       document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.classList.remove('bg-brand-800', 'text-white', 'border-brand-600');
         btn.classList.add('text-slate-400', 'border-transparent');
@@ -1858,6 +2178,8 @@
           populateDefaultArRidho();
           updateStatusBadge(true, `Siap Simpan (${currentMasjidId})`);
         }
+        updateDashboardSummary();
+        loadAllMasjidsFromFirestore();
       }, (error) => {
         console.error("Firestore listen error:", error);
         updateStatusBadge(false, "Koneksi Error: " + (error.message || error));
@@ -2277,11 +2599,11 @@
         const license = {
           licenseCode: licenseCode,
           status: licenseStatus,
-          deviceId: (activeData && activeData.license && activeData.license.deviceId) ? activeData.license.deviceId : "TV-ANDROID-DEFAULT",
+          deviceId: (activeData && activeData.license && activeData.license.deviceId) ? activeData.license.deviceId : "",
           masjidId: targetMasjidDoc,
-          activationDate: "2026-09-01",
+          activationDate: (activeData && activeData.license && activeData.license.activationDate) ? activeData.license.activationDate : "2026-09-01",
           expiryDate: licenseExpiry,
-          lastSync: "Cloud Firestore Synced"
+          lastSync: "Cloud Firestore Synced (" + targetMasjidDoc + ")"
         };
 
         const payload = {
@@ -2303,7 +2625,9 @@
         const docRef = (typeof col.doc === "function") ? col.doc(targetMasjidDoc) : col.document(targetMasjidDoc);
         await docRef.set(payload, { merge: true });
 
-        showToast("Berhasil disimpan! Tema warna dan seluruh pengaturan TV langsung terupdate saat ini juga.", "success");
+        updateDashboardSummary();
+        loadAllMasjidsFromFirestore();
+        showToast("Berhasil disimpan! Seluruh perubahan langsung terkirim dan diterapkan ke TV saat ini juga.", "success");
       } catch (err) {
         console.error("Save error:", err);
         showToast("Gagal menyimpan ke cloud: " + err.message, "error");
@@ -2347,47 +2671,70 @@
     }
 
     // ==========================================
-    // 4B. CUSTOM APK DOWNLOAD LINK HANDLER (VERCEL / GDRIVE)
+    // 4B. MULTI-MASJID & FIREBASE CLOUD MANAGEMENT
     // ==========================================
-    function initApkDownloadUrl() {
-      const savedUrl = localStorage.getItem("jamid_custom_apk_url") || "";
-      const headerBtn = document.getElementById('headerApkBtn');
-      const cardBtn = document.getElementById('btnDownloadApkLink');
-      const input = document.getElementById('customApkInput');
-
-      if (input) input.value = savedUrl;
-
-      const targetUrl = savedUrl.trim() || "/jammasjid.apk";
-      if (cardBtn) cardBtn.href = targetUrl;
-      if (headerBtn) headerBtn.href = targetUrl;
-    }
-
-    function openCustomApkModal() {
-      const modal = document.getElementById('modalCustomApk');
-      if (modal) {
-        modal.classList.remove('hidden');
-        const savedUrl = localStorage.getItem("jamid_custom_apk_url") || "";
-        document.getElementById('customApkInput').value = savedUrl;
+    async function loadAllMasjidsFromFirestore() {
+      const database = getDb();
+      if (!database) return;
+      try {
+        const col = database.collection("masjids");
+        const snapshot = await col.get();
+        const masjidList = [];
+        snapshot.forEach(doc => {
+          const data = doc.data() || {};
+          const prof = data.profile || {};
+          const name = prof.name || doc.id;
+          masjidList.push({ id: doc.id, name: name });
+        });
+        if (!masjidList.find(m => m.id === "masjid_001")) {
+          masjidList.unshift({ id: "masjid_001", name: "Masjid Ar-Ridho Kejati Lampung" });
+        }
+        if (currentMasjidId && !masjidList.find(m => m.id === currentMasjidId)) {
+          masjidList.push({ id: currentMasjidId, name: currentMasjidId });
+        }
+        populateMasjidDropdowns(masjidList);
+      } catch (err) {
+        console.warn("Gagal memuat daftar masjid dari Firestore:", err);
       }
     }
 
-    function closeCustomApkModal() {
-      const modal = document.getElementById('modalCustomApk');
-      if (modal) modal.classList.add('hidden');
+    function populateMasjidDropdowns(masjids) {
+      const selectors = ['headerMasjidSelect', 'superAdminMasjidSelect', 'dashMasjidSelect'];
+      selectors.forEach(selId => {
+        const sel = document.getElementById(selId);
+        if (!sel) return;
+        sel.innerHTML = "";
+        masjids.forEach(m => {
+          const opt = document.createElement('option');
+          opt.value = m.id;
+          opt.innerText = `${m.name} (${m.id})`;
+          if (m.id === currentMasjidId) opt.selected = true;
+          sel.appendChild(opt);
+        });
+        const addOpt = document.createElement('option');
+        addOpt.value = "NEW_MASJID";
+        addOpt.innerText = "➕ Tambah Masjid Baru...";
+        sel.appendChild(addOpt);
+      });
     }
 
-    function saveCustomApkUrl() {
-      const input = document.getElementById('customApkInput');
-      const newUrl = input ? input.value.trim() : "";
-      if (newUrl) {
-        localStorage.setItem("jamid_custom_apk_url", newUrl);
-        showToast("Tautan kustom APK berhasil disimpan! Tombol download sekarang mengarah ke tautan ini.", "success");
-      } else {
-        localStorage.removeItem("jamid_custom_apk_url");
-        showToast("Tautan direset ke /jammasjid.apk bawaan.", "info");
-      }
-      initApkDownloadUrl();
-      closeCustomApkModal();
+    function promptAddNewMasjid() {
+      const name = prompt("Masukkan Nama Masjid Baru:\n(Contoh: Masjid Al-Ikhlas)");
+      if (!name || !name.trim()) return;
+      const defaultId = "masjid_" + name.trim().toLowerCase().replace(/[^a-z0-9]/g, '_').substring(0, 15);
+      const idInput = prompt("Masukkan ID Kode Masjid untuk TV & Web:\n(Contoh: masjid_002, masjid_alikhlas)", defaultId);
+      if (!idInput || !idInput.trim()) return;
+      const cleanId = idInput.trim().toLowerCase().replace(/[^a-z0-9_-]/g, '');
+      if (!cleanId) return;
+
+      currentMasjidId = cleanId;
+      localStorage.setItem('jamid_active_masjid_id', cleanId);
+      document.getElementById('mosqueName').value = name.trim();
+
+      saveAllToCloud().then(() => {
+        loadAllMasjidsFromFirestore();
+        showToast(`Masjid baru '${name}' (${cleanId}) berhasil dibuat & tersambung ke cloud!`, 'success');
+      });
     }
 
     // ==========================================
@@ -3399,31 +3746,15 @@
 
     function changeTargetMasjid(newId) {
       if (newId === "NEW_MASJID") {
-        const customId = prompt("Masukkan ID Masjid baru (misal: masjid_alikhlas):");
-        if (customId && customId.trim()) {
-          const clean = customId.trim().toLowerCase().replace(/[^a-z0-9_-]/g, '');
-          currentMasjidId = clean;
-          localStorage.setItem('jamid_active_masjid_id', clean);
-          const sel = document.getElementById('superAdminMasjidSelect');
-          if (sel) {
-            const opt = document.createElement('option');
-            opt.value = clean;
-            opt.innerText = clean;
-            opt.selected = true;
-            sel.appendChild(opt);
-          }
-        } else {
-          document.getElementById('superAdminMasjidSelect').value = currentMasjidId;
-          return;
-        }
-      } else {
-        currentMasjidId = newId;
-        localStorage.setItem('jamid_active_masjid_id', newId);
+        promptAddNewMasjid();
+        return;
       }
-
+      currentMasjidId = newId;
+      localStorage.setItem('jamid_active_masjid_id', newId);
       const lbl = document.getElementById('targetMasjidIdLabel');
       if (lbl) lbl.innerText = "ID: " + currentMasjidId;
       setupRealtimeListener();
+      updateDashboardSummary();
       showToast("Beralih ke pengelolaan: " + currentMasjidId, "info");
     }
 
@@ -3432,7 +3763,8 @@
     // ==========================================
     populateDefaultArRidho();
     setupRealtimeListener();
-    initApkDownloadUrl();
+    loadAllMasjidsFromFirestore();
+    updateDashboardSummary();
     checkPinSecurity();
   </script>
 </body>
