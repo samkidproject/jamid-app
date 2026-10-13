@@ -97,34 +97,53 @@
 <body class="min-h-screen flex flex-col font-sans antialiased custom-scrollbar">
 
   <!-- ========================================== -->
-  <!-- MODAL: KUNCI KEAMANAN ADMIN DKM (ANTI HACK)-->
+  <!-- ========================================== -->
+  <!-- MODAL: LOGIN ADMIN & PENGURUS MASJID       -->
   <!-- ========================================== -->
   <div id="adminPinModal" class="hidden fixed inset-0 z-50 bg-[#080d0f]/95 backdrop-blur-md flex items-center justify-center p-4">
-    <div class="max-w-sm w-full bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-7 shadow-2xl text-center space-y-4">
+    <div class="max-w-md w-full bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-7 shadow-2xl text-center space-y-4">
       <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-brand-600 to-cyanTheme-500 mx-auto flex items-center justify-center text-white text-2xl shadow-lg shadow-brand-900/50">
-        <i class="fa-solid fa-shield-halved"></i>
+        <i class="fa-solid fa-user-shield"></i>
       </div>
       <div>
-        <h3 class="text-lg font-black text-white tracking-tight">KEAMANAN PENGURUS DKM</h3>
-        <p class="text-xs text-slate-400 mt-1">Masukkan PIN Pengurus untuk mengakses & mengubah pengaturan TV.</p>
+        <h3 class="text-lg font-black text-white tracking-tight">LOGIN PANEL ADMIN JAMID</h3>
+        <p class="text-xs text-slate-400 mt-1">Masuk dengan Email Super Admin atau Email Pengurus yang Terdaftar.</p>
       </div>
 
-      <div id="pinAlertBox" class="hidden p-3 rounded-xl border border-rose-800 bg-rose-950/80 text-rose-300 text-xs font-semibold">
+      <div id="pinAlertBox" class="hidden p-3 rounded-xl border border-rose-800 bg-rose-950/80 text-rose-300 text-xs font-semibold text-left">
         <i class="fa-solid fa-circle-exclamation mr-1"></i>
-        <span>PIN Pengurus salah. Silakan coba lagi.</span>
+        <span id="pinAlertMessage">Login gagal. Silakan coba lagi.</span>
       </div>
 
-      <form onsubmit="handleAdminPinSubmit(event)" class="space-y-3">
-        <input type="password" id="inputAdminPin" maxlength="10" placeholder="PIN Pengurus (Default: 1234)" class="w-full text-center tracking-widest text-lg font-mono font-bold bg-slate-950 border border-slate-700 rounded-xl py-3 text-white focus:outline-none focus:border-brand-500">
-        <button type="submit" class="w-full bg-gradient-to-r from-brand-600 to-cyanTheme-600 hover:from-brand-500 hover:to-cyanTheme-500 text-white font-bold text-sm py-3 rounded-xl shadow-lg shadow-brand-900/40 transition-all flex items-center justify-center space-x-2">
-          <i class="fa-solid fa-lock-open"></i>
-          <span>Buka Panel Pengurus</span>
+      <form onsubmit="handleAdminLoginSubmit(event)" class="space-y-3 text-left">
+        <div>
+          <label class="block text-[11px] font-bold text-slate-300 mb-1">Alamat Email Pengguna / Admin:</label>
+          <div class="relative">
+            <i class="fa-solid fa-envelope absolute left-3.5 top-3.5 text-slate-500 text-xs"></i>
+            <input type="email" id="inputAdminEmail" placeholder="Contoh: samkidproject@gmail.com" class="w-full pl-9 pr-3 py-2.5 text-xs bg-slate-950 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-brand-500 font-mono">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-[11px] font-bold text-slate-400 mb-1 flex items-center justify-between">
+            <span>PIN Pengurus (Opsional jika pakai email):</span>
+            <span class="text-[10px] text-slate-500">Default: 1234</span>
+          </label>
+          <div class="relative">
+            <i class="fa-solid fa-key absolute left-3.5 top-3.5 text-slate-500 text-xs"></i>
+            <input type="password" id="inputAdminPin" maxlength="10" placeholder="PIN Pengurus (1234)" class="w-full pl-9 pr-3 py-2.5 text-xs bg-slate-950 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-brand-500 font-mono">
+          </div>
+        </div>
+
+        <button type="submit" id="btnAdminLogin" class="w-full mt-2 bg-gradient-to-r from-brand-600 to-cyanTheme-600 hover:from-brand-500 hover:to-cyanTheme-500 text-white font-bold text-sm py-3 rounded-xl shadow-lg shadow-brand-900/40 transition-all flex items-center justify-center space-x-2">
+          <i class="fa-solid fa-right-to-bracket"></i>
+          <span>Masuk ke Panel Pengurus</span>
         </button>
       </form>
 
-      <div class="p-3 bg-slate-950 border border-slate-800/80 rounded-xl text-[11px] text-slate-400 space-y-1">
-        <p>PIN bawaan adalah <b class="text-gold-400 font-mono">1234</b>.</p>
-        <p class="text-[10px] text-slate-500">Fitur ini mengamankan link Vercel Anda agar tidak dapat diubah oleh orang lain.</p>
+      <div class="p-3 bg-slate-950 border border-slate-800/80 rounded-xl text-[11px] text-slate-400 space-y-1 text-left">
+        <p><b class="text-gold-400 font-bold">• Super Admin:</b> Gunakan <code class="text-emerald-400 font-mono">samkidproject@gmail.com</code> (atau PIN <code class="text-gold-400 font-mono">1234</code>) untuk kelola semua masjid & daftarkan klien baru.</p>
+        <p><b class="text-cyan-400 font-bold">• Pengurus / Pemesan:</b> Gunakan email yang didaftarkan ke Super Admin untuk mengelola konten masjid Anda sendiri.</p>
       </div>
     </div>
   </div>
@@ -154,10 +173,16 @@
 
       <!-- Cloud Status, Save Action & User Auth Profile -->
       <div class="flex items-center space-x-2 sm:space-x-3">
-        <!-- Target Mosque Selector in Header -->
-        <div class="flex items-center space-x-1.5 px-2.5 py-1.5 bg-slate-900 border border-slate-700/80 rounded-xl text-xs font-semibold">
+        <!-- User Badge -->
+        <div id="userProfileHeaderBadge" class="flex items-center space-x-1.5 px-2.5 py-1.5 bg-slate-900 border border-brand-700/60 rounded-xl text-xs font-bold text-brand-300">
+          <i class="fa-solid fa-circle-user text-brand-400"></i>
+          <span id="userProfileHeaderText" class="truncate max-w-[120px] sm:max-w-[160px]">Super Admin</span>
+        </div>
+
+        <!-- Target Mosque Selector in Header (Super Admin Only) -->
+        <div id="headerMasjidSelectContainer" class="flex items-center space-x-1.5 px-2.5 py-1.5 bg-slate-900 border border-slate-700/80 rounded-xl text-xs font-semibold">
           <i class="fa-solid fa-mosque text-brand-400 text-xs"></i>
-          <select id="headerMasjidSelect" onchange="changeTargetMasjid(this.value)" class="bg-transparent text-white font-bold focus:outline-none cursor-pointer max-w-[130px] sm:max-w-[200px] truncate text-xs">
+          <select id="headerMasjidSelect" onchange="changeTargetMasjid(this.value)" class="bg-transparent text-white font-bold focus:outline-none cursor-pointer max-w-[120px] sm:max-w-[180px] truncate text-xs">
             <option value="masjid_001">Masjid Ar-Ridho (masjid_001)</option>
           </select>
         </div>
@@ -172,10 +197,10 @@
           <span>Simpan ke TV</span>
         </button>
 
-        <!-- Kunci Panel Button -->
-        <button onclick="lockAdminPanel()" title="Kunci Panel Admin DKM" class="flex items-center space-x-1.5 px-3 py-2 bg-slate-800 hover:bg-rose-950 hover:text-rose-300 text-slate-300 text-xs font-semibold rounded-xl border border-slate-700 transition-colors">
-          <i class="fa-solid fa-lock text-gold-400"></i>
-          <span class="hidden sm:inline">Kunci</span>
+        <!-- Logout / Ganti Akun Button -->
+        <button onclick="logoutAdmin()" title="Keluar / Ganti Akun Admin" class="flex items-center space-x-1.5 px-3 py-2 bg-slate-800 hover:bg-rose-950 hover:text-rose-300 text-slate-300 text-xs font-semibold rounded-xl border border-slate-700 transition-colors">
+          <i class="fa-solid fa-right-from-bracket text-gold-400"></i>
+          <span class="hidden sm:inline">Keluar</span>
         </button>
       </div>
     </div>
@@ -1676,41 +1701,154 @@
     </div>
 
     <!-- ========================================== -->
-    <!-- TAB 10: LISENSI & BISNIS PENJUALAN (NEW!)  -->
+    <!-- TAB 10: PENDAFTARAN & APPROVAL MASJID      -->
     <!-- ========================================== -->
     <div id="tab-license" class="tab-content hidden space-y-6">
       <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 sm:p-6">
         <div class="flex items-center justify-between border-b border-slate-800 pb-4 mb-5">
           <div>
             <h2 class="text-base sm:text-lg font-bold text-white flex items-center space-x-2">
-              <i class="fa-solid fa-key text-gold-400"></i>
-              <span>Status Lisensi & Manajemen Penjualan TV Masjid</span>
+              <i class="fa-solid fa-crown text-gold-400"></i>
+              <span>Pendaftaran & Persetujuan Masjid (Super Admin)</span>
             </h2>
-            <p class="text-xs text-slate-400 mt-1">Atur lisensi aktivasi bagi pembeli aplikasi atau paket perangkat TV masjid Anda.</p>
+            <p class="text-xs text-slate-400 mt-1">Super Admin mendaftarkan email pemesan, nama masjid, dan lokasi. APK TV akan otomatis sinkron saat pengguna memasukkan email ini.</p>
           </div>
           <span id="licenseStatusBadge" class="px-3 py-1 bg-emerald-950 text-emerald-300 border border-emerald-700/60 rounded-xl text-xs font-black tracking-wider uppercase">ACTIVE</span>
         </div>
 
+        <!-- 1. FORM PENDAFTARAN MASJID BARU KHUSUS SUPER ADMIN -->
+        <div id="superAdminRegistrationCard" class="bg-gradient-to-b from-slate-950 to-slate-900 border border-emerald-700/60 rounded-2xl p-5 shadow-2xl mb-6 space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-3">
+            <div>
+              <h3 class="text-sm sm:text-base font-extrabold text-white flex items-center space-x-2">
+                <i class="fa-solid fa-user-plus text-emerald-400"></i>
+                <span>Form Pendaftaran Klien Masjid (Super Admin)</span>
+              </h3>
+              <p class="text-[11px] text-slate-400 mt-0.5">Daftarkan email pemesan, nama masjid, dan lokasi. Setelah didaftarkan & disetujui, APK TV cukup memasukkan email ini sekali saja.</p>
+            </div>
+            <span class="self-start sm:self-auto px-2.5 py-1 bg-emerald-950 text-emerald-300 border border-emerald-700/60 rounded-xl text-[10px] font-black uppercase tracking-wider">SUPER ADMIN KONSOL</span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+            <!-- 1. Alamat Email Pemesan -->
+            <div>
+              <label class="block text-[11px] font-bold text-slate-200 mb-1">
+                <i class="fa-solid fa-envelope text-emerald-400 mr-1"></i>
+                <span>Alamat Email Pemesan / Pengurus (Wajib):</span>
+              </label>
+              <input type="email" id="regClientEmail" placeholder="Contoh: dkm.annur@gmail.com" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-emerald-500">
+              <p class="text-[10px] text-slate-500 mt-1">Digunakan untuk login Web Admin dan aktivasi di layar TV (cukup sekali saja).</p>
+            </div>
+
+            <!-- 2. Nama Masjid -->
+            <div>
+              <label class="block text-[11px] font-bold text-slate-200 mb-1">
+                <i class="fa-solid fa-mosque text-emerald-400 mr-1"></i>
+                <span>Nama Lengkap Masjid:</span>
+              </label>
+              <input type="text" id="regMosqueName" oninput="autoGenerateMasjidId(this.value)" placeholder="Contoh: Masjid An-Nur" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs font-bold text-white focus:outline-none focus:border-emerald-500">
+            </div>
+
+            <!-- 3. Lokasi / Kota (Jadwal Shalat) -->
+            <div>
+              <label class="block text-[11px] font-bold text-slate-200 mb-1">
+                <i class="fa-solid fa-location-dot text-emerald-400 mr-1"></i>
+                <span>Lokasi / Kota (Otomatis Set Jadwal Shalat):</span>
+              </label>
+              <select id="regPresetCitySelect" onchange="handleRegCitySelect(this.value)" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500 font-semibold">
+                <option value="Bandar Lampung">Bandar Lampung (Lampung • WIB)</option>
+                <option value="Jakarta">DKI Jakarta (Jawa Barat • WIB)</option>
+                <option value="Bandung">Bandung (Jawa Barat • WIB)</option>
+                <option value="Surabaya">Surabaya (Jawa Timur • WIB)</option>
+                <option value="Semarang">Semarang (Jawa Tengah • WIB)</option>
+                <option value="Yogyakarta">DI Yogyakarta (WIB)</option>
+                <option value="Medan">Medan (Sumatera Utara • WIB)</option>
+                <option value="Palembang">Palembang (Sumatera Selatan • WIB)</option>
+                <option value="Padang">Padang (Sumatera Barat • WIB)</option>
+                <option value="Makassar">Makassar (Sulawesi Selatan • WITA)</option>
+                <option value="Denpasar">Denpasar (Bali • WITA)</option>
+                <option value="Banjarmasin">Banjarmasin (Kalimantan Selatan • WITA)</option>
+                <option value="Balikpapan">Balikpapan (Kalimantan Timur • WITA)</option>
+                <option value="Pontianak">Pontianak (Kalimantan Barat • WIB)</option>
+                <option value="Jayapura">Jayapura (Papua • WIT)</option>
+                <option value="CUSTOM">-- Ketik Kota Lain Secara Manual --</option>
+              </select>
+              <input type="text" id="regCustomCity" placeholder="Ketik nama kota manual jika tidak ada di list" class="hidden mt-1.5 w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none focus:border-brand-500">
+            </div>
+
+            <!-- 4. ID Dokumen Cloud & Status Persetujuan -->
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="block text-[11px] font-bold text-slate-200 mb-1">ID Dokumen Cloud:</label>
+                <input type="text" id="regMasjidId" placeholder="masjid_annur" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs font-mono text-emerald-400 focus:outline-none focus:border-emerald-500">
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-200 mb-1">Status Persetujuan:</label>
+                <select id="regApprovalStatus" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs font-bold text-white focus:outline-none focus:border-emerald-500">
+                  <option value="APPROVED" class="text-emerald-400 font-bold" selected>APPROVED (Langsung Aktif)</option>
+                  <option value="PENDING" class="text-amber-400 font-bold">PENDING (Menunggu)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Alamat Lengkap -->
+          <div>
+            <label class="block text-[11px] font-bold text-slate-200 mb-1">Alamat Lengkap Masjid:</label>
+            <input type="text" id="regMosqueAddress" placeholder="Contoh: Jl. Merdeka No. 45, Teluk Betung Selatan" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500">
+          </div>
+
+          <button type="button" onclick="registerNewMosqueBySuperAdmin()" class="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black text-xs py-3 rounded-xl shadow-lg shadow-emerald-950/80 active:scale-95 transition-all flex items-center justify-center space-x-2">
+            <i class="fa-solid fa-circle-check"></i>
+            <span>Daftarkan & Setujui Masjid Ini Sekarang</span>
+          </button>
+        </div>
+
+        <!-- 2. DAFTAR MASJID & MANAJER PERSETUJUAN (SUPER ADMIN) -->
+        <div id="superAdminMosqueListCard" class="bg-slate-950 border border-slate-800 rounded-2xl p-5 shadow-xl mb-6 space-y-4">
+          <div class="flex items-center justify-between border-b border-slate-800/80 pb-3">
+            <div>
+              <h3 class="text-sm font-bold text-white flex items-center space-x-2">
+                <i class="fa-solid fa-list-check text-gold-400"></i>
+                <span>Daftar Klien Masjid Terdaftar & Status TV</span>
+              </h3>
+              <p class="text-xs text-slate-400 mt-0.5">Kelola status aktivasi dan persetujuan akun TV untuk masing-masing pemesan.</p>
+            </div>
+            <button onclick="loadAllMasjidsFromFirestore()" class="px-3 py-1.5 text-xs font-bold text-slate-300 hover:text-white bg-slate-900 border border-slate-700 rounded-xl flex items-center space-x-1.5 transition-colors">
+              <i class="fa-solid fa-rotate"></i>
+              <span>Muat Ulang</span>
+            </button>
+          </div>
+
+          <div id="registeredMosquesList" class="space-y-3">
+            <div class="text-center py-6 text-slate-500 text-xs">Memuat daftar masjid dari cloud...</div>
+          </div>
+        </div>
+
+        <!-- 3. STATUS LISENSI MASJID YANG SEDANG AKTIF -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
           <div class="bg-slate-950 border border-slate-800 p-4 rounded-xl space-y-3 text-xs">
             <!-- Super Admin Multi-Tenant Masjid Selector -->
             <div>
               <label class="block text-[11px] font-bold text-emerald-400 mb-1 flex items-center space-x-1.5">
                 <i class="fa-solid fa-building-columns"></i>
-                <span>Pilih Masjid yang Sedang Dikelola:</span>
+                <span>Pilih Masjid yang Sedang Dikelola di Web:</span>
               </label>
               <div class="flex items-center space-x-2">
                 <select id="superAdminMasjidSelect" onchange="changeTargetMasjid(this.value)" class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs font-mono font-bold text-white focus:outline-none focus:border-brand-500">
                   <option value="masjid_001">masjid_001 (Masjid Ar-Ridho Kejati Lampung)</option>
                   <option value="masjid_002">masjid_002 (Klien Masjid 2)</option>
                   <option value="masjid_003">masjid_003 (Klien Masjid 3)</option>
-                  <option value="NEW_MASJID">+ Tambah ID Masjid Baru...</option>
                 </select>
               </div>
             </div>
 
             <div class="flex justify-between items-center py-1.5 border-b border-slate-800/80">
-              <span class="text-slate-400">Kode Lisensi Aktif</span>
+              <span class="text-slate-400">Email Pemesan Terdaftar</span>
+              <span id="licenseEmailDisplay" class="font-mono font-bold text-emerald-400 text-xs truncate max-w-[180px]">samkidproject@gmail.com</span>
+            </div>
+            <div class="flex justify-between items-center py-1.5 border-b border-slate-800/80">
+              <span class="text-slate-400">Kode Lisensi TV</span>
               <span id="licenseCodeDisplay" class="font-mono font-bold text-gold-400 text-sm">JM-2026-DEV-PREMIUM</span>
             </div>
             <div class="flex justify-between items-center py-1.5 border-b border-slate-800/80">
@@ -1731,20 +1869,27 @@
                 <span id="licenseDeviceDisplay" class="truncate max-w-[200px]">TV-ANDROID-DEFAULT</span>
                 <span id="deviceLockStatusBadge" class="text-[9px] px-1.5 py-0.5 rounded bg-cyan-950 text-cyan-400 border border-cyan-800">LOCKED</span>
               </div>
-              <p class="text-[10px] text-slate-500">1 Lisensi terkunci otomatis ke 1 TV. Klik 'Reset Kunci TV' jika klien mengganti perangkat TV baru.</p>
+              <p class="text-[10px] text-slate-500">1 Lisensi terkunci otomatis ke TV pengguna saat pertama kali aktivasi.</p>
             </div>
           </div>
 
           <!-- Form Update / Aktivasi Lisensi Baru Super Admin -->
           <div class="bg-slate-950 border border-slate-800 p-4 rounded-xl space-y-3">
             <h4 class="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center space-x-1.5">
-              <i class="fa-solid fa-crown text-gold-400"></i>
-              <span>Konsol Penerbitan Lisensi Klien (Super Admin)</span>
+              <i class="fa-solid fa-sliders text-gold-400"></i>
+              <span>Pengaturan Cepat Lisensi Masjid Aktif</span>
             </h4>
             
             <div>
               <div class="flex justify-between items-center mb-1">
-                <label class="text-[11px] font-semibold text-slate-400">Kode Lisensi Baru</label>
+                <label class="text-[11px] font-semibold text-slate-400">Email Pemesan</label>
+              </div>
+              <input type="email" id="inputClientEmail" placeholder="Email pemesan/pengurus" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-brand-500">
+            </div>
+
+            <div>
+              <div class="flex justify-between items-center mb-1">
+                <label class="text-[11px] font-semibold text-slate-400">Kode Lisensi TV</label>
                 <button type="button" onclick="generateRandomLicenseCode()" class="text-[10px] text-gold-400 hover:text-gold-300 font-bold flex items-center space-x-1">
                   <i class="fa-solid fa-wand-magic-sparkles"></i>
                   <span>Generate Kode</span>
@@ -1769,8 +1914,8 @@
             </div>
 
             <button type="button" onclick="applyLicenseUpdate()" class="w-full bg-gradient-to-r from-gold-600 to-amber-600 hover:from-gold-500 hover:to-amber-500 text-slate-950 font-black text-xs py-2.5 rounded-xl shadow-lg shadow-gold-950/50 flex items-center justify-center space-x-1.5 active:scale-95 transition-all">
-              <i class="fa-solid fa-key"></i>
-              <span>Simpan Status Lisensi & Kunci TV</span>
+              <i class="fa-solid fa-floppy-disk"></i>
+              <span>Simpan Perubahan Lisensi</span>
             </button>
           </div>
         </div>
@@ -1779,11 +1924,11 @@
         <div class="p-4 rounded-xl bg-gradient-to-r from-brand-950/80 to-slate-900 border border-brand-800/40 text-xs text-slate-300 leading-relaxed">
           <h4 class="font-bold text-white flex items-center space-x-2 mb-1.5">
             <i class="fa-solid fa-coins text-gold-400"></i>
-            <span>Peluang Bisnis Digital Signage Masjid (JAMID App):</span>
+            <span>Sistem Multi-Pengurus JAMID Signage:</span>
           </h4>
           <p>
-            Dengan panel admin web ini dan Firebase Auth, Anda dapat menjual produk sistem jam digital masjid ke banyak masjid berbeda. 
-            Cukup buat akun login pengurus untuk setiap masjid, atau setel ID masjid (misal: <code class="text-brand-300 font-mono">masjid_002</code>, <code class="text-brand-300 font-mono">masjid_003</code>) sehingga pengurus masjid hanya dapat merubah konten masjid mereka sendiri secara aman dari HP atau laptop.
+            Alur ini memungkinkan Anda menjual aplikasi ke banyak masjid: Super Admin mendaftarkan email pemesan, nama masjid, dan lokasi. 
+            Pengurus masjid login ke web ini dengan emailnya untuk mengelola konten masjid mereka sendiri, dan memasang aplikasi TV di masjid dengan memasukkan email yang sama hanya sekali saat awal pemasangan.
           </p>
         </div>
       </div>
@@ -2658,6 +2803,8 @@
     // ==========================================
     // 4B. MULTI-MASJID & FIREBASE CLOUD MANAGEMENT
     // ==========================================
+    let allLoadedMasjids = [];
+
     async function loadAllMasjidsFromFirestore() {
       const database = getDb();
       if (!database) return;
@@ -2668,16 +2815,34 @@
         snapshot.forEach(doc => {
           const data = doc.data() || {};
           const prof = data.profile || {};
+          const lic = data.license || {};
           const name = prof.name || doc.id;
-          masjidList.push({ id: doc.id, name: name });
+          masjidList.push({
+            id: doc.id,
+            name: name,
+            city: prof.city || "Bandar Lampung",
+            address: prof.address || "",
+            userEmail: lic.userEmail || "",
+            licenseCode: lic.licenseCode || "",
+            licenseStatus: lic.status || "ACTIVE",
+            approvedBy: lic.approvedBy || ""
+          });
         });
         if (!masjidList.find(m => m.id === "masjid_001")) {
-          masjidList.unshift({ id: "masjid_001", name: "Masjid Ar-Ridho Kejati Lampung" });
+          masjidList.unshift({
+            id: "masjid_001",
+            name: "Masjid Ar-Ridho Kejati Lampung",
+            city: "Bandar Lampung",
+            userEmail: "samkidproject@gmail.com",
+            licenseStatus: "ACTIVE"
+          });
         }
         if (currentMasjidId && !masjidList.find(m => m.id === currentMasjidId)) {
-          masjidList.push({ id: currentMasjidId, name: currentMasjidId });
+          masjidList.push({ id: currentMasjidId, name: currentMasjidId, city: "", userEmail: "", licenseStatus: "ACTIVE" });
         }
+        allLoadedMasjids = masjidList;
         populateMasjidDropdowns(masjidList);
+        renderSuperAdminMosqueList(masjidList);
       } catch (err) {
         console.warn("Gagal memuat daftar masjid dari Firestore:", err);
       }
@@ -3440,58 +3605,388 @@
     }
 
     // ==========================================
-    // 4D. DKM SECURITY PIN (ANTI-HACK FOR VERCEL)
+    // 4D. AUTHENTICATION & SUPER ADMIN APPROVAL SYSTEM
     // ==========================================
+    const SUPER_ADMIN_EMAIL = "samkidproject@gmail.com";
     const DEFAULT_DKM_PIN = "1234";
-    let activeDkmPin = DEFAULT_DKM_PIN;
 
-    function checkPinSecurity() {
+    let currentUserRole = "SUPER_ADMIN"; // "SUPER_ADMIN" or "DKM_ADMIN"
+    let currentUserEmail = "";
+
+    function initAuthSession() {
+      const storedEmail = sessionStorage.getItem("jamid_auth_email");
+      const storedRole = sessionStorage.getItem("jamid_auth_role");
       const isLocked = sessionStorage.getItem("jamid_dkm_locked") === "true";
-      const modal = document.getElementById('adminPinModal');
-      const root = document.getElementById('adminProtectedRoot');
 
-      if (isLocked) {
-        if (modal) modal.classList.remove('hidden');
-        if (root) root.classList.add('hidden');
-        setTimeout(() => {
-          const inp = document.getElementById('inputAdminPin');
-          if (inp) inp.focus();
-        }, 150);
+      if (isLocked || !storedEmail) {
+        showLoginModal();
       } else {
-        if (modal) modal.classList.add('hidden');
-        if (root) root.classList.remove('hidden');
+        currentUserEmail = storedEmail;
+        currentUserRole = storedRole || "SUPER_ADMIN";
+        applyUserRoleUI(currentUserRole, currentUserEmail, currentMasjidId);
+        hideLoginModal();
       }
     }
 
-    function handleAdminPinSubmit(e) {
-      e.preventDefault();
-      const input = document.getElementById('inputAdminPin');
-      const entered = input ? input.value.trim() : "";
-      const alertBox = document.getElementById('pinAlertBox');
-      const root = document.getElementById('adminProtectedRoot');
+    function showLoginModal() {
       const modal = document.getElementById('adminPinModal');
+      const root = document.getElementById('adminProtectedRoot');
+      if (modal) modal.classList.remove('hidden');
+      if (root) root.classList.add('hidden');
+      setTimeout(() => {
+        const inp = document.getElementById('inputAdminEmail');
+        if (inp) inp.focus();
+      }, 150);
+    }
 
-      if (entered === activeDkmPin || entered === DEFAULT_DKM_PIN || entered === "admin123" || entered === "1234") {
-        sessionStorage.removeItem("jamid_dkm_locked");
-        sessionStorage.setItem("jamid_dkm_unlocked", "true");
-        if (modal) modal.classList.add('hidden');
-        if (root) root.classList.remove('hidden');
-        if (alertBox) alertBox.classList.add('hidden');
-        showToast("Akses Pengurus Diterima! Selamat datang di Panel Admin JAMID.", "success");
-      } else {
+    function hideLoginModal() {
+      const modal = document.getElementById('adminPinModal');
+      const root = document.getElementById('adminProtectedRoot');
+      if (modal) modal.classList.add('hidden');
+      if (root) root.classList.remove('hidden');
+    }
+
+    async function handleAdminLoginSubmit(e) {
+      e.preventDefault();
+      const emailInput = document.getElementById('inputAdminEmail');
+      const pinInput = document.getElementById('inputAdminPin');
+      const alertBox = document.getElementById('pinAlertBox');
+      const alertMsg = document.getElementById('pinAlertMessage');
+      const btn = document.getElementById('btnAdminLogin');
+
+      const enteredEmail = emailInput ? emailInput.value.trim().toLowerCase() : "";
+      const enteredPin = pinInput ? pinInput.value.trim() : "";
+
+      if (!enteredEmail && !enteredPin) {
         if (alertBox) alertBox.classList.remove('hidden');
-        if (input) {
-          input.value = "";
-          input.focus();
-        }
+        if (alertMsg) alertMsg.innerText = "Silakan masukkan alamat email atau PIN Pengurus.";
+        return;
       }
+
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Memverifikasi...';
+
+      try {
+        // 1. Super Admin Check (Email samkidproject@gmail.com atau PIN 1234)
+        if (enteredEmail === SUPER_ADMIN_EMAIL || enteredPin === DEFAULT_DKM_PIN || enteredPin === "admin123") {
+          currentUserRole = "SUPER_ADMIN";
+          currentUserEmail = enteredEmail || SUPER_ADMIN_EMAIL;
+          sessionStorage.setItem("jamid_auth_email", currentUserEmail);
+          sessionStorage.setItem("jamid_auth_role", "SUPER_ADMIN");
+          sessionStorage.removeItem("jamid_dkm_locked");
+
+          applyUserRoleUI("SUPER_ADMIN", currentUserEmail, currentMasjidId);
+          hideLoginModal();
+          showToast(`Selamat datang Super Admin (${currentUserEmail})! Akses penuh seluruh masjid terbuka.`, "success");
+          return;
+        }
+
+        // 2. Client / Pemesan DKM Check by Registered Email
+        const database = getDb();
+        if (!database) {
+          throw new Error("Koneksi Firebase belum siap. Periksa internet Anda.");
+        }
+
+        const snapshot = await database.collection("masjids").get();
+        let matchedMasjid = null;
+
+        snapshot.forEach(doc => {
+          const data = doc.data() || {};
+          const lic = data.license || {};
+          const docEmail = (lic.userEmail || "").trim().toLowerCase();
+          if (docEmail && docEmail === enteredEmail) {
+            matchedMasjid = { id: doc.id, data: data };
+          }
+        });
+
+        if (matchedMasjid) {
+          const lic = matchedMasjid.data.license || {};
+          const status = (lic.status || "ACTIVE").toUpperCase();
+
+          if (status === "PENDING" || status === "PENDING_ACTIVATION") {
+            if (alertBox) alertBox.classList.remove('hidden');
+            if (alertMsg) alertMsg.innerText = `Akun Anda (${enteredEmail}) sudah didaftarkan untuk '${matchedMasjid.data.profile?.name || matchedMasjid.id}', namun masih MENUNGGU PERSETUJUAN Super Admin. Silakan hubungi Super Admin untuk menyetujui aktivasi.`;
+            return;
+          }
+
+          if (status === "SUSPENDED" || status === "INACTIVE") {
+            if (alertBox) alertBox.classList.remove('hidden');
+            if (alertMsg) alertMsg.innerText = `Akun untuk email ${enteredEmail} ditangguhkan atau tidak aktif. Silakan hubungi Super Admin.`;
+            return;
+          }
+
+          // Approved DKM Admin!
+          currentUserRole = "DKM_ADMIN";
+          currentUserEmail = enteredEmail;
+          sessionStorage.setItem("jamid_auth_email", currentUserEmail);
+          sessionStorage.setItem("jamid_auth_role", "DKM_ADMIN");
+          sessionStorage.removeItem("jamid_dkm_locked");
+
+          // Beralih otomatis ke masjid miliknya
+          currentMasjidId = matchedMasjid.id;
+          localStorage.setItem('jamid_active_masjid_id', currentMasjidId);
+
+          applyUserRoleUI("DKM_ADMIN", currentUserEmail, currentMasjidId);
+          hideLoginModal();
+          await fetchMasjidFromFirestore(currentMasjidId);
+          showToast(`Berhasil masuk sebagai Pengurus '${matchedMasjid.data.profile?.name || matchedMasjid.id}'!`, "success");
+        } else {
+          if (alertBox) alertBox.classList.remove('hidden');
+          if (alertMsg) alertMsg.innerText = `Email '${enteredEmail}' belum terdaftar di sistem. Harap hubungi Super Admin untuk mendaftarkan email, nama masjid, dan lokasi Anda.`;
+        }
+      } catch (err) {
+        console.error("Login error:", err);
+        if (alertBox) alertBox.classList.remove('hidden');
+        if (alertMsg) alertMsg.innerText = err.message || "Gagal masuk. Periksa koneksi internet.";
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i><span>Masuk ke Panel Pengurus</span>';
+      }
+    }
+
+    function applyUserRoleUI(role, email, masjidId) {
+      const roleBadgeText = document.getElementById('userProfileHeaderText');
+      const superAdminCard = document.getElementById('superAdminRegistrationCard');
+      const superAdminList = document.getElementById('superAdminMosqueListCard');
+      const headerSelectContainer = document.getElementById('headerMasjidSelectContainer');
+
+      if (role === "SUPER_ADMIN") {
+        if (roleBadgeText) roleBadgeText.innerText = "Super Admin";
+        if (superAdminCard) superAdminCard.classList.remove('hidden');
+        if (superAdminList) superAdminList.classList.remove('hidden');
+        if (headerSelectContainer) headerSelectContainer.classList.remove('hidden');
+      } else {
+        // DKM Client
+        if (roleBadgeText) roleBadgeText.innerText = "DKM: " + (email ? email.split('@')[0] : masjidId);
+        if (superAdminCard) superAdminCard.classList.add('hidden');
+        if (superAdminList) superAdminList.classList.add('hidden');
+        if (headerSelectContainer) headerSelectContainer.classList.add('hidden');
+      }
+    }
+
+    function logoutAdmin() {
+      sessionStorage.removeItem("jamid_auth_email");
+      sessionStorage.removeItem("jamid_auth_role");
+      sessionStorage.setItem("jamid_dkm_locked", "true");
+      currentUserEmail = "";
+      showLoginModal();
+      showToast("Anda telah keluar dari sesi admin.", "info");
     }
 
     function lockAdminPanel() {
-      sessionStorage.setItem("jamid_dkm_locked", "true");
-      sessionStorage.removeItem("jamid_dkm_unlocked");
-      checkPinSecurity();
-      showToast("Panel admin dikunci untuk keamanan.", "info");
+      logoutAdmin();
+    }
+
+    // Helper pendaftaran masjid Super Admin
+    function autoGenerateMasjidId(name) {
+      if (!name) return;
+      const clean = "masjid_" + name.trim().toLowerCase().replace(/[^a-z0-9]/g, '_').replace(/_+/g, '_').substring(0, 16);
+      const idInp = document.getElementById('regMasjidId');
+      if (idInp && (!idInp.value || idInp.value.startsWith("masjid_"))) {
+        idInp.value = clean;
+      }
+    }
+
+    function handleRegCitySelect(cityName) {
+      const customInp = document.getElementById('regCustomCity');
+      if (cityName === "CUSTOM") {
+        if (customInp) customInp.classList.remove('hidden');
+      } else {
+        if (customInp) customInp.classList.add('hidden');
+      }
+    }
+
+    const CITY_COORDINATES = {
+      "Bandar Lampung": { lat: -5.4414, lng: 105.2580, tz: 7 },
+      "Jakarta": { lat: -6.2088, lng: 106.8456, tz: 7 },
+      "Bandung": { lat: -6.9175, lng: 107.6191, tz: 7 },
+      "Surabaya": { lat: -7.2575, lng: 112.7521, tz: 7 },
+      "Semarang": { lat: -6.9667, lng: 110.4167, tz: 7 },
+      "Yogyakarta": { lat: -7.7956, lng: 110.3695, tz: 7 },
+      "Medan": { lat: 3.5952, lng: 98.6722, tz: 7 },
+      "Palembang": { lat: -2.9761, lng: 104.7754, tz: 7 },
+      "Padang": { lat: -0.9471, lng: 100.4172, tz: 7 },
+      "Makassar": { lat: -5.1477, lng: 119.4327, tz: 8 },
+      "Denpasar": { lat: -8.6705, lng: 115.2126, tz: 8 },
+      "Banjarmasin": { lat: -3.3194, lng: 114.5908, tz: 8 },
+      "Balikpapan": { lat: -1.2654, lng: 116.8312, tz: 8 },
+      "Pontianak": { lat: -0.0263, lng: 109.3425, tz: 7 },
+      "Jayapura": { lat: -2.5916, lng: 140.6690, tz: 9 }
+    };
+
+    async function registerNewMosqueBySuperAdmin() {
+      const email = document.getElementById('regClientEmail')?.value.trim().toLowerCase();
+      const name = document.getElementById('regMosqueName')?.value.trim();
+      const citySelect = document.getElementById('regPresetCitySelect')?.value;
+      const customCity = document.getElementById('regCustomCity')?.value.trim();
+      const city = (citySelect === "CUSTOM" && customCity) ? customCity : citySelect || "Bandar Lampung";
+      const idInput = document.getElementById('regMasjidId')?.value.trim().toLowerCase().replace(/[^a-z0-9_-]/g, '');
+      const status = document.getElementById('regApprovalStatus')?.value || "APPROVED";
+      const address = document.getElementById('regMosqueAddress')?.value.trim() || "";
+
+      if (!email || !email.includes('@')) {
+        alert("Harap masukkan alamat email pemesan / pengurus yang valid.");
+        return;
+      }
+      if (!name) {
+        alert("Harap masukkan nama masjid.");
+        return;
+      }
+      const finalId = idInput || ("masjid_" + name.toLowerCase().replace(/[^a-z0-9]/g, '_').substring(0, 15));
+
+      const database = getDb();
+      if (!database) {
+        alert("Firebase belum terhubung.");
+        return;
+      }
+
+      const coord = CITY_COORDINATES[city] || { lat: -5.4414, lng: 105.2580, tz: 7 };
+      const now = Date.now();
+      const today = new Date().toISOString().split('T')[0];
+      const timeStr = new Date(now).toLocaleString('id-ID');
+
+      const payload = {
+        profile: {
+          name: name,
+          city: city,
+          address: address,
+          province: "",
+          latitude: coord.lat,
+          longitude: coord.lng,
+          leaderName: "",
+          phoneNumber: "",
+          logoUrl: "",
+          isLogoEnabled: false
+        },
+        license: {
+          licenseCode: "JM-PRO-" + finalId.replace(/[^a-zA-Z0-9]/g, '').toUpperCase(),
+          status: status,
+          userEmail: email,
+          approvedBy: currentUserEmail || SUPER_ADMIN_EMAIL,
+          deviceId: "",
+          masjidId: finalId,
+          activationDate: today,
+          expiryDate: "2028-12-31",
+          lastSync: `Didaftarkan Super Admin (${status})`
+        },
+        appConfig: {
+          selectedCityName: city,
+          theme: "JAMID_CYAN",
+          tvLayout: "JAMID_APP",
+          adminPin: "1234",
+          allowTvAdminAccess: true
+        },
+        runningTexts: [{
+          id: "rt_1",
+          text: `SELAMAT DATANG DI ${name.toUpperCase()} • WAKTU SHALAT MENGIKUTI JADWAL YANG TAMPIL DI LAYAR • MARI SHALAT BERJAMAAH • LURUSKAN DAN RAPATKAN SHAF •`,
+          speed: 45,
+          enabled: true,
+          position: "BOTTOM"
+        }],
+        lastUpdated: now,
+        lastUpdatedString: timeStr,
+        updatedByDevice: "Super Admin Web Registration"
+      };
+
+      try {
+        await database.collection("masjids").doc(finalId).set(payload, { merge: true });
+
+        // Reset form fields
+        if (document.getElementById('regClientEmail')) document.getElementById('regClientEmail').value = "";
+        if (document.getElementById('regMosqueName')) document.getElementById('regMosqueName').value = "";
+        if (document.getElementById('regMosqueAddress')) document.getElementById('regMosqueAddress').value = "";
+        if (document.getElementById('regMasjidId')) document.getElementById('regMasjidId').value = "";
+
+        await loadAllMasjidsFromFirestore();
+        showToast(`Alhamdulillah! Masjid '${name}' (${finalId}) berhasil didaftarkan untuk '${email}' dengan status [${status}]. APK TV klien siap diaktifkan!`, "success");
+      } catch (err) {
+        console.error("Gagal mendaftarkan masjid:", err);
+        alert("Gagal mendaftarkan masjid: " + err.message);
+      }
+    }
+
+    async function toggleMosqueApproval(masjidId, newStatus) {
+      const database = getDb();
+      if (!database) return;
+      try {
+        await database.collection("masjids").doc(masjidId).set({
+          license: {
+            status: newStatus,
+            approvedBy: currentUserEmail || SUPER_ADMIN_EMAIL,
+            lastSync: `Diubah Super Admin (${newStatus}) pada ${new Date().toLocaleString('id-ID')}`
+          }
+        }, { merge: true });
+
+        await loadAllMasjidsFromFirestore();
+        showToast(`Status masjid '${masjidId}' berhasil diubah ke: ${newStatus}`, "success");
+      } catch (err) {
+        showToast("Gagal mengubah status: " + err.message, "error");
+      }
+    }
+
+    function renderSuperAdminMosqueList(masjids) {
+      const container = document.getElementById('registeredMosquesList');
+      if (!container) return;
+
+      if (!masjids || masjids.length === 0) {
+        container.innerHTML = '<div class="text-center py-6 text-slate-500 text-xs">Belum ada masjid yang terdaftar di cloud.</div>';
+        return;
+      }
+
+      container.innerHTML = "";
+      masjids.forEach(m => {
+        const isCurrent = m.id === currentMasjidId;
+        const status = (m.licenseStatus || "ACTIVE").toUpperCase();
+        const isApproved = status === "ACTIVE" || status === "APPROVED";
+        const isPending = status === "PENDING" || status === "PENDING_ACTIVATION";
+
+        const card = document.createElement('div');
+        card.className = `p-3.5 rounded-xl border ${isCurrent ? 'border-brand-500 bg-brand-950/30' : 'border-slate-800 bg-slate-900/60'} flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs`;
+
+        const badgeHtml = isApproved ?
+          '<span class="px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider bg-emerald-950 text-emerald-300 border border-emerald-700/60">APPROVED (AKTIF)</span>' :
+          isPending ?
+          '<span class="px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider bg-amber-950 text-amber-300 border border-amber-700/60 animate-pulse">PENDING (MENUNGGU)</span>' :
+          '<span class="px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider bg-rose-950 text-rose-300 border border-rose-700/60">SUSPENDED</span>';
+
+        card.innerHTML = `
+          <div class="space-y-1">
+            <div class="flex items-center space-x-2">
+              <span class="font-bold text-white text-sm">${escapeHtml(m.name)}</span>
+              <span class="font-mono text-[10px] text-slate-400">(${escapeHtml(m.id)})</span>
+              ${badgeHtml}
+            </div>
+            <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-slate-400">
+              <span class="flex items-center space-x-1">
+                <i class="fa-solid fa-envelope text-emerald-400"></i>
+                <span class="font-mono text-emerald-300">${escapeHtml(m.userEmail || "(Belum ada email)")}</span>
+              </span>
+              <span class="flex items-center space-x-1">
+                <i class="fa-solid fa-location-dot text-slate-500"></i>
+                <span>${escapeHtml(m.city || "-")}</span>
+              </span>
+            </div>
+          </div>
+          <div class="flex items-center space-x-1.5 self-end sm:self-auto">
+            ${isPending ? `
+              <button onclick="toggleMosqueApproval('${m.id}', 'APPROVED')" class="px-2.5 py-1.5 bg-emerald-700 hover:bg-emerald-600 text-white rounded-lg font-bold text-[11px] flex items-center space-x-1 shadow transition-colors">
+                <i class="fa-solid fa-check"></i>
+                <span>Setujui</span>
+              </button>
+            ` : `
+              <button onclick="toggleMosqueApproval('${m.id}', 'PENDING')" class="px-2.5 py-1.5 bg-slate-800 hover:bg-amber-900/60 text-amber-300 border border-slate-700 rounded-lg font-bold text-[11px] flex items-center space-x-1 transition-colors">
+                <i class="fa-solid fa-pause"></i>
+                <span>Tangguhkan</span>
+              </button>
+            `}
+            <button onclick="changeTargetMasjid('${m.id}')" class="px-2.5 py-1.5 ${isCurrent ? 'bg-brand-600 text-white' : 'bg-slate-800 hover:bg-slate-700 text-slate-200'} rounded-lg font-bold text-[11px] flex items-center space-x-1 border border-slate-700 transition-colors">
+              <i class="fa-solid fa-tv"></i>
+              <span>${isCurrent ? 'Sedang Dikelola' : 'Kelola Konten'}</span>
+            </button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
     }
 
     function setMediaPreset(url, title) {
@@ -3770,9 +4265,9 @@
     }
 
     try {
-      checkPinSecurity();
+      initAuthSession();
     } catch (err) {
-      console.warn("checkPinSecurity error:", err);
+      console.warn("initAuthSession error:", err);
     }
   </script>
 </body>
