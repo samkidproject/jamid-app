@@ -183,8 +183,8 @@
           <span id="userProfileHeaderText" class="truncate max-w-[120px] sm:max-w-[160px]">Super Admin</span>
         </div>
 
-        <!-- Target Mosque Selector in Header (Super Admin Only) -->
-        <div id="headerMasjidSelectContainer" class="flex items-center space-x-1.5 px-2.5 py-1.5 bg-slate-900 border border-slate-700/80 rounded-xl text-xs font-semibold">
+        <!-- Target Mosque Selector in Header (Hidden by default) -->
+        <div id="headerMasjidSelectContainer" class="hidden items-center space-x-1.5 px-2.5 py-1.5 bg-slate-900 border border-slate-700/80 rounded-xl text-xs font-semibold">
           <i class="fa-solid fa-mosque text-brand-400 text-xs"></i>
           <select id="headerMasjidSelect" onchange="changeTargetMasjid(this.value)" class="bg-transparent text-white font-bold focus:outline-none cursor-pointer max-w-[120px] sm:max-w-[180px] truncate text-xs">
             <option value="masjid_001">Masjid Ar-Ridho (masjid_001)</option>
@@ -211,7 +211,7 @@
   </header>
 
   <!-- Pusat Kontrol Penuh TV Signage Banner -->
-  <div class="bg-gradient-to-r from-emerald-950 via-slate-900 to-slate-900 border-b border-emerald-800/40 px-4 py-2.5 sm:px-6">
+  <div id="liveSyncBanner" class="bg-gradient-to-r from-emerald-950 via-slate-900 to-slate-900 border-b border-emerald-800/40 px-4 py-2.5 sm:px-6">
     <div class="max-w-6xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
       <div class="flex items-center space-x-2 text-emerald-300 font-semibold">
         <i class="fa-solid fa-tower-broadcast text-emerald-400 text-sm animate-pulse"></i>
@@ -403,9 +403,163 @@
     </div>
 
     <!-- ========================================== -->
+    <!-- PORTAL KHUSUS SUPER ADMIN                  -->
+    <!-- (Hanya untuk pendaftaran akun & password)  -->
+    <!-- ========================================== -->
+    <div id="superAdminPortalView" class="hidden space-y-6">
+      <!-- 1. Header Banner Super Admin -->
+      <div class="rounded-3xl bg-gradient-to-r from-emerald-950 via-slate-900 to-slate-900 border border-emerald-600/50 p-5 sm:p-6 shadow-2xl relative overflow-hidden">
+        <div class="absolute -right-10 -top-10 w-44 h-44 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div class="space-y-1.5">
+            <div class="flex items-center space-x-2">
+              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-gold-500/20 text-gold-300 border border-gold-500/40 flex items-center space-x-1.5">
+                <i class="fa-solid fa-crown text-gold-400"></i>
+                <span>PORTAL KHUSUS SUPER ADMIN</span>
+              </span>
+              <span class="text-xs text-slate-400 font-mono">samkidproject@gmail.com</span>
+            </div>
+            <h2 class="text-lg sm:text-2xl font-black text-white tracking-tight">Manajemen Akun, User & Password Masjid</h2>
+            <p class="text-xs text-slate-300 max-w-2xl leading-relaxed">
+              Khusus Super Admin hanya berfokus pada pendaftaran akun pengguna, pengaturan email & kata sandi, serta persetujuan status lisensi TV. Pengisian profil, tema (Tema 1, Tema 2 dst), tata letak (Layout 1, Layout 2 dst), running text, jadwal, pengumuman, dan kas dilakukan mandiri oleh masing-masing pengurus masjid setelah mereka login.
+            </p>
+          </div>
+          <div class="flex sm:flex-col items-center sm:items-end gap-2 shrink-0">
+            <button onclick="loadAllMasjidsFromFirestore()" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-xl border border-slate-700 flex items-center space-x-1.5 transition-colors">
+              <i class="fa-solid fa-arrows-rotate text-emerald-400"></i>
+              <span>Refresh Daftar User</span>
+            </button>
+            <span class="text-[11px] text-slate-400 font-medium">Isian masjid baru otomatis bersih & kosong</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Form Pendaftaran Akun Pengguna & Password -->
+      <div id="superAdminRegistrationCard" class="bg-gradient-to-b from-slate-950 to-slate-900 border border-emerald-700/60 rounded-2xl p-5 sm:p-6 shadow-2xl space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-3">
+          <div>
+            <h3 class="text-sm sm:text-base font-extrabold text-white flex items-center space-x-2">
+              <i class="fa-solid fa-user-plus text-emerald-400"></i>
+              <span>Form Pendaftaran User & Password Admin Masjid</span>
+            </h3>
+            <p class="text-xs text-slate-400 mt-0.5">Daftarkan email dan password pengurus. Seluruh isian data awal masjid akan berstatus kosong.</p>
+          </div>
+          <span class="self-start sm:self-auto px-2.5 py-1 bg-emerald-950 text-emerald-300 border border-emerald-700/60 rounded-xl text-[10px] font-black uppercase tracking-wider">KONSOL REGISTRASI</span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+          <!-- 1. Alamat Email Pengguna -->
+          <div>
+            <label class="block text-[11px] font-bold text-slate-200 mb-1">
+              <i class="fa-solid fa-envelope text-emerald-400 mr-1"></i>
+              <span>Alamat Email Pengguna / Pengurus (Wajib):</span>
+            </label>
+            <input type="email" id="regClientEmail" placeholder="Contoh: dkm.annur@gmail.com" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-emerald-500">
+            <p class="text-[10px] text-slate-500 mt-1">Digunakan untuk login Web Admin pengurus dan aktivasi TV.</p>
+          </div>
+
+          <!-- 2. Password Pengguna -->
+          <div>
+            <label class="block text-[11px] font-bold text-slate-200 mb-1 flex items-center justify-between">
+              <span><i class="fa-solid fa-key text-cyan-400 mr-1"></i> Password Akun Pengguna (Wajib):</span>
+              <button type="button" onclick="generateRandomRegPassword()" class="text-[10px] text-cyan-400 hover:text-cyan-300 font-semibold">
+                <i class="fa-solid fa-wand-magic-sparkles mr-0.5"></i> Buat Acak
+              </button>
+            </label>
+            <input type="text" id="regClientPassword" placeholder="Contoh: masjid123" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs font-mono font-bold text-cyan-300 focus:outline-none focus:border-cyan-500">
+            <p class="text-[10px] text-slate-500 mt-1">Berikan password ini kepada pengurus masjid untuk login mandiri.</p>
+          </div>
+
+          <!-- 3. Nama Masjid -->
+          <div>
+            <label class="block text-[11px] font-bold text-slate-200 mb-1">
+              <i class="fa-solid fa-mosque text-emerald-400 mr-1"></i>
+              <span>Nama Lengkap Masjid:</span>
+            </label>
+            <input type="text" id="regMosqueName" oninput="autoGenerateMasjidId(this.value)" placeholder="Contoh: Masjid An-Nur" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs font-bold text-white focus:outline-none focus:border-emerald-500">
+          </div>
+
+          <!-- 4. Lokasi / Kota (Jadwal Shalat) -->
+          <div>
+            <label class="block text-[11px] font-bold text-slate-200 mb-1">
+              <i class="fa-solid fa-location-dot text-emerald-400 mr-1"></i>
+              <span>Lokasi / Kota (Jadwal Shalat):</span>
+            </label>
+            <select id="regPresetCitySelect" onchange="handleRegCitySelect(this.value)" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500 font-semibold">
+              <option value="Bandar Lampung">Bandar Lampung (Lampung • WIB)</option>
+              <option value="Jakarta">DKI Jakarta (Jawa Barat • WIB)</option>
+              <option value="Bandung">Bandung (Jawa Barat • WIB)</option>
+              <option value="Surabaya">Surabaya (Jawa Timur • WIB)</option>
+              <option value="Semarang">Semarang (Jawa Tengah • WIB)</option>
+              <option value="Yogyakarta">DI Yogyakarta (WIB)</option>
+              <option value="Medan">Medan (Sumatera Utara • WIB)</option>
+              <option value="Palembang">Palembang (Sumatera Selatan • WIB)</option>
+              <option value="Padang">Padang (Sumatera Barat • WIB)</option>
+              <option value="Makassar">Makassar (Sulawesi Selatan • WITA)</option>
+              <option value="Denpasar">Denpasar (Bali • WITA)</option>
+              <option value="Banjarmasin">Banjarmasin (Kalimantan Selatan • WITA)</option>
+              <option value="Balikpapan">Balikpapan (Kalimantan Timur • WITA)</option>
+              <option value="Pontianak">Pontianak (Kalimantan Barat • WIB)</option>
+              <option value="Jayapura">Jayapura (Papua • WIT)</option>
+              <option value="CUSTOM">-- Ketik Kota Lain Secara Manual --</option>
+            </select>
+            <input type="text" id="regCustomCity" placeholder="Ketik nama kota manual jika tidak ada di list" class="hidden mt-1.5 w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none focus:border-brand-500">
+          </div>
+
+          <!-- 5. ID Dokumen Cloud & Status Persetujuan -->
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block text-[11px] font-bold text-slate-200 mb-1">ID Dokumen Cloud:</label>
+              <input type="text" id="regMasjidId" placeholder="masjid_annur" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs font-mono text-emerald-400 focus:outline-none focus:border-emerald-500">
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold text-slate-200 mb-1">Status Persetujuan:</label>
+              <select id="regApprovalStatus" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs font-bold text-white focus:outline-none focus:border-emerald-500">
+                <option value="APPROVED" class="text-emerald-400 font-bold" selected>APPROVED (Langsung Aktif)</option>
+                <option value="PENDING" class="text-amber-400 font-bold">PENDING (Menunggu)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- 6. Alamat Lengkap Masjid -->
+          <div>
+            <label class="block text-[11px] font-bold text-slate-200 mb-1">Alamat Lengkap (Opsional):</label>
+            <input type="text" id="regMosqueAddress" placeholder="Bisa dikosongkan (diisi pengurus nanti)" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500">
+          </div>
+        </div>
+
+        <button type="button" onclick="registerNewMosqueBySuperAdmin()" class="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black text-xs py-3 rounded-xl shadow-lg shadow-emerald-950/80 active:scale-95 transition-all flex items-center justify-center space-x-2">
+          <i class="fa-solid fa-circle-check"></i>
+          <span>Daftarkan User, Password & Akun Masjid (Isian Bersih/Kosong)</span>
+        </button>
+      </div>
+
+      <!-- 3. Daftar User, Password & Masjid Terdaftar -->
+      <div id="superAdminMosqueListCard" class="bg-slate-950 border border-slate-800 rounded-2xl p-5 shadow-xl space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-800/80 pb-3">
+          <div>
+            <h3 class="text-sm font-bold text-white flex items-center space-x-2">
+              <i class="fa-solid fa-users-gear text-gold-400"></i>
+              <span>Daftar User, Password & Akun Masjid Terdaftar</span>
+            </h3>
+            <p class="text-xs text-slate-400 mt-0.5">Kelola akun pengurus, reset kata sandi, ubah status persetujuan, atau hapus data masjid.</p>
+          </div>
+          <button onclick="loadAllMasjidsFromFirestore()" class="px-3 py-1.5 text-xs font-bold text-slate-300 hover:text-white bg-slate-900 border border-slate-700 rounded-xl flex items-center space-x-1.5 transition-colors">
+            <i class="fa-solid fa-rotate"></i>
+            <span>Muat Ulang</span>
+          </button>
+        </div>
+
+        <div id="registeredMosquesList" class="space-y-3">
+          <div class="text-center py-6 text-slate-500 text-xs">Memuat daftar masjid dari cloud...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
     <!-- DASHBOARD UTAMA (Eksklusif Mobile & Android) -->
     <!-- ========================================== -->
-    <div id="dashboardHomeView" class="block space-y-5">
+    <div id="dashboardHomeView" class="hidden space-y-5">
       <!-- 1. Hero Card: Status Masjid & Kendali TV Real-time -->
       <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-950 via-slate-900 to-slate-950 border border-emerald-800/50 p-5 sm:p-6 shadow-2xl">
         <div class="absolute -right-8 -top-8 w-40 h-40 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
@@ -424,7 +578,7 @@
 
           <!-- Selector Switch Masjid & Tambah Masjid -->
           <div class="flex flex-col sm:items-end gap-2 shrink-0">
-            <div class="flex items-center space-x-2">
+            <div id="dashMasjidSelectContainer" class="hidden flex items-center space-x-2">
               <select id="dashMasjidSelect" onchange="changeTargetMasjid(this.value)" class="bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs font-bold text-white focus:outline-none focus:border-brand-500 cursor-pointer max-w-[200px] truncate">
                 <option value="masjid_001">Masjid Ar-Ridho (masjid_001)</option>
               </select>
@@ -645,17 +799,17 @@
             </div>
           </div>
 
-          <!-- Card 11: TV & Multi-Masjid -->
+          <!-- Card 11: Status Lisensi TV -->
           <div onclick="openMenuFromDashboard('license')" class="cursor-pointer group rounded-2xl bg-slate-900/90 hover:bg-slate-800/90 border border-slate-800 hover:border-gold-500/50 p-4 transition-all duration-200 shadow-lg hover:shadow-gold-950/40 flex flex-col justify-between space-y-3 col-span-2 md:col-span-1">
             <div class="flex items-start justify-between">
               <div class="w-10 h-10 rounded-xl bg-gold-500/20 text-gold-400 flex items-center justify-center text-lg shadow-md group-hover:scale-105 transition-transform">
                 <i class="fa-solid fa-tv"></i>
               </div>
-              <span id="dashBadgeLicense" class="text-[10px] px-2 py-0.5 rounded-full bg-amber-950 text-gold-300 border border-gold-800/60 font-bold">Multi-TV</span>
+              <span id="dashBadgeLicense" class="text-[10px] px-2 py-0.5 rounded-full bg-amber-950 text-gold-300 border border-gold-800/60 font-bold">Lisensi TV</span>
             </div>
             <div>
-              <h4 class="text-sm font-bold text-white group-hover:text-gold-300 transition-colors">11. Manajemen TV Masjid</h4>
-              <p class="text-[11px] text-slate-400 mt-0.5 line-clamp-2">Kelola ID masjid untuk banyak TV & lisensi</p>
+              <h4 class="text-sm font-bold text-white group-hover:text-gold-300 transition-colors">11. Status Lisensi TV</h4>
+              <p class="text-[11px] text-slate-400 mt-0.5 line-clamp-2">Informasi aktivasi & kode lisensi layar TV</p>
             </div>
             <div class="flex items-center text-[10px] font-bold text-gold-400 space-x-1 pt-1 border-t border-slate-800/60">
               <span>Buka Menu</span>
@@ -921,143 +1075,133 @@
 
         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3" id="themeGridContainer">
           <!-- 1. Tema 1 -->
-          <div onclick="selectThemeOption('JAMID_CYAN')" id="theme-card-JAMID_CYAN" class="theme-card cursor-pointer border border-slate-700 bg-slate-950/80 rounded-2xl p-3.5 transition-all hover:border-cyan-500">
-            <div class="flex items-center space-x-2.5 mb-1.5">
+          <div onclick="selectThemeOption('JAMID_CYAN')" id="theme-card-JAMID_CYAN" class="theme-card cursor-pointer border border-slate-700 bg-slate-950/80 rounded-2xl p-3 transition-all hover:border-cyan-500">
+            <div class="flex items-center space-x-2.5">
               <span class="w-7 h-7 rounded-lg bg-[#0891b2] border border-white/60 flex items-center justify-center text-white text-xs font-bold shrink-0">
                 <i class="fa-solid fa-check theme-check hidden"></i>
               </span>
               <div>
-                <h4 class="text-sm font-extrabold text-white">Tema 1</h4>
+                <h4 class="text-xs font-extrabold text-white">Tema 1</h4>
                 <span class="text-[10px] text-cyan-400 font-medium">Toska Cyan</span>
               </div>
             </div>
-            <p class="text-[11px] text-slate-400">Toska kubah & kaca transparan.</p>
           </div>
 
           <!-- 2. Tema 2 -->
-          <div onclick="selectThemeOption('HIJAU_ELEGAN')" id="theme-card-HIJAU_ELEGAN" class="theme-card cursor-pointer border border-slate-700 bg-slate-950/80 rounded-2xl p-3.5 transition-all hover:border-emerald-500">
-            <div class="flex items-center space-x-2.5 mb-1.5">
+          <div onclick="selectThemeOption('HIJAU_ELEGAN')" id="theme-card-HIJAU_ELEGAN" class="theme-card cursor-pointer border border-slate-700 bg-slate-950/80 rounded-2xl p-3 transition-all hover:border-emerald-500">
+            <div class="flex items-center space-x-2.5">
               <span class="w-7 h-7 rounded-lg bg-[#1B6B44] border border-white/60 flex items-center justify-center text-white text-xs font-bold shrink-0">
                 <i class="fa-solid fa-check theme-check hidden"></i>
               </span>
               <div>
-                <h4 class="text-sm font-extrabold text-white">Tema 2</h4>
+                <h4 class="text-xs font-extrabold text-white">Tema 2</h4>
                 <span class="text-[10px] text-emerald-400 font-medium">Hijau Elegan</span>
               </div>
             </div>
-            <p class="text-[11px] text-slate-400">Hijau masjid sejuk & tenang.</p>
           </div>
 
           <!-- 3. Tema 3 -->
-          <div onclick="selectThemeOption('HIJAU_ZAMRUD')" id="theme-card-HIJAU_ZAMRUD" class="theme-card cursor-pointer border border-slate-700 bg-slate-950/80 rounded-2xl p-3.5 transition-all hover:border-emerald-500">
-            <div class="flex items-center space-x-2.5 mb-1.5">
+          <div onclick="selectThemeOption('HIJAU_ZAMRUD')" id="theme-card-HIJAU_ZAMRUD" class="theme-card cursor-pointer border border-slate-700 bg-slate-950/80 rounded-2xl p-3 transition-all hover:border-emerald-500">
+            <div class="flex items-center space-x-2.5">
               <span class="w-7 h-7 rounded-lg bg-[#047857] border border-white/60 flex items-center justify-center text-white text-xs font-bold shrink-0">
                 <i class="fa-solid fa-check theme-check hidden"></i>
               </span>
               <div>
-                <h4 class="text-sm font-extrabold text-white">Tema 3</h4>
+                <h4 class="text-xs font-extrabold text-white">Tema 3</h4>
                 <span class="text-[10px] text-emerald-400 font-medium">Hijau Zamrud</span>
               </div>
             </div>
-            <p class="text-[11px] text-slate-400">Emerald segar, kontras tinggi.</p>
           </div>
 
           <!-- 4. Tema 4 -->
-          <div onclick="selectThemeOption('BIRU_NAVY')" id="theme-card-BIRU_NAVY" class="theme-card cursor-pointer border border-slate-700 bg-slate-950/80 rounded-2xl p-3.5 transition-all hover:border-blue-500">
-            <div class="flex items-center space-x-2.5 mb-1.5">
+          <div onclick="selectThemeOption('BIRU_NAVY')" id="theme-card-BIRU_NAVY" class="theme-card cursor-pointer border border-slate-700 bg-slate-950/80 rounded-2xl p-3 transition-all hover:border-blue-500">
+            <div class="flex items-center space-x-2.5">
               <span class="w-7 h-7 rounded-lg bg-[#1D4ED8] border border-white/60 flex items-center justify-center text-white text-xs font-bold shrink-0">
                 <i class="fa-solid fa-check theme-check hidden"></i>
               </span>
               <div>
-                <h4 class="text-sm font-extrabold text-white">Tema 4</h4>
+                <h4 class="text-xs font-extrabold text-white">Tema 4</h4>
                 <span class="text-[10px] text-blue-400 font-medium">Biru Navy</span>
               </div>
             </div>
-            <p class="text-[11px] text-slate-400">Biru royal formal & modern.</p>
           </div>
 
           <!-- 5. Tema 5 -->
-          <div onclick="selectThemeOption('GOLD_LUXURY')" id="theme-card-GOLD_LUXURY" class="theme-card cursor-pointer border border-slate-700 bg-slate-950/80 rounded-2xl p-3.5 transition-all hover:border-amber-500">
-            <div class="flex items-center space-x-2.5 mb-1.5">
+          <div onclick="selectThemeOption('GOLD_LUXURY')" id="theme-card-GOLD_LUXURY" class="theme-card cursor-pointer border border-slate-700 bg-slate-950/80 rounded-2xl p-3 transition-all hover:border-amber-500">
+            <div class="flex items-center space-x-2.5">
               <span class="w-7 h-7 rounded-lg bg-[#B45309] border border-white/60 flex items-center justify-center text-white text-xs font-bold shrink-0">
                 <i class="fa-solid fa-check theme-check hidden"></i>
               </span>
               <div>
-                <h4 class="text-sm font-extrabold text-white">Tema 5</h4>
-                <span class="text-[10px] text-amber-400 font-medium">Gold Luxury</span>
+                <h4 class="text-xs font-extrabold text-white">Tema 5</h4>
+                <span class="text-[10px] text-amber-400 font-medium">Emas Mewah</span>
               </div>
             </div>
-            <p class="text-[11px] text-slate-400">Sentuhan keemasan mewah.</p>
           </div>
 
           <!-- 6. Tema 6 -->
-          <div onclick="selectThemeOption('MERAH_MARUN')" id="theme-card-MERAH_MARUN" class="theme-card cursor-pointer border border-slate-700 bg-slate-950/80 rounded-2xl p-3.5 transition-all hover:border-rose-500">
-            <div class="flex items-center space-x-2.5 mb-1.5">
+          <div onclick="selectThemeOption('MERAH_MARUN')" id="theme-card-MERAH_MARUN" class="theme-card cursor-pointer border border-slate-700 bg-slate-950/80 rounded-2xl p-3 transition-all hover:border-rose-500">
+            <div class="flex items-center space-x-2.5">
               <span class="w-7 h-7 rounded-lg bg-[#9F1239] border border-white/60 flex items-center justify-center text-white text-xs font-bold shrink-0">
                 <i class="fa-solid fa-check theme-check hidden"></i>
               </span>
               <div>
-                <h4 class="text-sm font-extrabold text-white">Tema 6</h4>
+                <h4 class="text-xs font-extrabold text-white">Tema 6</h4>
                 <span class="text-[10px] text-rose-400 font-medium">Merah Marun</span>
               </div>
             </div>
-            <p class="text-[11px] text-slate-400">Marun hangat & berkarakter.</p>
           </div>
 
           <!-- 7. Tema 7 -->
-          <div onclick="selectThemeOption('SULTAN_EMERALD_GOLD')" id="theme-card-SULTAN_EMERALD_GOLD" class="theme-card cursor-pointer border border-slate-700 bg-slate-950/80 rounded-2xl p-3.5 transition-all hover:border-amber-400">
-            <div class="flex items-center space-x-2.5 mb-1.5">
+          <div onclick="selectThemeOption('SULTAN_EMERALD_GOLD')" id="theme-card-SULTAN_EMERALD_GOLD" class="theme-card cursor-pointer border border-slate-700 bg-slate-950/80 rounded-2xl p-3 transition-all hover:border-amber-400">
+            <div class="flex items-center space-x-2.5">
               <span class="w-7 h-7 rounded-lg bg-[#065F46] border border-amber-400 flex items-center justify-center text-amber-300 text-xs font-bold shrink-0">
                 <i class="fa-solid fa-check theme-check hidden"></i>
               </span>
               <div>
-                <h4 class="text-sm font-extrabold text-white">Tema 7</h4>
+                <h4 class="text-xs font-extrabold text-white">Tema 7</h4>
                 <span class="text-[10px] text-amber-300 font-medium">Zamrud Emas</span>
               </div>
             </div>
-            <p class="text-[11px] text-slate-400">Zamrud raja aksen emas royal.</p>
           </div>
 
           <!-- 8. Tema 8 -->
-          <div onclick="selectThemeOption('ROYAL_SAPPHIRE')" id="theme-card-ROYAL_SAPPHIRE" class="theme-card cursor-pointer border border-slate-700 bg-slate-950/80 rounded-2xl p-3.5 transition-all hover:border-blue-400">
-            <div class="flex items-center space-x-2.5 mb-1.5">
+          <div onclick="selectThemeOption('ROYAL_SAPPHIRE')" id="theme-card-ROYAL_SAPPHIRE" class="theme-card cursor-pointer border border-slate-700 bg-slate-950/80 rounded-2xl p-3 transition-all hover:border-blue-400">
+            <div class="flex items-center space-x-2.5">
               <span class="w-7 h-7 rounded-lg bg-[#1E40AF] border border-blue-300 flex items-center justify-center text-white text-xs font-bold shrink-0">
                 <i class="fa-solid fa-check theme-check hidden"></i>
               </span>
               <div>
-                <h4 class="text-sm font-extrabold text-white">Tema 8</h4>
+                <h4 class="text-xs font-extrabold text-white">Tema 8</h4>
                 <span class="text-[10px] text-blue-300 font-medium">Safir Royal</span>
               </div>
             </div>
-            <p class="text-[11px] text-slate-400">Safir dalam kilau perak malam.</p>
           </div>
 
           <!-- 9. Tema 9 -->
-          <div onclick="selectThemeOption('MADINAH_BRONZE')" id="theme-card-MADINAH_BRONZE" class="theme-card cursor-pointer border border-slate-700 bg-slate-950/80 rounded-2xl p-3.5 transition-all hover:border-amber-600">
-            <div class="flex items-center space-x-2.5 mb-1.5">
+          <div onclick="selectThemeOption('MADINAH_BRONZE')" id="theme-card-MADINAH_BRONZE" class="theme-card cursor-pointer border border-slate-700 bg-slate-950/80 rounded-2xl p-3 transition-all hover:border-amber-600">
+            <div class="flex items-center space-x-2.5">
               <span class="w-7 h-7 rounded-lg bg-[#92400E] border border-amber-500 flex items-center justify-center text-white text-xs font-bold shrink-0">
                 <i class="fa-solid fa-check theme-check hidden"></i>
               </span>
               <div>
-                <h4 class="text-sm font-extrabold text-white">Tema 9</h4>
+                <h4 class="text-xs font-extrabold text-white">Tema 9</h4>
                 <span class="text-[10px] text-amber-500 font-medium">Madinah Bronze</span>
               </div>
             </div>
-            <p class="text-[11px] text-slate-400">Marmer Nabawi & perunggu.</p>
           </div>
 
           <!-- 10. Tema 10 -->
-          <div onclick="selectThemeOption('MONOCHROME_SLATE')" id="theme-card-MONOCHROME_SLATE" class="theme-card cursor-pointer border border-slate-700 bg-slate-950/80 rounded-2xl p-3.5 transition-all hover:border-slate-400">
-            <div class="flex items-center space-x-2.5 mb-1.5">
+          <div onclick="selectThemeOption('MONOCHROME_SLATE')" id="theme-card-MONOCHROME_SLATE" class="theme-card cursor-pointer border border-slate-700 bg-slate-950/80 rounded-2xl p-3 transition-all hover:border-slate-400">
+            <div class="flex items-center space-x-2.5">
               <span class="w-7 h-7 rounded-lg bg-[#334155] border border-white/60 flex items-center justify-center text-white text-xs font-bold shrink-0">
                 <i class="fa-solid fa-check theme-check hidden"></i>
               </span>
               <div>
-                <h4 class="text-sm font-extrabold text-white">Tema 10</h4>
+                <h4 class="text-xs font-extrabold text-white">Tema 10</h4>
                 <span class="text-[10px] text-slate-300 font-medium">Monokrom Abu</span>
               </div>
             </div>
-            <p class="text-[11px] text-slate-400">Minimalis netral tanpa silau.</p>
           </div>
         </div>
         <input type="hidden" id="selectedThemeKey" value="JAMID_CYAN">
@@ -1070,89 +1214,80 @@
             <i class="fa-solid fa-table-columns text-brand-400"></i>
             <span>Tata Letak Layar (TV Layout)</span>
           </h2>
-          <p class="text-xs text-slate-400 mt-1">Sesuaikan orientasi tata letak berdasarkan dimensi dan rasio layar TV masjid.</p>
+          <p class="text-xs text-slate-400 mt-1">Pilih susunan tata letak TV digital masjid.</p>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="layoutGridContainer">
-          <!-- 1. JAMID App -->
-          <div onclick="selectLayoutOption('JAMID_APP')" id="layout-card-JAMID_APP" class="layout-card cursor-pointer border border-slate-700 bg-slate-950/80 rounded-2xl p-4 transition-all">
-            <div class="flex items-center justify-between mb-2">
-              <span class="text-xs font-bold text-white">Layout JAMID App</span>
-              <span class="text-[10px] px-2 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-800">Bawaan Foto</span>
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3" id="layoutGridContainer">
+          <!-- 1. Layout 1 -->
+          <div onclick="selectLayoutOption('JAMID_APP')" id="layout-card-JAMID_APP" class="layout-card cursor-pointer border border-slate-700 bg-slate-950/80 rounded-2xl p-3 transition-all hover:border-cyan-500 flex flex-col justify-between">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-white">Layout 1</span>
+              <span class="text-[9px] px-1.5 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-800">Standar</span>
             </div>
-            <p class="text-xs text-slate-400">Header 3 kartu atas (Logo & Tanggal, Jam & Cuaca, Countdown), Agenda tengah, Jadwal glowing horizontal bawah.</p>
           </div>
 
-          <!-- 2. Pilihan Tema 5 -->
-          <div onclick="selectLayoutOption('TEMA_5')" id="layout-card-TEMA_5" class="layout-card cursor-pointer border border-slate-700 bg-slate-950/80 rounded-2xl p-4 transition-all">
-            <div class="flex items-center justify-between mb-2">
-              <span class="text-xs font-bold text-white">Pilihan Tema 5</span>
-              <span class="text-[10px] px-2 py-0.5 rounded bg-amber-950 text-amber-300 border border-amber-800">Shalat Vertikal Kiri</span>
+          <!-- 2. Layout 2 -->
+          <div onclick="selectLayoutOption('TEMA_5')" id="layout-card-TEMA_5" class="layout-card cursor-pointer border border-slate-700 bg-slate-950/80 rounded-2xl p-3 transition-all hover:border-amber-500 flex flex-col justify-between">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-white">Layout 2</span>
+              <span class="text-[9px] px-1.5 py-0.5 rounded bg-amber-950 text-amber-300 border border-amber-800">Vertikal</span>
             </div>
-            <p class="text-xs text-slate-400">Jam besar di kiri atas, 7 jadwal shalat vertikal ke bawah dengan highlight aktif emas & countdown, media 16:9 di kanan.</p>
           </div>
 
-          <!-- 3. Pilihan Tema 6 -->
-          <div onclick="selectLayoutOption('TEMA_6')" id="layout-card-TEMA_6" class="layout-card cursor-pointer border border-slate-700 bg-slate-950/80 rounded-2xl p-4 transition-all">
-            <div class="flex items-center justify-between mb-2">
-              <span class="text-xs font-bold text-white">Pilihan Tema 6</span>
-              <span class="text-[10px] px-2 py-0.5 rounded bg-blue-950 text-blue-300 border border-blue-800">3 Kotak Kiri & Strip Bawah</span>
+          <!-- 3. Layout 3 -->
+          <div onclick="selectLayoutOption('TEMA_6')" id="layout-card-TEMA_6" class="layout-card cursor-pointer border border-slate-700 bg-slate-950/80 rounded-2xl p-3 transition-all hover:border-blue-500 flex flex-col justify-between">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-white">Layout 3</span>
+              <span class="text-[9px] px-1.5 py-0.5 rounded bg-blue-950 text-blue-300 border border-blue-800">3 Kotak</span>
             </div>
-            <p class="text-xs text-slate-400">3 kotak bertingkat (Profil solid, Jam besar, Countdown), media stage luas, strip 7 jadwal shalat horizontal di bawah.</p>
           </div>
 
-          <!-- 4. Tema Khusus Info (Layar Penuh) -->
-          <div onclick="selectLayoutOption('KHUSUS_INFO')" id="layout-card-KHUSUS_INFO" class="layout-card cursor-pointer border border-slate-700 bg-slate-950/80 rounded-2xl p-4 transition-all">
-            <div class="flex items-center justify-between mb-2">
-              <span class="text-xs font-bold text-white">Tema Khusus Info</span>
-              <span class="text-[10px] px-2 py-0.5 rounded bg-amber-950 text-amber-300 border border-amber-800">Layar Penuh TV</span>
+          <!-- 4. Layout 4 -->
+          <div onclick="selectLayoutOption('KHUSUS_INFO')" id="layout-card-KHUSUS_INFO" class="layout-card cursor-pointer border border-slate-700 bg-slate-950/80 rounded-2xl p-3 transition-all hover:border-amber-500 flex flex-col justify-between">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-white">Layout 4</span>
+              <span class="text-[9px] px-1.5 py-0.5 rounded bg-amber-950 text-amber-300 border border-amber-800">Layar Penuh</span>
             </div>
-            <p class="text-xs text-slate-400">Kajian, laporan kas & himbauan tampil penuh (full stage) dengan lower-third jadwal shalat berikutnya dan jam di ujung bawah.</p>
           </div>
 
-          <!-- 3. Klasik -->
-          <div onclick="selectLayoutOption('KLASIK')" id="layout-card-KLASIK" class="layout-card cursor-pointer border border-slate-700 bg-slate-950/80 rounded-2xl p-4 transition-all">
-            <div class="flex items-center justify-between mb-2">
-              <span class="text-xs font-bold text-white">Layout Klasik</span>
-              <span class="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-300">Populer</span>
+          <!-- 5. Layout 5 -->
+          <div onclick="selectLayoutOption('KLASIK')" id="layout-card-KLASIK" class="layout-card cursor-pointer border border-slate-700 bg-slate-950/80 rounded-2xl p-3 transition-all hover:border-emerald-500 flex flex-col justify-between">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-white">Layout 5</span>
+              <span class="text-[9px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">Klasik</span>
             </div>
-            <p class="text-xs text-slate-400">Header atas memanjang, konten slideshow tengah, jadwal shalat horizontal simetris di bagian bawah.</p>
           </div>
 
-          <!-- 3. Modern -->
-          <div onclick="selectLayoutOption('MODERN')" id="layout-card-MODERN" class="layout-card cursor-pointer border border-slate-700 bg-slate-950/80 rounded-2xl p-4 transition-all">
-            <div class="flex items-center justify-between mb-2">
-              <span class="text-xs font-bold text-white">Layout Modern</span>
-              <span class="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-300">Vertikal Grid</span>
+          <!-- 6. Layout 6 -->
+          <div onclick="selectLayoutOption('MODERN')" id="layout-card-MODERN" class="layout-card cursor-pointer border border-slate-700 bg-slate-950/80 rounded-2xl p-3 transition-all hover:border-emerald-500 flex flex-col justify-between">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-white">Layout 6</span>
+              <span class="text-[9px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">Modern</span>
             </div>
-            <p class="text-xs text-slate-400">Jam & hitung mundur di sebelah kiri, konten dinamis di tengah, dan deretan jadwal shalat di sebelah kanan.</p>
           </div>
 
-          <!-- 4. Elegan -->
-          <div onclick="selectLayoutOption('ELEGAN')" id="layout-card-ELEGAN" class="layout-card cursor-pointer border border-slate-700 bg-slate-950/80 rounded-2xl p-4 transition-all">
-            <div class="flex items-center justify-between mb-2">
-              <span class="text-xs font-bold text-white">Layout Elegan</span>
-              <span class="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-300">Premium</span>
+          <!-- 7. Layout 7 -->
+          <div onclick="selectLayoutOption('ELEGAN')" id="layout-card-ELEGAN" class="layout-card cursor-pointer border border-slate-700 bg-slate-950/80 rounded-2xl p-3 transition-all hover:border-emerald-500 flex flex-col justify-between">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-white">Layout 7</span>
+              <span class="text-[9px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">Elegan</span>
             </div>
-            <p class="text-xs text-slate-400">Header transparan elegan, slider berbayang halus, dan jadwal card modern dengan sudut membulat mewah.</p>
           </div>
 
-          <!-- 5. Minimal -->
-          <div onclick="selectLayoutOption('MINIMAL')" id="layout-card-MINIMAL" class="layout-card cursor-pointer border border-slate-700 bg-slate-950/80 rounded-2xl p-4 transition-all">
-            <div class="flex items-center justify-between mb-2">
-              <span class="text-xs font-bold text-white">Layout Minimal</span>
-              <span class="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-300">Simpel</span>
+          <!-- 8. Layout 8 -->
+          <div onclick="selectLayoutOption('MINIMAL')" id="layout-card-MINIMAL" class="layout-card cursor-pointer border border-slate-700 bg-slate-950/80 rounded-2xl p-3 transition-all hover:border-emerald-500 flex flex-col justify-between">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-white">Layout 8</span>
+              <span class="text-[9px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">Minimal</span>
             </div>
-            <p class="text-xs text-slate-400">Fokus pada angka jam super besar, status countdown, dan ringkasan jadwal shalat yang bersih.</p>
           </div>
 
-          <!-- 6. Pengumuman -->
-          <div onclick="selectLayoutOption('PENGUMUMAN')" id="layout-card-PENGUMUMAN" class="layout-card cursor-pointer border border-slate-700 bg-slate-950/80 rounded-2xl p-4 transition-all">
-            <div class="flex items-center justify-between mb-2">
-              <span class="text-xs font-bold text-white">Layout Pengumuman</span>
-              <span class="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-300">Info Fokus</span>
+          <!-- 9. Layout 9 -->
+          <div onclick="selectLayoutOption('PENGUMUMAN')" id="layout-card-PENGUMUMAN" class="layout-card cursor-pointer border border-slate-700 bg-slate-950/80 rounded-2xl p-3 transition-all hover:border-emerald-500 flex flex-col justify-between">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-white">Layout 9</span>
+              <span class="text-[9px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">Pengumuman</span>
             </div>
-            <p class="text-xs text-slate-400">Area poster dan info kajian mendominasi layar penuh, jadwal shalat tampil rapi di kolom samping.</p>
           </div>
         </div>
         <input type="hidden" id="selectedLayoutKey" value="JAMID_APP">
@@ -1720,144 +1855,18 @@
           <span id="licenseStatusBadge" class="px-3 py-1 bg-emerald-950 text-emerald-300 border border-emerald-700/60 rounded-xl text-xs font-black tracking-wider uppercase">ACTIVE</span>
         </div>
 
-        <!-- 1. FORM PENDAFTARAN MASJID BARU KHUSUS SUPER ADMIN -->
-        <div id="superAdminRegistrationCard" class="bg-gradient-to-b from-slate-950 to-slate-900 border border-emerald-700/60 rounded-2xl p-5 shadow-2xl mb-6 space-y-4">
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-3">
-            <div>
-              <h3 class="text-sm sm:text-base font-extrabold text-white flex items-center space-x-2">
-                <i class="fa-solid fa-user-plus text-emerald-400"></i>
-                <span>Form Pendaftaran Klien Masjid (Super Admin)</span>
-              <h3 class="text-sm font-bold text-white flex items-center space-x-2">
-                <i class="fa-solid fa-user-plus text-emerald-400"></i>
-                <span>Pendaftaran User & Password Admin Masjid (Super Admin)</span>
-              </h3>
-              <p class="text-[11px] text-slate-400 mt-0.5">Super Admin mendaftarkan email, password, nama masjid & kota. Semua data awal masjid berstatus kosong agar diisi pengurus sendiri.</p>
-            </div>
-            <span class="self-start sm:self-auto px-2.5 py-1 bg-emerald-950 text-emerald-300 border border-emerald-700/60 rounded-xl text-[10px] font-black uppercase tracking-wider">SUPER ADMIN KONSOL</span>
-          </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-            <!-- 1. Alamat Email Pengguna -->
-            <div>
-              <label class="block text-[11px] font-bold text-slate-200 mb-1">
-                <i class="fa-solid fa-envelope text-emerald-400 mr-1"></i>
-                <span>Alamat Email Pengguna / Pengurus (Wajib):</span>
-              </label>
-              <input type="email" id="regClientEmail" placeholder="Contoh: dkm.annur@gmail.com" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-emerald-500">
-              <p class="text-[10px] text-slate-500 mt-1">Digunakan untuk login Web Admin dan aktivasi layar TV.</p>
-            </div>
-
-            <!-- 2. Password Pengguna -->
-            <div>
-              <label class="block text-[11px] font-bold text-slate-200 mb-1 flex items-center justify-between">
-                <span><i class="fa-solid fa-key text-cyan-400 mr-1"></i> Password Akun Pengguna (Wajib):</span>
-                <button type="button" onclick="generateRandomRegPassword()" class="text-[10px] text-cyan-400 hover:text-cyan-300 font-semibold">
-                  <i class="fa-solid fa-wand-magic-sparkles mr-0.5"></i> Buat Acak
-                </button>
-              </label>
-              <input type="text" id="regClientPassword" placeholder="Contoh: masjid123" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs font-mono font-bold text-cyan-300 focus:outline-none focus:border-cyan-500">
-              <p class="text-[10px] text-slate-500 mt-1">Berikan password ini ke pengurus masjid untuk login.</p>
-            </div>
-
-            <!-- 3. Nama Masjid -->
-            <div>
-              <label class="block text-[11px] font-bold text-slate-200 mb-1">
-                <i class="fa-solid fa-mosque text-emerald-400 mr-1"></i>
-                <span>Nama Lengkap Masjid:</span>
-              </label>
-              <input type="text" id="regMosqueName" oninput="autoGenerateMasjidId(this.value)" placeholder="Contoh: Masjid An-Nur" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs font-bold text-white focus:outline-none focus:border-emerald-500">
-            </div>
-
-            <!-- 4. Lokasi / Kota (Jadwal Shalat) -->
-            <div>
-              <label class="block text-[11px] font-bold text-slate-200 mb-1">
-                <i class="fa-solid fa-location-dot text-emerald-400 mr-1"></i>
-                <span>Lokasi / Kota (Jadwal Shalat):</span>
-              </label>
-              <select id="regPresetCitySelect" onchange="handleRegCitySelect(this.value)" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500 font-semibold">
-                <option value="Bandar Lampung">Bandar Lampung (Lampung • WIB)</option>
-                <option value="Jakarta">DKI Jakarta (Jawa Barat • WIB)</option>
-                <option value="Bandung">Bandung (Jawa Barat • WIB)</option>
-                <option value="Surabaya">Surabaya (Jawa Timur • WIB)</option>
-                <option value="Semarang">Semarang (Jawa Tengah • WIB)</option>
-                <option value="Yogyakarta">DI Yogyakarta (WIB)</option>
-                <option value="Medan">Medan (Sumatera Utara • WIB)</option>
-                <option value="Palembang">Palembang (Sumatera Selatan • WIB)</option>
-                <option value="Padang">Padang (Sumatera Barat • WIB)</option>
-                <option value="Makassar">Makassar (Sulawesi Selatan • WITA)</option>
-                <option value="Denpasar">Denpasar (Bali • WITA)</option>
-                <option value="Banjarmasin">Banjarmasin (Kalimantan Selatan • WITA)</option>
-                <option value="Balikpapan">Balikpapan (Kalimantan Timur • WITA)</option>
-                <option value="Pontianak">Pontianak (Kalimantan Barat • WIB)</option>
-                <option value="Jayapura">Jayapura (Papua • WIT)</option>
-                <option value="CUSTOM">-- Ketik Kota Lain Secara Manual --</option>
-              </select>
-              <input type="text" id="regCustomCity" placeholder="Ketik nama kota manual jika tidak ada di list" class="hidden mt-1.5 w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none focus:border-brand-500">
-            </div>
-
-            <!-- 5. ID Dokumen Cloud & Status Persetujuan -->
-            <div class="grid grid-cols-2 gap-2">
-              <div>
-                <label class="block text-[11px] font-bold text-slate-200 mb-1">ID Dokumen Cloud:</label>
-                <input type="text" id="regMasjidId" placeholder="masjid_annur" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs font-mono text-emerald-400 focus:outline-none focus:border-emerald-500">
-              </div>
-              <div>
-                <label class="block text-[11px] font-bold text-slate-200 mb-1">Status Persetujuan:</label>
-                <select id="regApprovalStatus" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs font-bold text-white focus:outline-none focus:border-emerald-500">
-                  <option value="APPROVED" class="text-emerald-400 font-bold" selected>APPROVED (Langsung Aktif)</option>
-                  <option value="PENDING" class="text-amber-400 font-bold">PENDING (Menunggu)</option>
-                </select>
-              </div>
-            </div>
-
-            <!-- 6. Alamat Lengkap Masjid -->
-            <div>
-              <label class="block text-[11px] font-bold text-slate-200 mb-1">Alamat Lengkap (Opsional):</label>
-              <input type="text" id="regMosqueAddress" placeholder="Bisa dikosongkan (diisi pengurus nanti)" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500">
-            </div>
-          </div>
-
-          <button type="button" onclick="registerNewMosqueBySuperAdmin()" class="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black text-xs py-3 rounded-xl shadow-lg shadow-emerald-950/80 active:scale-95 transition-all flex items-center justify-center space-x-2">
-            <i class="fa-solid fa-circle-check"></i>
-            <span>Daftarkan User, Password & Akun Masjid (Isian Bersih/Kosong)</span>
-          </button>
-        </div>
-
-        <!-- 2. DAFTAR MASJID & MANAJER PERSETUJUAN (SUPER ADMIN) -->
-        <div id="superAdminMosqueListCard" class="bg-slate-950 border border-slate-800 rounded-2xl p-5 shadow-xl mb-6 space-y-4">
-          <div class="flex items-center justify-between border-b border-slate-800/80 pb-3">
-            <div>
-              <h3 class="text-sm font-bold text-white flex items-center space-x-2">
-                <i class="fa-solid fa-list-check text-gold-400"></i>
-                <span>Daftar Klien Masjid Terdaftar & Status TV</span>
-              </h3>
-              <p class="text-xs text-slate-400 mt-0.5">Kelola status aktivasi dan persetujuan akun TV untuk masing-masing pemesan.</p>
-            </div>
-            <button onclick="loadAllMasjidsFromFirestore()" class="px-3 py-1.5 text-xs font-bold text-slate-300 hover:text-white bg-slate-900 border border-slate-700 rounded-xl flex items-center space-x-1.5 transition-colors">
-              <i class="fa-solid fa-rotate"></i>
-              <span>Muat Ulang</span>
-            </button>
-          </div>
-
-          <div id="registeredMosquesList" class="space-y-3">
-            <div class="text-center py-6 text-slate-500 text-xs">Memuat daftar masjid dari cloud...</div>
-          </div>
-        </div>
-
-        <!-- 3. STATUS LISENSI MASJID YANG SEDANG AKTIF -->
+        <!-- 1. STATUS LISENSI MASJID YANG SEDANG AKTIF -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
           <div class="bg-slate-950 border border-slate-800 p-4 rounded-xl space-y-3 text-xs">
-            <!-- Super Admin Multi-Tenant Masjid Selector -->
+            <!-- Multi-Tenant Masjid Selector -->
             <div>
               <label class="block text-[11px] font-bold text-emerald-400 mb-1 flex items-center space-x-1.5">
                 <i class="fa-solid fa-building-columns"></i>
-                <span>Pilih Masjid yang Sedang Dikelola di Web:</span>
+                <span>Masjid Aktif Saat Ini:</span>
               </label>
               <div class="flex items-center space-x-2">
                 <select id="superAdminMasjidSelect" onchange="changeTargetMasjid(this.value)" class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs font-mono font-bold text-white focus:outline-none focus:border-brand-500">
                   <option value="masjid_001">masjid_001 (Masjid Ar-Ridho Kejati Lampung)</option>
-                  <option value="masjid_002">masjid_002 (Klien Masjid 2)</option>
-                  <option value="masjid_003">masjid_003 (Klien Masjid 3)</option>
                 </select>
               </div>
             </div>
@@ -2064,13 +2073,15 @@
     };
 
     const LAYOUT_TITLES = {
-      JAMID_APP: "Layout JAMID App",
-      KHUSUS_INFO: "Tema Khusus Info (Layar Penuh)",
-      KLASIK: "Layout Klasik",
-      MODERN: "Layout Modern",
-      MINIMAL: "Layout Minimal",
-      ELEGAN: "Layout Elegan",
-      PENGUMUMAN: "Layout Pengumuman"
+      JAMID_APP: "Layout 1",
+      TEMA_5: "Layout 2",
+      TEMA_6: "Layout 3",
+      KHUSUS_INFO: "Layout 4",
+      KLASIK: "Layout 5",
+      MODERN: "Layout 6",
+      ELEGAN: "Layout 7",
+      MINIMAL: "Layout 8",
+      PENGUMUMAN: "Layout 9"
     };
 
     const SECTION_TITLES = {
@@ -2083,11 +2094,15 @@
       qris: { title: "7. Rekening Bank & QRIS", icon: "fa-qrcode", color: "text-violet-400" },
       media: { title: "8. Siaran Media / YouTube", icon: "fa-video", color: "text-red-400" },
       system: { title: "9. Sistem & PIN Pengurus", icon: "fa-shield-halved", color: "text-blue-400" },
-      license: { title: "10. Manajemen TV & Multi-Masjid", icon: "fa-crown", color: "text-gold-400" }
+      license: { title: "11. Status Lisensi TV", icon: "fa-tv", color: "text-gold-400" }
     };
 
     // --- Dashboard & Menu Navigation Logic ---
     function openMenuFromDashboard(tabKey, subTarget) {
+      if (currentUserRole === "SUPER_ADMIN") {
+        applyUserRoleUI("SUPER_ADMIN", currentUserEmail, currentMasjidId);
+        return;
+      }
       const dash = document.getElementById('dashboardHomeView');
       const detail = document.getElementById('sectionDetailView');
       if (dash) dash.classList.add('hidden');
@@ -2106,6 +2121,10 @@
     }
 
     function backToDashboard() {
+      if (currentUserRole === "SUPER_ADMIN") {
+        applyUserRoleUI("SUPER_ADMIN", currentUserEmail, currentMasjidId);
+        return;
+      }
       const dash = document.getElementById('dashboardHomeView');
       const detail = document.getElementById('sectionDetailView');
       if (detail) detail.classList.add('hidden');
@@ -2116,13 +2135,19 @@
     }
 
     function updateDashboardSummary() {
-      const mosqueName = document.getElementById('mosqueName')?.value || "Masjid Ar-Ridho";
+      if (currentUserRole === "SUPER_ADMIN") {
+        const hMosque = document.getElementById('headerMosqueName');
+        if (hMosque) hMosque.innerText = "Portal Super Admin (Pendaftaran Akun & Password)";
+        return;
+      }
+
+      const mosqueName = document.getElementById('mosqueName')?.value || "Nama Masjid";
       const mosqueCity = document.getElementById('mosqueCity')?.value || "Bandar Lampung";
       const mosqueAddr = document.getElementById('mosqueAddress')?.value || "";
       const themeKey = document.getElementById('selectedThemeKey')?.value || "JAMID_CYAN";
-      const themeTitle = THEME_PALETTES[themeKey]?.title || "Toska Cyan";
+      const themeTitle = THEME_PALETTES[themeKey]?.title || "Tema 1";
       const layoutKey = document.getElementById('selectedLayoutKey')?.value || "JAMID_APP";
-      const layoutTitle = LAYOUT_TITLES[layoutKey] || "Layout Standar";
+      const layoutTitle = LAYOUT_TITLES[layoutKey] || "Layout 1";
 
       // Header and Hero elements
       const hMosque = document.getElementById('headerMosqueName');
@@ -2196,6 +2221,10 @@
 
     // --- Tab Switching Logic ---
     function switchTab(tabKey) {
+      if (currentUserRole === "SUPER_ADMIN") {
+        applyUserRoleUI("SUPER_ADMIN", currentUserEmail, currentMasjidId);
+        return;
+      }
       const info = SECTION_TITLES[tabKey] || { title: tabKey, icon: "fa-shapes", color: "text-white" };
       const titleEl = document.getElementById('currentSectionTitle');
       if (titleEl) {
@@ -2307,6 +2336,8 @@
         unsubscribeFirestore = null;
       }
 
+      if (currentUserRole === "SUPER_ADMIN") return;
+
       const database = getDb();
       if (!database) return;
       updateStatusBadge(true, `Menghubungkan (${currentMasjidId})...`);
@@ -2402,6 +2433,7 @@
     // --- Populate Form from Remote Cloud Snapshot ---
     function populateForm(data) {
       if (!data) return;
+      if (currentUserRole === "SUPER_ADMIN") return;
 
       if (data.profile) {
         document.getElementById('mosqueName').value = data.profile.name || "";
@@ -2481,10 +2513,12 @@
           if (document.getElementById('khutbahDateOrPeriod')) document.getElementById('khutbahDateOrPeriod').value = fk.dateOrPeriod || "";
         }
 
-        if (cfg.quotes && Array.isArray(cfg.quotes) && cfg.quotes.length > 0) {
+        if (cfg.quotes && Array.isArray(cfg.quotes)) {
           activeQuotesList = cfg.quotes;
-          renderQuotesCards();
+        } else {
+          activeQuotesList = [];
         }
+        renderQuotesCards();
       }
 
       if (data.runningTexts && data.runningTexts.length > 0) {
@@ -2551,6 +2585,10 @@
 
     // --- Save Everything to Firebase Firestore ---
     async function saveAllToCloud() {
+      if (currentUserRole === "SUPER_ADMIN") {
+        showToast("Super Admin hanya berfokus pada pendaftaran akun dan lisensi TV, bukan konten masjid.", "warning");
+        return;
+      }
       const database = getDb();
       if (!database) {
         alert("Firebase belum terhubung. Periksa koneksi internet Anda.");
@@ -2906,7 +2944,7 @@
       const name = prompt("Masukkan Nama Masjid Baru:\n(Contoh: Masjid Al-Ikhlas)");
       if (!name || !name.trim()) return;
       const defaultId = "masjid_" + name.trim().toLowerCase().replace(/[^a-z0-9]/g, '_').substring(0, 15);
-      const idInput = prompt("Masukkan ID Kode Masjid untuk TV & Web:\n(Contoh: masjid_002, masjid_alikhlas)", defaultId);
+      const idInput = prompt("Masukkan ID Kode Masjid untuk TV & Web:\n(Contoh: masjid_annur, masjid_alikhlas)", defaultId);
       if (!idInput || !idInput.trim()) return;
       const cleanId = idInput.trim().toLowerCase().replace(/[^a-z0-9_-]/g, '');
       if (!cleanId) return;
@@ -3818,21 +3856,43 @@
 
     function applyUserRoleUI(role, email, masjidId) {
       const roleBadgeText = document.getElementById('userProfileHeaderText');
-      const superAdminCard = document.getElementById('superAdminRegistrationCard');
-      const superAdminList = document.getElementById('superAdminMosqueListCard');
+      const superAdminPortal = document.getElementById('superAdminPortalView');
+      const dkmDashboard = document.getElementById('dashboardHomeView');
+      const sectionDetail = document.getElementById('sectionDetailView');
+      const btnSave = document.getElementById('btnSaveAll');
       const headerSelectContainer = document.getElementById('headerMasjidSelectContainer');
+      const headerMosqueName = document.getElementById('headerMosqueName');
+      const liveSyncBanner = document.getElementById('liveSyncBanner');
+      const licenseBadge = document.getElementById('licenseBadgeHeader');
 
       if (role === "SUPER_ADMIN") {
-        if (roleBadgeText) roleBadgeText.innerText = "Super Admin";
-        if (superAdminCard) superAdminCard.classList.remove('hidden');
-        if (superAdminList) superAdminList.classList.remove('hidden');
-        if (headerSelectContainer) headerSelectContainer.classList.remove('hidden');
-      } else {
-        // DKM Client
-        if (roleBadgeText) roleBadgeText.innerText = "DKM: " + (email ? email.split('@')[0] : masjidId);
-        if (superAdminCard) superAdminCard.classList.add('hidden');
-        if (superAdminList) superAdminList.classList.add('hidden');
+        if (roleBadgeText) roleBadgeText.innerHTML = '<i class="fa-solid fa-crown text-gold-400 mr-1"></i> Super Admin';
+        if (headerMosqueName) headerMosqueName.innerText = "Portal Super Admin (Pendaftaran Akun & Password)";
+        if (licenseBadge) {
+          licenseBadge.innerText = "SUPER ADMIN";
+          licenseBadge.className = "px-2 py-0.5 text-[10px] font-bold tracking-wider uppercase bg-amber-950 text-gold-300 border border-gold-600/50 rounded-full";
+        }
+        if (superAdminPortal) superAdminPortal.classList.remove('hidden');
+        if (dkmDashboard) dkmDashboard.classList.add('hidden');
+        if (sectionDetail) sectionDetail.classList.add('hidden');
+        if (btnSave) btnSave.classList.add('hidden');
         if (headerSelectContainer) headerSelectContainer.classList.add('hidden');
+        if (liveSyncBanner) liveSyncBanner.classList.add('hidden');
+        loadAllMasjidsFromFirestore();
+      } else {
+        // DKM Client (Admin Pengurus Masjid Terdaftar)
+        const dkmName = email ? email.split('@')[0] : masjidId;
+        if (roleBadgeText) roleBadgeText.innerHTML = `<i class="fa-solid fa-circle-user text-brand-400 mr-1"></i> DKM: ${escapeHtml(dkmName)}`;
+        if (licenseBadge) {
+          licenseBadge.innerText = "PRO ACTIVE";
+          licenseBadge.className = "px-2 py-0.5 text-[10px] font-bold tracking-wider uppercase bg-brand-800/80 text-brand-200 border border-brand-600/50 rounded-full";
+        }
+        if (superAdminPortal) superAdminPortal.classList.add('hidden');
+        if (dkmDashboard) dkmDashboard.classList.remove('hidden');
+        if (sectionDetail) sectionDetail.classList.add('hidden');
+        if (btnSave) btnSave.classList.remove('hidden');
+        if (headerSelectContainer) headerSelectContainer.classList.add('hidden');
+        if (liveSyncBanner) liveSyncBanner.classList.remove('hidden');
       }
     }
 
@@ -3986,13 +4046,13 @@
         if (document.getElementById('regMosqueAddress')) document.getElementById('regMosqueAddress').value = "";
         if (document.getElementById('regMasjidId')) document.getElementById('regMasjidId').value = "";
 
-        // Beralih ke masjid yang baru didaftarkan
+        // Perbarui daftar masjid untuk Super Admin
         currentMasjidId = finalId;
         localStorage.setItem('jamid_active_masjid_id', currentMasjidId);
 
         await loadAllMasjidsFromFirestore();
-        await fetchMasjidFromFirestore(finalId);
-        showToast(`Alhamdulillah! Akun user '${email}' & masjid '${name}' (${finalId}) berhasil didaftarkan dengan status [${status}]. Seluruh isian awal bersih/kosong!`, "success");
+        applyUserRoleUI(currentUserRole, currentUserEmail, currentMasjidId);
+        showToast(`Alhamdulillah! Akun user '${email}' & masjid '${name}' (${finalId}) berhasil didaftarkan. Pengurus dapat langsung login dengan email & password tersebut!`, "success");
       } catch (err) {
         console.error("Gagal mendaftarkan masjid:", err);
         alert("Gagal mendaftarkan masjid: " + err.message);
@@ -4124,10 +4184,6 @@
             <button onclick="promptChangePassword('${m.id}', '${escapeHtml(userPass)}')" title="Ubah Password Akun Pengurus" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-slate-700 rounded-lg font-bold text-[11px] flex items-center space-x-1 transition-colors">
               <i class="fa-solid fa-key"></i>
               <span>Password</span>
-            </button>
-            <button onclick="changeTargetMasjid('${m.id}')" class="px-2.5 py-1.5 ${isCurrent ? 'bg-brand-600 text-white' : 'bg-slate-800 hover:bg-slate-700 text-slate-200'} rounded-lg font-bold text-[11px] flex items-center space-x-1 border border-slate-700 transition-colors">
-              <i class="fa-solid fa-tv"></i>
-              <span>${isCurrent ? 'Sedang Dikelola' : 'Kelola Konten'}</span>
             </button>
             <button onclick="deleteMosqueFromCloud('${m.id}')" title="Hapus Masjid Dari Cloud" class="px-2 py-1.5 bg-rose-950/80 hover:bg-rose-900 text-rose-300 border border-rose-800/80 rounded-lg font-bold text-[11px] flex items-center space-x-1 transition-colors">
               <i class="fa-solid fa-trash"></i>
@@ -4391,33 +4447,35 @@
     // 5. DIRECT INITIALIZATION
     // ==========================================
     try {
-      populateDefaultArRidho();
+      initAuthSession();
     } catch (err) {
-      console.warn("populateDefaultArRidho error:", err);
+      console.warn("initAuthSession error:", err);
     }
 
-    try {
-      setupRealtimeListener();
-    } catch (err) {
-      console.warn("setupRealtimeListener error:", err);
+    if (currentUserRole !== "SUPER_ADMIN") {
+      try {
+        populateDefaultArRidho();
+      } catch (err) {
+        console.warn("populateDefaultArRidho error:", err);
+      }
+
+      try {
+        setupRealtimeListener();
+      } catch (err) {
+        console.warn("setupRealtimeListener error:", err);
+      }
+
+      try {
+        updateDashboardSummary();
+      } catch (err) {
+        console.warn("updateDashboardSummary error:", err);
+      }
     }
 
     try {
       loadAllMasjidsFromFirestore();
     } catch (err) {
       console.warn("loadAllMasjidsFromFirestore error:", err);
-    }
-
-    try {
-      updateDashboardSummary();
-    } catch (err) {
-      console.warn("updateDashboardSummary error:", err);
-    }
-
-    try {
-      initAuthSession();
-    } catch (err) {
-      console.warn("initAuthSession error:", err);
     }
   </script>
 </body>
