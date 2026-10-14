@@ -169,7 +169,7 @@
         <div>
           <div class="flex items-center space-x-2">
             <h1 class="text-lg sm:text-xl font-bold tracking-tight text-white">JAMID <span class="text-gold-400 font-extrabold">ADMIN</span></h1>
-            <span id="licenseBadgeHeader" class="px-2 py-0.5 text-[10px] font-bold tracking-wider uppercase bg-brand-800/80 text-brand-200 border border-brand-600/50 rounded-full">PRO ACTIVE</span>
+            <span id="licenseBadgeHeader" class="px-2 py-0.5 text-[10px] font-bold tracking-wider uppercase bg-emerald-950 text-emerald-300 border border-emerald-700/60 rounded-full">PANEL PENGURUS</span>
           </div>
           <p id="headerMosqueName" class="text-xs text-brand-300/80 truncate max-w-[200px] sm:max-w-md">Masjid Ar-Ridho Kejati Lampung</p>
         </div>
@@ -521,7 +521,27 @@
             </div>
           </div>
 
-          <!-- 6. Alamat Lengkap Masjid -->
+          <!-- 6. Pengaturan Lisensi TV (Dikelola Penuh oleh Super Admin) -->
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block text-[11px] font-bold text-slate-200 mb-1 flex items-center justify-between">
+                <span><i class="fa-solid fa-key text-gold-400 mr-1"></i> Kode Lisensi TV:</span>
+                <button type="button" onclick="generateRandomRegLicenseCode()" class="text-[10px] text-gold-400 hover:text-gold-300 font-semibold">
+                  <i class="fa-solid fa-wand-magic-sparkles mr-0.5"></i> Buat Acak
+                </button>
+              </label>
+              <input type="text" id="regLicenseCode" placeholder="Contoh: JM-2026-ANNUR-01" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs font-mono text-gold-400 font-bold uppercase focus:outline-none focus:border-gold-500">
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold text-slate-200 mb-1">
+                <i class="fa-solid fa-calendar-check text-emerald-400 mr-1"></i>
+                <span>Masa Berlaku TV:</span>
+              </label>
+              <input type="date" id="regLicenseExpiry" value="2028-12-31" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none focus:border-emerald-500">
+            </div>
+          </div>
+
+          <!-- 7. Alamat Lengkap Masjid -->
           <div>
             <label class="block text-[11px] font-bold text-slate-200 mb-1">Alamat Lengkap (Opsional):</label>
             <input type="text" id="regMosqueAddress" placeholder="Bisa dikosongkan (diisi pengurus nanti)" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500">
@@ -798,24 +818,6 @@
               <i class="fa-solid fa-chevron-right text-[9px] group-hover:translate-x-0.5 transition-transform"></i>
             </div>
           </div>
-
-          <!-- Card 11: Status Lisensi TV -->
-          <div onclick="openMenuFromDashboard('license')" class="cursor-pointer group rounded-2xl bg-slate-900/90 hover:bg-slate-800/90 border border-slate-800 hover:border-gold-500/50 p-4 transition-all duration-200 shadow-lg hover:shadow-gold-950/40 flex flex-col justify-between space-y-3 col-span-2 md:col-span-1">
-            <div class="flex items-start justify-between">
-              <div class="w-10 h-10 rounded-xl bg-gold-500/20 text-gold-400 flex items-center justify-center text-lg shadow-md group-hover:scale-105 transition-transform">
-                <i class="fa-solid fa-tv"></i>
-              </div>
-              <span id="dashBadgeLicense" class="text-[10px] px-2 py-0.5 rounded-full bg-amber-950 text-gold-300 border border-gold-800/60 font-bold">Lisensi TV</span>
-            </div>
-            <div>
-              <h4 class="text-sm font-bold text-white group-hover:text-gold-300 transition-colors">11. Status Lisensi TV</h4>
-              <p class="text-[11px] text-slate-400 mt-0.5 line-clamp-2">Informasi aktivasi & kode lisensi layar TV</p>
-            </div>
-            <div class="flex items-center text-[10px] font-bold text-gold-400 space-x-1 pt-1 border-t border-slate-800/60">
-              <span>Buka Menu</span>
-              <i class="fa-solid fa-chevron-right text-[9px] group-hover:translate-x-0.5 transition-transform"></i>
-            </div>
-          </div>
         </div>
       </div>
     </div> <!-- END OF dashboardHomeView -->
@@ -861,7 +863,6 @@
             <option value="qris">📱 7. Rekening Bank & QRIS</option>
             <option value="media">🎥 8. Siaran Media / YouTube</option>
             <option value="system">🛡️ 9. Sistem & PIN Pengurus</option>
-            <option value="license">👑 10. Lisensi & Super Admin</option>
           </select>
         </div>
       </div>
@@ -903,10 +904,6 @@
         <button onclick="switchTab('system')" id="tab-btn-system" class="tab-btn flex items-center space-x-2 px-3.5 py-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent whitespace-nowrap active:scale-95 transition-all">
           <i class="fa-solid fa-shield-halved text-blue-400"></i>
           <span>9. Sistem & PIN</span>
-        </button>
-        <button onclick="switchTab('license')" id="tab-btn-license" class="tab-btn flex items-center space-x-2 px-3.5 py-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent whitespace-nowrap active:scale-95 transition-all">
-          <i class="fa-solid fa-crown text-gold-400"></i>
-          <span>10. Lisensi Super</span>
         </button>
       </div>
 
@@ -1839,128 +1836,6 @@
       </div>
     </div>
 
-    <!-- ========================================== -->
-    <!-- TAB 10: PENDAFTARAN & APPROVAL MASJID      -->
-    <!-- ========================================== -->
-    <div id="tab-license" class="tab-content hidden space-y-6">
-      <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 sm:p-6">
-        <div class="flex items-center justify-between border-b border-slate-800 pb-4 mb-5">
-          <div>
-            <h2 class="text-base sm:text-lg font-bold text-white flex items-center space-x-2">
-              <i class="fa-solid fa-crown text-gold-400"></i>
-              <span>Pendaftaran & Persetujuan Masjid (Super Admin)</span>
-            </h2>
-            <p class="text-xs text-slate-400 mt-1">Super Admin mendaftarkan email pemesan, nama masjid, dan lokasi. APK TV akan otomatis sinkron saat pengguna memasukkan email ini.</p>
-          </div>
-          <span id="licenseStatusBadge" class="px-3 py-1 bg-emerald-950 text-emerald-300 border border-emerald-700/60 rounded-xl text-xs font-black tracking-wider uppercase">ACTIVE</span>
-        </div>
-
-        <!-- 1. STATUS LISENSI MASJID YANG SEDANG AKTIF -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
-          <div class="bg-slate-950 border border-slate-800 p-4 rounded-xl space-y-3 text-xs">
-            <!-- Multi-Tenant Masjid Selector -->
-            <div>
-              <label class="block text-[11px] font-bold text-emerald-400 mb-1 flex items-center space-x-1.5">
-                <i class="fa-solid fa-building-columns"></i>
-                <span>Masjid Aktif Saat Ini:</span>
-              </label>
-              <div class="flex items-center space-x-2">
-                <select id="superAdminMasjidSelect" onchange="changeTargetMasjid(this.value)" class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs font-mono font-bold text-white focus:outline-none focus:border-brand-500">
-                  <option value="masjid_001">masjid_001 (Masjid Ar-Ridho Kejati Lampung)</option>
-                </select>
-              </div>
-            </div>
-
-            <div class="flex justify-between items-center py-1.5 border-b border-slate-800/80">
-              <span class="text-slate-400">Email Pemesan Terdaftar</span>
-              <span id="licenseEmailDisplay" class="font-mono font-bold text-emerald-400 text-xs truncate max-w-[180px]">samkidproject@gmail.com</span>
-            </div>
-            <div class="flex justify-between items-center py-1.5 border-b border-slate-800/80">
-              <span class="text-slate-400">Kode Lisensi TV</span>
-              <span id="licenseCodeDisplay" class="font-mono font-bold text-gold-400 text-sm">JM-2026-DEV-PREMIUM</span>
-            </div>
-            <div class="flex justify-between items-center py-1.5 border-b border-slate-800/80">
-              <span class="text-slate-400">Masa Berlaku Lisensi</span>
-              <span id="licenseExpiryDisplay" class="font-semibold text-white">2028-12-31</span>
-            </div>
-
-            <!-- Hardware Device Binding Status -->
-            <div class="pt-1 space-y-1.5">
-              <div class="flex justify-between items-center">
-                <span class="text-slate-400">Kunci Perangkat TV Terikat:</span>
-                <button type="button" onclick="resetBoundDevice()" class="text-[10px] text-rose-400 hover:text-rose-300 font-bold underline flex items-center space-x-1">
-                  <i class="fa-solid fa-arrows-rotate"></i>
-                  <span>Reset Kunci TV</span>
-                </button>
-              </div>
-              <div class="p-2 bg-slate-900 rounded-lg border border-slate-800 font-mono text-[11px] text-cyan-300 flex items-center justify-between">
-                <span id="licenseDeviceDisplay" class="truncate max-w-[200px]">TV-ANDROID-DEFAULT</span>
-                <span id="deviceLockStatusBadge" class="text-[9px] px-1.5 py-0.5 rounded bg-cyan-950 text-cyan-400 border border-cyan-800">LOCKED</span>
-              </div>
-              <p class="text-[10px] text-slate-500">1 Lisensi terkunci otomatis ke TV pengguna saat pertama kali aktivasi.</p>
-            </div>
-          </div>
-
-          <!-- Form Update / Aktivasi Lisensi Baru Super Admin -->
-          <div class="bg-slate-950 border border-slate-800 p-4 rounded-xl space-y-3">
-            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center space-x-1.5">
-              <i class="fa-solid fa-sliders text-gold-400"></i>
-              <span>Pengaturan Cepat Lisensi Masjid Aktif</span>
-            </h4>
-            
-            <div>
-              <div class="flex justify-between items-center mb-1">
-                <label class="text-[11px] font-semibold text-slate-400">Email Pemesan</label>
-              </div>
-              <input type="email" id="inputClientEmail" placeholder="Email pemesan/pengurus" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-brand-500">
-            </div>
-
-            <div>
-              <div class="flex justify-between items-center mb-1">
-                <label class="text-[11px] font-semibold text-slate-400">Kode Lisensi TV</label>
-                <button type="button" onclick="generateRandomLicenseCode()" class="text-[10px] text-gold-400 hover:text-gold-300 font-bold flex items-center space-x-1">
-                  <i class="fa-solid fa-wand-magic-sparkles"></i>
-                  <span>Generate Kode</span>
-                </button>
-              </div>
-              <input type="text" id="inputNewLicenseCode" placeholder="Contoh: JM-2026-ALIKHLAS-01" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-brand-500 uppercase">
-            </div>
-
-            <div class="grid grid-cols-2 gap-3">
-              <div>
-                <label class="block text-[11px] font-semibold text-slate-400 mb-1">Status Layar TV</label>
-                <select id="selectLicenseStatus" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-500 font-semibold">
-                  <option value="ACTIVE" class="text-emerald-400">ACTIVE (TV Normal)</option>
-                  <option value="TRIAL" class="text-amber-400">TRIAL (Uji Coba)</option>
-                  <option value="INACTIVE" class="text-rose-400">INACTIVE (Kunci Layar TV)</option>
-                </select>
-              </div>
-              <div>
-                <label class="block text-[11px] font-semibold text-slate-400 mb-1">Masa Berlaku</label>
-                <input type="date" id="inputLicenseExpiry" value="2028-12-31" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none focus:border-brand-500">
-              </div>
-            </div>
-
-            <button type="button" onclick="applyLicenseUpdate()" class="w-full bg-gradient-to-r from-gold-600 to-amber-600 hover:from-gold-500 hover:to-amber-500 text-slate-950 font-black text-xs py-2.5 rounded-xl shadow-lg shadow-gold-950/50 flex items-center justify-center space-x-1.5 active:scale-95 transition-all">
-              <i class="fa-solid fa-floppy-disk"></i>
-              <span>Simpan Perubahan Lisensi</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- Panduan Bisnis / Monetisasi -->
-        <div class="p-4 rounded-xl bg-gradient-to-r from-brand-950/80 to-slate-900 border border-brand-800/40 text-xs text-slate-300 leading-relaxed">
-          <h4 class="font-bold text-white flex items-center space-x-2 mb-1.5">
-            <i class="fa-solid fa-coins text-gold-400"></i>
-            <span>Sistem Multi-Pengurus JAMID Signage:</span>
-          </h4>
-          <p>
-            Alur ini memungkinkan Anda menjual aplikasi ke banyak masjid: Super Admin mendaftarkan email pemesan, nama masjid, dan lokasi. 
-            Pengurus masjid login ke web ini dengan emailnya untuk mengelola konten masjid mereka sendiri, dan memasang aplikasi TV di masjid dengan memasukkan email yang sama hanya sekali saat awal pemasangan.
-          </p>
-        </div>
-      </div>
-      </div> <!-- END OF tab-license -->
     </div> <!-- END OF sectionDetailView -->
 
   </main>
@@ -2093,14 +1968,17 @@
       financial: { title: "6. Laporan Kas Masjid", icon: "fa-wallet", color: "text-teal-400" },
       qris: { title: "7. Rekening Bank & QRIS", icon: "fa-qrcode", color: "text-violet-400" },
       media: { title: "8. Siaran Media / YouTube", icon: "fa-video", color: "text-red-400" },
-      system: { title: "9. Sistem & PIN Pengurus", icon: "fa-shield-halved", color: "text-blue-400" },
-      license: { title: "11. Status Lisensi TV", icon: "fa-tv", color: "text-gold-400" }
+      system: { title: "9. Sistem & PIN Pengurus", icon: "fa-shield-halved", color: "text-blue-400" }
     };
 
     // --- Dashboard & Menu Navigation Logic ---
     function openMenuFromDashboard(tabKey, subTarget) {
       if (currentUserRole === "SUPER_ADMIN") {
         applyUserRoleUI("SUPER_ADMIN", currentUserEmail, currentMasjidId);
+        return;
+      }
+      if (tabKey === 'license') {
+        showToast("Status & pengaturan lisensi TV dikelola sepenuhnya oleh Super Admin.", "info");
         return;
       }
       const dash = document.getElementById('dashboardHomeView');
@@ -2212,17 +2090,17 @@
         const ytOn = document.getElementById('ytActive')?.checked;
         bYt.innerText = ytOn ? "Live On" : "Off";
       }
-
-      const bLic = document.getElementById('dashBadgeLicense');
-      if (bLic) {
-        bLic.innerText = currentMasjidId;
-      }
     }
 
     // --- Tab Switching Logic ---
     function switchTab(tabKey) {
       if (currentUserRole === "SUPER_ADMIN") {
         applyUserRoleUI("SUPER_ADMIN", currentUserEmail, currentMasjidId);
+        return;
+      }
+      if (tabKey === 'license') {
+        showToast("Status & pengaturan lisensi TV dikelola sepenuhnya oleh Super Admin.", "info");
+        backToDashboard();
         return;
       }
       const info = SECTION_TITLES[tabKey] || { title: tabKey, icon: "fa-shapes", color: "text-white" };
@@ -2420,9 +2298,12 @@
       document.getElementById('hijriAdjustmentInput').value = 0;
       document.getElementById('allowTvAdminAccessCheck').checked = true;
 
-      document.getElementById('inputNewLicenseCode').value = "JM-" + (currentMasjidId || "BARU").toUpperCase();
-      document.getElementById('licenseCodeDisplay').innerText = "JM-" + (currentMasjidId || "BARU").toUpperCase();
-      document.getElementById('licenseStatusBadge').innerText = "ACTIVE";
+      const inLic = document.getElementById('inputNewLicenseCode');
+      if (inLic) inLic.value = "JM-" + (currentMasjidId || "BARU").toUpperCase();
+      const dispLic = document.getElementById('licenseCodeDisplay');
+      if (dispLic) dispLic.innerText = "JM-" + (currentMasjidId || "BARU").toUpperCase();
+      const badgeLic = document.getElementById('licenseStatusBadge');
+      if (badgeLic) badgeLic.innerText = "ACTIVE";
     }
 
     // Alias kompatibilitas
@@ -2566,16 +2447,7 @@
         document.getElementById('qrisAccountName').value = "";
       }
 
-      if (data.license) {
-        const lic = data.license;
-        document.getElementById('licenseCodeDisplay').innerText = lic.licenseCode || "JM-2026-DEV-PREMIUM";
-        document.getElementById('inputNewLicenseCode').value = lic.licenseCode || "JM-2026-DEV-PREMIUM";
-        document.getElementById('licenseStatusBadge').innerText = lic.status || "ACTIVE";
-        document.getElementById('selectLicenseStatus').value = lic.status || "ACTIVE";
-        document.getElementById('licenseExpiryDisplay').innerText = lic.expiryDate || "2028-12-31";
-        document.getElementById('inputLicenseExpiry').value = lic.expiryDate || "2028-12-31";
-        if (lic.deviceId) document.getElementById('licenseDeviceDisplay').innerText = lic.deviceId;
-      }
+      // License data sepenuhnya dikelola oleh Super Admin dan tidak ditampilkan di panel pengurus
     }
 
     function resetRunningTextDefault() {
@@ -2802,21 +2674,17 @@
           });
         }
 
-        // 8. License Data
-        const licenseCode = document.getElementById('inputNewLicenseCode').value.trim() || "JM-2026-DEV-PREMIUM";
-        const licenseStatus = document.getElementById('selectLicenseStatus').value || "ACTIVE";
-        const licenseExpiry = document.getElementById('inputLicenseExpiry').value || "2028-12-31";
-
+        // 8. License Data (Dikelola penuh oleh Super Admin, jangan ditimpa atau dibaca dari form pengurus)
         const targetMasjidDoc = currentMasjidId || "masjid_001";
-        const license = {
-          licenseCode: licenseCode,
-          status: licenseStatus,
-          deviceId: (activeData && activeData.license && activeData.license.deviceId) ? activeData.license.deviceId : "",
+        const license = (activeData && activeData.license) ? { ...activeData.license } : {
+          licenseCode: "JM-" + targetMasjidDoc.replace(/[^a-zA-Z0-9]/g, '').toUpperCase(),
+          status: "ACTIVE",
+          deviceId: "",
           masjidId: targetMasjidDoc,
-          activationDate: (activeData && activeData.license && activeData.license.activationDate) ? activeData.license.activationDate : "2026-09-01",
-          expiryDate: licenseExpiry,
+          expiryDate: "2028-12-31",
           lastSync: "Cloud Firestore Synced (" + targetMasjidDoc + ")"
         };
+        license.masjidId = targetMasjidDoc;
 
         const payload = {
           profile: profile,
@@ -2906,8 +2774,10 @@
             address: prof.address || "",
             userEmail: lic.userEmail || "",
             userPassword: lic.userPassword || data.appConfig?.adminPin || "",
-            licenseCode: lic.licenseCode || "",
+            licenseCode: lic.licenseCode || ("JM-" + doc.id.toUpperCase()),
             licenseStatus: lic.status || "ACTIVE",
+            expiryDate: lic.expiryDate || "2028-12-31",
+            deviceId: lic.deviceId || "",
             approvedBy: lic.approvedBy || ""
           });
         });
@@ -3884,8 +3754,8 @@
         const dkmName = email ? email.split('@')[0] : masjidId;
         if (roleBadgeText) roleBadgeText.innerHTML = `<i class="fa-solid fa-circle-user text-brand-400 mr-1"></i> DKM: ${escapeHtml(dkmName)}`;
         if (licenseBadge) {
-          licenseBadge.innerText = "PRO ACTIVE";
-          licenseBadge.className = "px-2 py-0.5 text-[10px] font-bold tracking-wider uppercase bg-brand-800/80 text-brand-200 border border-brand-600/50 rounded-full";
+          licenseBadge.innerText = "PANEL PENGURUS";
+          licenseBadge.className = "px-2 py-0.5 text-[10px] font-bold tracking-wider uppercase bg-emerald-950 text-emerald-300 border border-emerald-700/60 rounded-full";
         }
         if (superAdminPortal) superAdminPortal.classList.add('hidden');
         if (dkmDashboard) dkmDashboard.classList.remove('hidden');
@@ -3917,6 +3787,22 @@
       if (idInp && (!idInp.value || idInp.value.startsWith("masjid_"))) {
         idInp.value = clean;
       }
+      const codeInp = document.getElementById('regLicenseCode');
+      if (codeInp && (!codeInp.value || codeInp.value.startsWith("JM-"))) {
+        const shortName = name.trim().toUpperCase().replace(/[^A-Z0-9]/g, '').substring(0, 8);
+        const year = new Date().getFullYear();
+        codeInp.value = `JM-${year}-${shortName}`;
+      }
+    }
+
+    function generateRandomRegLicenseCode() {
+      const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+      let part = "";
+      for (let i = 0; i < 6; i++) part += chars.charAt(Math.floor(Math.random() * chars.length));
+      const year = new Date().getFullYear();
+      const code = `JM-${year}-${part}`;
+      const input = document.getElementById('regLicenseCode');
+      if (input) input.value = code;
     }
 
     function handleRegCitySelect(cityName) {
@@ -3956,6 +3842,8 @@
       const idInput = document.getElementById('regMasjidId')?.value.trim().toLowerCase().replace(/[^a-z0-9_-]/g, '');
       const status = document.getElementById('regApprovalStatus')?.value || "APPROVED";
       const address = document.getElementById('regMosqueAddress')?.value.trim() || "";
+      const customCode = document.getElementById('regLicenseCode')?.value.trim();
+      const customExpiry = document.getElementById('regLicenseExpiry')?.value.trim() || "2028-12-31";
 
       if (!email || !email.includes('@')) {
         alert("Harap masukkan alamat email pemesan / pengurus yang valid.");
@@ -3970,6 +3858,7 @@
         return;
       }
       const finalId = idInput || ("masjid_" + name.toLowerCase().replace(/[^a-z0-9]/g, '_').substring(0, 15));
+      const finalLicenseCode = customCode ? customCode.toUpperCase() : ("JM-" + finalId.replace(/[^a-zA-Z0-9]/g, '').toUpperCase());
 
       const database = getDb();
       if (!database) {
@@ -3997,7 +3886,7 @@
           isLogoEnabled: false
         },
         license: {
-          licenseCode: "JM-" + finalId.replace(/[^a-zA-Z0-9]/g, '').toUpperCase(),
+          licenseCode: finalLicenseCode,
           status: status,
           userEmail: email,
           userPassword: password,
@@ -4005,7 +3894,7 @@
           deviceId: "",
           masjidId: finalId,
           activationDate: today,
-          expiryDate: "2028-12-31",
+          expiryDate: customExpiry,
           lastSync: `Didaftarkan Super Admin (${status})`
         },
         appConfig: {
@@ -4045,6 +3934,8 @@
         if (document.getElementById('regMosqueName')) document.getElementById('regMosqueName').value = "";
         if (document.getElementById('regMosqueAddress')) document.getElementById('regMosqueAddress').value = "";
         if (document.getElementById('regMasjidId')) document.getElementById('regMasjidId').value = "";
+        if (document.getElementById('regLicenseCode')) document.getElementById('regLicenseCode').value = "";
+        if (document.getElementById('regLicenseExpiry')) document.getElementById('regLicenseExpiry').value = "2028-12-31";
 
         // Perbarui daftar masjid untuk Super Admin
         currentMasjidId = finalId;
@@ -4148,7 +4039,7 @@
           '<span class="px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider bg-rose-950 text-rose-300 border border-rose-700/60">SUSPENDED</span>';
 
         card.innerHTML = `
-          <div class="space-y-1.5">
+          <div class="space-y-1.5 flex-1">
             <div class="flex items-center space-x-2">
               <span class="font-bold text-white text-sm">${escapeHtml(m.name)}</span>
               <span class="font-mono text-[10px] text-slate-400">(${escapeHtml(m.id)})</span>
@@ -4168,8 +4059,23 @@
                 <span>${escapeHtml(m.city || "-")}</span>
               </span>
             </div>
+            <!-- Informasi Lisensi TV (Dikelola Eksklusif oleh Super Admin) -->
+            <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] pt-1.5 border-t border-slate-800/60 text-slate-400">
+              <span class="flex items-center space-x-1">
+                <i class="fa-solid fa-id-badge text-gold-400"></i>
+                <span>Kode TV: <b class="font-mono font-bold text-gold-300">${escapeHtml(m.licenseCode || "-")}</b></span>
+              </span>
+              <span class="flex items-center space-x-1">
+                <i class="fa-solid fa-calendar-check text-emerald-400"></i>
+                <span>Masa Berlaku: <b class="text-white">${escapeHtml(m.expiryDate || "2028-12-31")}</b></span>
+              </span>
+              <span class="flex items-center space-x-1">
+                <i class="fa-solid fa-tv text-cyan-400"></i>
+                <span>${m.deviceId ? '<b class="text-amber-300 font-mono text-[10px] bg-slate-950 px-1.5 py-0.5 rounded border border-amber-900/60">🔒 Terkunci: ' + escapeHtml(m.deviceId) + '</b>' : '<span class="text-emerald-400 text-[10px] bg-slate-950 px-1.5 py-0.5 rounded border border-emerald-900/60 font-semibold">🔓 Siap Dipasang di TV Baru</span>'}</span>
+              </span>
+            </div>
           </div>
-          <div class="flex flex-wrap items-center gap-1.5 self-end sm:self-auto">
+          <div class="flex flex-wrap items-center gap-1.5 self-end sm:self-auto shrink-0">
             ${isPending ? `
               <button onclick="toggleMosqueApproval('${m.id}', 'APPROVED')" class="px-2.5 py-1.5 bg-emerald-700 hover:bg-emerald-600 text-white rounded-lg font-bold text-[11px] flex items-center space-x-1 shadow transition-colors">
                 <i class="fa-solid fa-check"></i>
@@ -4185,6 +4091,18 @@
               <i class="fa-solid fa-key"></i>
               <span>Password</span>
             </button>
+            <button onclick="promptChangeExpiry('${m.id}', '${escapeHtml(m.expiryDate || '2028-12-31')}')" title="Ubah Masa Berlaku Lisensi TV" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-gold-300 border border-slate-700 rounded-lg font-bold text-[11px] flex items-center space-x-1 transition-colors">
+              <i class="fa-solid fa-calendar-days"></i>
+              <span>Masa Berlaku</span>
+            </button>
+            <button onclick="resetBoundDeviceForMasjid('${m.id}')" title="Reset Kunci Perangkat TV" class="px-2.5 py-1.5 bg-slate-800 hover:bg-rose-950/80 text-rose-300 border border-slate-700 rounded-lg font-bold text-[11px] flex items-center space-x-1 transition-colors">
+              <i class="fa-solid fa-arrows-rotate"></i>
+              <span>Reset TV</span>
+            </button>
+            <button onclick="promptChangeLicenseCode('${m.id}', '${escapeHtml(m.licenseCode || '')}')" title="Ubah Kode Lisensi TV" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-teal-300 border border-slate-700 rounded-lg font-bold text-[11px] flex items-center space-x-1 transition-colors">
+              <i class="fa-solid fa-barcode"></i>
+              <span>Kode TV</span>
+            </button>
             <button onclick="deleteMosqueFromCloud('${m.id}')" title="Hapus Masjid Dari Cloud" class="px-2 py-1.5 bg-rose-950/80 hover:bg-rose-900 text-rose-300 border border-rose-800/80 rounded-lg font-bold text-[11px] flex items-center space-x-1 transition-colors">
               <i class="fa-solid fa-trash"></i>
               <span>Hapus</span>
@@ -4193,6 +4111,77 @@
         `;
         container.appendChild(card);
       });
+    }
+
+    async function promptChangeExpiry(masjidId, currentExpiry) {
+      const newDate = prompt(`Atur Masa Berlaku Lisensi TV untuk masjid '${masjidId}' (Format: YYYY-MM-DD):`, currentExpiry || "2028-12-31");
+      if (newDate === null) return;
+      if (!newDate.trim()) {
+        alert("Tanggal masa berlaku tidak boleh kosong.");
+        return;
+      }
+      const database = getDb();
+      if (!database) return;
+      try {
+        await database.collection("masjids").doc(masjidId).set({
+          license: {
+            expiryDate: newDate.trim(),
+            lastSync: `Masa berlaku diubah Super Admin (${newDate.trim()}) pada ${new Date().toLocaleString('id-ID')}`
+          }
+        }, { merge: true });
+        await loadAllMasjidsFromFirestore();
+        showToast(`Masa berlaku lisensi '${masjidId}' berhasil diubah ke: ${newDate.trim()}`, "success");
+      } catch (err) {
+        showToast("Gagal mengubah masa berlaku: " + err.message, "error");
+      }
+    }
+
+    async function resetBoundDeviceForMasjid(masjidId) {
+      if (!confirm(`Reset kunci perangkat TV untuk masjid '${masjidId}'?\n\nTV baru akan diizinkan mengikat akun/lisensi ini saat aplikasi dinyalakan.`)) {
+        return;
+      }
+      const database = getDb();
+      if (!database) return;
+      try {
+        await database.collection("masjids").doc(masjidId).set({
+          license: {
+            deviceId: "",
+            lastSync: `Kunci TV direset Super Admin pada ${new Date().toLocaleString('id-ID')}`
+          }
+        }, { merge: true });
+        await loadAllMasjidsFromFirestore();
+        showToast(`Kunci TV masjid '${masjidId}' berhasil di-reset! TV baru kini siap aktivasi.`, "success");
+      } catch (err) {
+        showToast("Gagal reset kunci TV: " + err.message, "error");
+      }
+    }
+
+    async function promptChangeLicenseCode(masjidId, currentCode) {
+      const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+      let r = "";
+      for (let i = 0; i < 4; i++) r += chars.charAt(Math.floor(Math.random() * chars.length));
+      const suggested = `JM-${new Date().getFullYear()}-${r}`;
+      const newCode = prompt(`Masukkan Kode Lisensi TV untuk masjid '${masjidId}':\n(Contoh: ${suggested})`, currentCode || suggested);
+      if (newCode === null) return;
+      if (!newCode.trim()) {
+        alert("Kode lisensi tidak boleh kosong.");
+        return;
+      }
+      const cleanCode = newCode.trim().toUpperCase();
+      const database = getDb();
+      if (!database) return;
+      try {
+        await database.collection("masjids").doc(masjidId).set({
+          license: {
+            licenseCode: cleanCode,
+            lastSync: `Kode lisensi diubah Super Admin (${cleanCode}) pada ${new Date().toLocaleString('id-ID')}`
+          }
+        }, { merge: true });
+        await loadAllMasjidsFromFirestore();
+        showToast(`Kode lisensi masjid '${masjidId}' berhasil diubah ke: ${cleanCode}`, "success");
+      } catch (err) {
+        showToast("Gagal mengubah kode lisensi: " + err.message, "error");
+      }
     }
 
     function setMediaPreset(url, title) {
@@ -4397,36 +4386,14 @@
     }
 
     // ==========================================
-    // 4F. TAB 10: SUPER ADMIN & LICENSE CONTROLS
+    // 4F. SUPER ADMIN LICENSE CONTROLS (DELEGATES)
     // ==========================================
     function resetBoundDevice() {
-      if (confirm("Reset kunci perangkat TV? Ini akan mengizinkan perangkat TV baru mengikat kode lisensi ini saat aplikasi dinyalakan.")) {
-        if (activeData && activeData.license) {
-          activeData.license.deviceId = "";
-        }
-        const devDisplay = document.getElementById('licenseDeviceDisplay');
-        const badge = document.getElementById('deviceLockStatusBadge');
-        if (devDisplay) devDisplay.innerText = "UNBOUND (Siap Digunakan di TV Baru)";
-        if (badge) {
-          badge.innerText = "UNLOCKED";
-          badge.className = "text-[9px] px-1.5 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-800";
-        }
-        saveAllToCloud();
-        showToast("Kunci perangkat TV berhasil di-reset! TV baru kini dapat mengaktifkan lisensi ini.", "success");
-      }
+      resetBoundDeviceForMasjid(currentMasjidId);
     }
 
     function generateRandomLicenseCode() {
-      const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-      let part1 = "";
-      let part2 = "";
-      for (let i = 0; i < 4; i++) part1 += chars.charAt(Math.floor(Math.random() * chars.length));
-      for (let i = 0; i < 4; i++) part2 += chars.charAt(Math.floor(Math.random() * chars.length));
-      const year = new Date().getFullYear();
-      const code = `JM-${year}-${part1}-${part2}`;
-      const input = document.getElementById('inputNewLicenseCode');
-      if (input) input.value = code;
-      showToast("Kode lisensi acak dibuat: " + code, "info");
+      generateRandomRegLicenseCode();
     }
 
     function changeTargetMasjid(newId) {
